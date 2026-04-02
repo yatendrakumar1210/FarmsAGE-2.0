@@ -75,7 +75,10 @@ const Offers = () => {
                   </div>
                 </div>
 
-                <button className="bg-white text-slate-900 px-6 py-3 rounded-2xl font-bold text-sm hover:bg-emerald-50 transition-colors shadow-lg shadow-black/10 active:scale-95">
+                <button 
+                  onClick={() => window.location.href = '/category/all'}
+                  className="bg-white text-slate-900 px-6 py-3 rounded-2xl font-bold text-sm hover:bg-emerald-50 transition-colors shadow-lg shadow-black/10 active:scale-95"
+                >
                   Claim Now
                 </button>
               </div>

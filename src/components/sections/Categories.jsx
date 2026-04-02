@@ -4,6 +4,14 @@ import { ArrowRight } from "lucide-react";
 
 const categories = [
   {
+    name: "All Products",
+    image: "https://images.unsplash.com/photo-1542838132-92c53300491e",
+    path: "all",
+    color: "bg-indigo-50",
+    border: "border-indigo-100",
+    textColor: "text-indigo-700",
+  },
+  {
     name: "Fresh Fruits",
     image: "https://images.unsplash.com/photo-1610832958506-aa56368176cf",
     path: "fruits",
@@ -19,15 +27,15 @@ const categories = [
     border: "border-emerald-100",
     textColor: "text-emerald-700",
   },
-  {
-    name: "Dairy & Eggs",
-    image:
-      "https://images.unsplash.com/photo-1622371684824-dc014541a4f5?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    path: "dairy",
-    color: "bg-blue-50",
-    border: "border-blue-100",
-    textColor: "text-blue-700",
-  },
+  // {
+  //   name: "Dairy & Eggs",
+  //   image:
+  //     "https://images.unsplash.com/photo-1622371684824-dc014541a4f5?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  //   path: "dairy",
+  //   color: "bg-blue-50",
+  //   border: "border-blue-100",
+  //   textColor: "text-blue-700",
+  // }
   {
     name: "Organic Store",
     image: "https://images.unsplash.com/photo-1506806732259-39c2d0268443",
@@ -36,39 +44,40 @@ const categories = [
     border: "border-green-100",
     textColor: "text-green-700",
   },
-  {
-    name: "Atta & Rice",
-    image:
-      "https://media.istockphoto.com/id/686747322/photo/food-in-a-market-in-fes-morocco-the-market-is-one-of-the-most-important-attractions-of-the-city.jpg?s=1024x1024&w=is&k=20&c=_PHFB3jkuJFslsAOL1kvkm2gvAhqxUxyxgGkuWhGezY=",
-    path: "grains",
-    color: "bg-amber-50",
-    border: "border-amber-100",
-    textColor: "text-amber-700",
-  },
-  {
-    name: "Snacks & Munchies",
-    image: "https://images.unsplash.com/photo-1599490659213-e2b9527bd087",
-    path: "snacks",
-    color: "bg-rose-50",
-    border: "border-rose-100",
-    textColor: "text-rose-700",
-  },
-  {
-    name: "Cold Drinks",
-    image: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a",
-    path: "drinks",
-    color: "bg-purple-50",
-    border: "border-purple-100",
-    textColor: "text-purple-700",
-  },
-  {
-    name: "Instant Food",
-    image: "https://images.unsplash.com/photo-1604909052743-94e838986d24",
-    path: "instant",
-    color: "bg-yellow-50",
-    border: "border-yellow-100",
-    textColor: "text-yellow-700",
-  },
+
+  // {
+  //   name: "Atta & Rice",
+  //   image:
+  //     "https://media.istockphoto.com/id/686747322/photo/food-in-a-market-in-fes-morocco-the-market-is-one-of-the-most-important-attractions-of-the-city.jpg?s=1024x1024&w=is&k=20&c=_PHFB3jkuJFslsAOL1kvkm2gvAhqxUxyxgGkuWhGezY=",
+  //   path: "grains",
+  //   color: "bg-amber-50",
+  //   border: "border-amber-100",
+  //   textColor: "text-amber-700",
+  // },
+  // {
+  //   name: "Snacks & Munchies",
+  //   image: "https://images.unsplash.com/photo-1599490659213-e2b9527bd087",
+  //   path: "snacks",
+  //   color: "bg-rose-50",
+  //   border: "border-rose-100",
+  //   textColor: "text-rose-700",
+  // },
+  // {
+  //   name: "Cold Drinks",
+  //   image: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a",
+  //   path: "drinks",
+  //   color: "bg-purple-50",
+  //   border: "border-purple-100",
+  //   textColor: "text-purple-700",
+  // },
+  // {
+  //   name: "Instant Food",
+  //   image: "https://images.unsplash.com/photo-1604909052743-94e838986d24",
+  //   path: "instant",
+  //   color: "bg-yellow-50",
+  //   border: "border-yellow-100",
+  //   textColor: "text-yellow-700",
+  // },
 ];
 
 const Categories = () => {
@@ -86,7 +95,10 @@ const Categories = () => {
             Shop by Category
           </h2>
         </div>
-        <button className="hidden sm:flex items-center gap-2 text-emerald-600 font-bold hover:gap-3 transition-all">
+        <button 
+          onClick={() => navigate('/category/all')}
+          className="hidden sm:flex items-center gap-2 text-emerald-600 font-bold hover:gap-3 transition-all"
+        >
           View All <ArrowRight size={20} />
         </button>
       </div>

@@ -48,12 +48,15 @@ const Hero = () => {
               Skip the middleman. Get 100% organic produce delivered from the
               fertile lands of India to your dining table in{" "}
               <span className="font-bold text-slate-900 underline decoration-amber-400">
-                10 minutes.
+                30 minutes.
               </span>
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
-              <button className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-emerald-200 transition-all active:scale-95 group">
+              <button 
+                onClick={() => window.location.href = '/category/all'}
+                className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-emerald-200 transition-all active:scale-95 group"
+              >
                 <ShoppingBag size={20} />
                 Start Shopping
                 <ChevronRight

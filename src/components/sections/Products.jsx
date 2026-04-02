@@ -75,7 +75,10 @@ const Products = () => {
 
       {/* 4. Bottom CTA: "View More" */}
       <div className="mt-16 text-center">
-        <button className="group inline-flex items-center gap-3 bg-white border-2 border-slate-200 px-10 py-4 rounded-2xl font-black text-slate-800 hover:border-emerald-500 hover:text-emerald-600 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-emerald-50/50">
+        <button 
+          onClick={() => window.location.href = '/category/all'}
+          className="group inline-flex items-center gap-3 bg-white border-2 border-slate-200 px-10 py-4 rounded-2xl font-black text-slate-800 hover:border-emerald-500 hover:text-emerald-600 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-emerald-50/50"
+        >
           View All Products
           <ArrowRight
             size={20}

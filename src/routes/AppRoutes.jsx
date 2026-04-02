@@ -5,8 +5,9 @@ import Contact from "../pages/Contact";
 import Login from "../pages/Login";
 import Fruits from "../Pages/Fruits";
 import Vegetables from "../Pages/Vegetables";
-import Dairy from "../Pages/Dairy";
+
 import Organic from "../Pages/Organic";
+import AllProducts from "../Pages/AllProducts";
 
 const AppRoutes = () => {
   return (
@@ -18,8 +19,9 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/category/fruits" element={<Fruits />} />
       <Route path="/category/vegetables" element={<Vegetables />} />
-      <Route path="/category/dairy" element={<Dairy />} />
+  
       <Route path="/category/organic" element={<Organic />} />
+      <Route path="/category/all" element={<AllProducts />} />
     </Routes>
   );
 };

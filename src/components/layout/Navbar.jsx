@@ -16,7 +16,7 @@ import { Link, useLocation } from "react-router-dom";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [locationName, setLocationName] = useState("Faridabad, HR");
+  const [locationName, setLocationName] = useState("Noida");
   const routerLocation = useLocation();
 
   // Change navbar style on scroll
@@ -52,7 +52,7 @@ const Navbar = () => {
         {/* 2. Delivery Location (Desktop) */}
         <div className="hidden lg:flex flex-col border-l border-gray-200 pl-4 ml-2 cursor-pointer group">
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter leading-none">
-            Delivery in 10 mins
+            Delivery in 30 mins
           </span>
           <div className="flex items-center gap-1 text-slate-800">
             <span className="text-sm font-bold truncate max-w-[120px]">
