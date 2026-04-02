@@ -17,7 +17,10 @@ export const CartProvider = ({ children }) => {
       if (existingItemIndex >= 0) {
         // Increment quantity if same product & weight exists
         const updatedCart = [...prevCart];
-        updatedCart[existingItemIndex].quantity += 1;
+        updatedCart[existingItemIndex] = {
+          ...updatedCart[existingItemIndex],
+          quantity: updatedCart[existingItemIndex].quantity + 1,
+        };
         return updatedCart;
       }
 
@@ -44,9 +47,45 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  const updateItemWeight = (productId, oldWeight, newWeight, newPrice) => {
+    setCart((prevCart) => {
+      const itemToUpdateIndex = prevCart.findIndex(
+        (item) => item.id === productId && item.weight === oldWeight
+      );
+      if (itemToUpdateIndex === -1) return prevCart;
+
+      const itemToUpdate = prevCart[itemToUpdateIndex];
+      const existingNewWeightIndex = prevCart.findIndex(
+        (item) => item.id === productId && item.weight === newWeight
+      );
+
+      if (
+        existingNewWeightIndex >= 0 &&
+        existingNewWeightIndex !== itemToUpdateIndex
+      ) {
+        // Merge quantities if the target weight already exists
+        const updatedCart = [...prevCart];
+        updatedCart[existingNewWeightIndex] = {
+          ...updatedCart[existingNewWeightIndex],
+          quantity: updatedCart[existingNewWeightIndex].quantity + itemToUpdate.quantity,
+        };
+        return updatedCart.filter((_, index) => index !== itemToUpdateIndex);
+      } else {
+        // Otherwise just update the weight and price
+        const updatedCart = [...prevCart];
+        updatedCart[itemToUpdateIndex] = {
+          ...itemToUpdate,
+          weight: newWeight,
+          price: newPrice,
+        };
+        return updatedCart;
+      }
+    });
+  };
+
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, updateQuantity }}
+      value={{ cart, addToCart, removeFromCart, updateQuantity, updateItemWeight }}
     >
       {children}
     </CartContext.Provider>

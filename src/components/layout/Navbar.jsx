@@ -12,12 +12,15 @@ import {
   Leaf,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [locationName, setLocationName] = useState("Noida");
+  const [locationName, setLocationName] = useState("Bulandshahr");
   const routerLocation = useLocation();
+  const { cart } = useCart();
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   // Change navbar style on scroll
   useEffect(() => {
@@ -31,7 +34,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-[110] transition-all duration-300 ${
+      className={`w-full z-[110] transition-all duration-300 relative ${
         scrolled
           ? "bg-white/90 backdrop-blur-md shadow-lg py-2"
           : "bg-white py-4"
@@ -101,7 +104,7 @@ const Navbar = () => {
               <span className="text-sm font-bold hidden md:block">My Cart</span>
             </div>
             <span className="absolute -top-1 -right-1 bg-amber-400 text-slate-900 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
-              3
+              {cartCount}
             </span>
           </Link>
 

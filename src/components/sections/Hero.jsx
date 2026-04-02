@@ -33,7 +33,7 @@ const Hero = () => {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
               <span className="text-emerald-700 text-xs font-bold uppercase tracking-wider">
-                Live in Noida & Faridabad
+                Live in Noida & Bulandshahr
               </span>
             </div>
 
