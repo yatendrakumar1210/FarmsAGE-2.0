@@ -7,17 +7,14 @@ const orderItemSchema = new mongoose.Schema(
       ref: "Product",
       required: true,
     },
-    weight: {
-      type: Number, 
-      required: true,
-    },
+    weight: Number,
     quantity: {
       type: Number,
       required: true,
       min: 1,
     },
     price: {
-      type: Number, 
+      type: Number,
       required: true,
     },
   },
@@ -31,11 +28,12 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
     vendorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
+
     items: [orderItemSchema],
 
     status: {
@@ -56,9 +54,20 @@ const orderSchema = new mongoose.Schema(
       default: "Pending",
     },
 
+    paymentMethod: {
+      type: String,
+      enum: ["Online", "COD"],
+      default: "COD",
+    },
+
+    paymentId: String, 
+
     deliveryAddress: {
-      type: Object, 
-      required: true,
+      name: String,
+      phone: String,
+      street: String,
+      city: String,
+      pincode: String,
     },
 
     totalAmount: {
@@ -66,9 +75,7 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Order", orderSchema);

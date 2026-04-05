@@ -1,13 +1,24 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, ArrowLeft, Trash2, Plus, Minus, Truck, ShieldCheck, Ticket } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 
 const Cart = () => {
   const { cart, removeFromCart, updateQuantity } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    navigate('/checkout');
+  };
 
   const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const deliveryCharge = subtotal > 500 ? 0 : 40;
@@ -189,7 +200,10 @@ const Cart = () => {
                   <span className="text-2xl font-black text-emerald-600">₹{total}</span>
                 </div>
 
-                <button className="w-full bg-slate-900 text-white py-4 sm:py-5 rounded-2xl font-black text-lg shadow-xl shadow-slate-200 hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3">
+                <button 
+                  onClick={handleCheckout}
+                  className="w-full bg-slate-900 text-white py-4 sm:py-5 rounded-2xl font-black text-lg shadow-xl shadow-slate-200 hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3"
+                >
                   Proceed to Checkout
                   <ArrowLeft size={20} className="rotate-180" />
                 </button>
