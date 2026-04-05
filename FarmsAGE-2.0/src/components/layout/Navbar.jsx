@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -20,6 +21,7 @@ const Navbar = () => {
   const [locationName, setLocationName] = useState("Bulandshahr");
   const routerLocation = useLocation();
   const { cart } = useCart();
+  const { user, logout } = useAuth();
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   // Change navbar style on scroll
@@ -87,13 +89,37 @@ const Navbar = () => {
 
         {/* 4. Action Icons */}
         <div className="flex items-center gap-2 sm:gap-6">
-          <Link
-            to="/login"
-            className="hidden sm:flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600 transition-colors"
-          >
-            <User size={20} />
-            <span className="text-sm">Login</span>
-          </Link>
+          {user ? (
+            <div className="relative group hidden sm:flex items-center gap-2 font-bold text-slate-700 cursor-pointer">
+              <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                <User size={16} />
+              </div>
+              <span className="text-sm truncate max-w-[100px]">{user.name || "User"}</span>
+              <ChevronDown size={14} className="text-slate-400 group-hover:-rotate-180 transition-transform" />
+              
+              {/* Dropdown menu */}
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden z-50">
+                <div className="p-3 border-b border-slate-50">
+                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Logged in as</p>
+                   <p className="text-sm truncate mt-1 text-slate-800">{user.phone}</p>
+                </div>
+                <button 
+                  onClick={logout}
+                  className="w-full text-left px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="hidden sm:flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600 transition-colors"
+            >
+              <User size={20} />
+              <span className="text-sm">Login</span>
+            </Link>
+          )}
 
           <Link
             to="/cart"

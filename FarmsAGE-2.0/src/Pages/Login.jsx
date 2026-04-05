@@ -1,11 +1,76 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, ArrowRight, ShieldCheck, Leaf } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    if (!phone || phone.length !== 10) {
+      setError("Please enter a valid 10-digit phone number");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const resp = await fetch("http://localhost:3000/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone })
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        setIsOtpSent(true);
+      } else {
+        setError(data.message || "Failed to send OTP");
+      }
+    } catch (err) {
+      setError("Server error. Make sure backend is running.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if (!otp) {
+      setError("Please enter a valid OTP");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const resp = await fetch("http://localhost:3000/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, otp })
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        login(data.user || { phone }, data.token);
+        if (data.isNewUser) {
+          navigate("/complete-profile");
+        } else {
+          navigate("/");
+        }
+      } else {
+        setError(data.message || "Invalid OTP");
+      }
+    } catch (err) {
+      setError("Server error. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] relative overflow-hidden">
@@ -63,20 +128,45 @@ const Login = () => {
                   placeholder="9876543210"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 pl-14 pr-6 focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-800 tracking-widest"
+                  disabled={isOtpSent || loading}
+                  className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 pl-14 pr-6 focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-800 tracking-widest disabled:opacity-50"
                 />
               </div>
             </div>
 
+            {isOtpSent && (
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                  Enter OTP
+                </label>
+                <div className="relative group">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="123456"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    disabled={loading}
+                    className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-800 tracking-widest disabled:opacity-50"
+                  />
+                </div>
+              </div>
+            )}
+
+            {error && <p className="text-red-500 text-sm font-bold">{error}</p>}
+
             <button
-              onClick={() => setIsOtpSent(true)}
-              className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-95 flex items-center justify-center gap-3 group"
+              onClick={isOtpSent ? handleVerifyOtp : handleSendOtp}
+              disabled={loading}
+              className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-95 flex items-center justify-center gap-3 group disabled:opacity-70 disabled:active:scale-100"
             >
-              {isOtpSent ? "Verify OTP" : "Send OTP"}
-              <ArrowRight
-                size={20}
-                className="group-hover:translate-x-1 transition-transform"
-              />
+              {loading ? "Processing..." : isOtpSent ? "Verify OTP" : "Send OTP"}
+              {!loading && (
+                <ArrowRight
+                  size={20}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+              )}
             </button>
 
             {/* Social Logins */}

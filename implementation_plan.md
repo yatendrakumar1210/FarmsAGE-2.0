@@ -93,3 +93,197 @@ Build a robust, scalable, and secure backend RESTful API to support the FarmsAge
 
 **Phase 6: Frontend Wiring**
 1. Modify the `src/utils/` and context files on the frontend to execute `fetch` or `axios` calls pointing to `http://localhost:5000` instead of reading static JS objects.
+
+
+
+
+
+
+
+
+****************************************************************************
+
+
+# 📱 OTP-Based Authentication System (FarmsAge)
+
+## 🚀 Overview
+
+This module implements a secure **OTP-based login and registration system** using phone numbers.
+Users can authenticate without passwords using a one-time verification code (OTP).
+
+---
+
+## 🧠 Flow Diagram
+
+```
+User enters phone number
+        ↓
+Send OTP API generates OTP
+        ↓
+OTP stored in DB (with expiry)
+        ↓
+User enters OTP
+        ↓
+Verify OTP API
+        ↓
+If user exists → Login
+Else → Register new user
+        ↓
+JWT token returned
+```
+
+---
+
+## 🛠️ Tech Stack
+
+* Backend: Node.js + Express
+* Database: MongoDB (Mongoose)
+* Auth: JWT (JSON Web Tokens)
+* OTP Generator: otp-generator
+* SMS Service: Twilio / Fast2SMS (optional)
+
+---
+
+## 📂 Folder Structure
+
+```
+src/
+ ├── models/
+ │   ├── userModel.js
+ │   └── otpModel.js
+ │
+ ├── controllers/
+ │   └── authController.js
+ │
+ ├── routes/
+ │   └── authRoutes.js
+ │
+ ├── utils/
+ │   ├── generateOtp.js
+ │   └── sendSms.js
+ │
+ └── middleware/
+     └── authMiddleware.js
+```
+
+---
+
+## ⚙️ Implementation Steps
+
+### 1️⃣ Create OTP Model
+
+* Fields: `phone`, `otp`, `expiresAt`
+* Store OTP with expiration time (5 min)
+
+---
+
+### 2️⃣ Generate OTP
+
+* Use `otp-generator` package
+* Generate 6-digit numeric OTP
+
+---
+
+### 3️⃣ Send OTP API
+
+**Endpoint:** `/api/auth/send-otp`
+
+* Accept phone number
+* Generate OTP
+* Save OTP in DB
+* Send OTP via SMS (or console for testing)
+
+---
+
+### 4️⃣ Verify OTP API
+
+**Endpoint:** `/api/auth/verify-otp`
+
+* Accept `phone` + `otp`
+* Validate OTP:
+
+  * Exists in DB
+  * Not expired
+* If valid:
+
+  * Check if user exists
+  * If not → Create user (Register)
+  * If yes → Login user
+
+---
+
+### 5️⃣ Generate JWT Token
+
+* After successful verification
+* Return token to client
+* Used for protected routes
+
+---
+
+## 🔐 Security Best Practices
+
+* Hash OTP before storing (bcrypt)
+* Set OTP expiry (5 minutes)
+* Limit OTP requests (rate limiting)
+* Delete OTP after successful verification
+* Use HTTPS in production
+
+---
+
+## 📦 Example API Requests
+
+### Send OTP
+
+```
+POST /api/auth/send-otp
+{
+  "phone": "9876543210"
+}
+```
+
+### Verify OTP
+
+```
+POST /api/auth/verify-otp
+{
+  "phone": "9876543210",
+  "otp": "123456"
+}
+```
+
+---
+
+## 📈 Future Enhancements
+
+* 🔁 Resend OTP feature
+* 🚫 OTP attempt limit (max 5 tries)
+* 📱 Auto OTP detection (frontend)
+* 🌍 International phone support
+* 🔐 Role-based authentication (User/Admin)
+
+---
+
+## 🧪 Testing
+
+* Use Postman / Thunder Client
+* Test:
+
+  * Send OTP
+  * Verify OTP
+  * Invalid OTP
+  * Expired OTP
+
+---
+
+## 🚀 Deployment Notes
+
+* Store secrets in `.env`
+* Use services like MongoDB Atlas
+* Integrate SMS provider (Twilio/Fast2SMS)
+* Enable logging & monitoring
+
+---
+
+## 🧑‍💻 Author
+
+Developed as part of **FarmsAge Project** 🌱

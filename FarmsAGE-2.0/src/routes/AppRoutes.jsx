@@ -8,6 +8,7 @@ import Vegetables from "../Pages/Vegetables";
 
 import Organic from "../Pages/Organic";
 import AllProducts from "../Pages/AllProducts";
+import CompleteProfile from "../Pages/CompleteProfile";
 
 const AppRoutes = () => {
   return (
@@ -17,6 +18,7 @@ const AppRoutes = () => {
       <Route path="/cart" element={<Cart />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/complete-profile" element={<CompleteProfile />} />
       <Route path="/category/fruits" element={<Fruits />} />
       <Route path="/category/vegetables" element={<Vegetables />} />
   
