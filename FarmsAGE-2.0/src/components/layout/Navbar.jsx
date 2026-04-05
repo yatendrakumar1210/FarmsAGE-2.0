@@ -10,6 +10,7 @@ import {
   Search,
   ChevronDown,
   Leaf,
+  Package
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
@@ -120,6 +121,16 @@ const Navbar = () => {
               <span className="text-sm">Login</span>
             </Link>
           )}
+          
+          {user && (
+            <Link
+              to="/my-orders"
+              className="hidden lg:flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600 transition-colors"
+            >
+              <Package size={20} />
+              <span className="text-sm">My Orders</span>
+            </Link>
+          )}
 
           <Link
             to="/cart"
@@ -167,6 +178,7 @@ const Navbar = () => {
       >
         <div className="p-6 flex flex-col gap-6 font-bold text-xl text-slate-800">
           <Link to="/home">Home</Link>
+          <Link to="/my-orders">My Orders</Link>
           <Link to="/category/fruits">Seasonal Fruits</Link>
           <Link to="/category/vegetables">Fresh Vegetables</Link>
           <Link to="/category/dairy">Dairy Products</Link>

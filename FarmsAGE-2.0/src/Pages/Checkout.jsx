@@ -46,7 +46,9 @@ const Checkout = () => {
           productId: item.id,
           price: item.price,
           quantity: item.quantity,
-          weight: item.weight
+          weight: item.weight,
+          name: item.name,
+          image: item.image
         }))
       };
 
@@ -136,7 +138,9 @@ const Checkout = () => {
           productId: item.id,
           price: item.price,
           quantity: item.quantity,
-          weight: item.weight
+          weight: item.weight,
+          name: item.name,
+          image: item.image
         })),
         deliveryAddress: address,
         totalAmount: total

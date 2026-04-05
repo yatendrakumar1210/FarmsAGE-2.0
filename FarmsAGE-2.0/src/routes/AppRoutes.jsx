@@ -11,6 +11,7 @@ import AllProducts from "../Pages/AllProducts";
 import CompleteProfile from "../Pages/CompleteProfile";
 import Checkout from "../Pages/Checkout";
 import OrderSuccess from "../Pages/OrderSuccess";
+import MyOrders from "../Pages/MyOrders";
 
 const AppRoutes = () => {
   return (
@@ -28,6 +29,7 @@ const AppRoutes = () => {
       <Route path="/category/all" element={<AllProducts />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/my-orders" element={<MyOrders />} />
     </Routes>
   );
 };

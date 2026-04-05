@@ -3,11 +3,10 @@ const mongoose = require("mongoose");
 const orderItemSchema = new mongoose.Schema(
   {
     productId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+      type: String,
       required: true,
     },
-    weight: Number,
+    weight: String,
     quantity: {
       type: Number,
       required: true,
@@ -17,6 +16,8 @@ const orderItemSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    name: String,
+    image: String,
   },
   { _id: false },
 );
@@ -29,6 +30,7 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
+   
     vendorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -60,7 +62,7 @@ const orderSchema = new mongoose.Schema(
       default: "COD",
     },
 
-    paymentId: String, 
+    paymentId: String,
 
     deliveryAddress: {
       name: String,

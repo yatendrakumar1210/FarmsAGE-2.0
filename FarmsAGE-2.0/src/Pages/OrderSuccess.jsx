@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, ShoppingBag, ArrowRight, Home } from "lucide-react";
+import { CheckCircle2, ShoppingBag, ArrowRight, Home, Package } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
@@ -37,19 +37,21 @@ const OrderSuccess = () => {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/home" className="flex-1">
-                <button className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2">
+                <button className="w-full bg-emerald-50 text-emerald-600 py-4 rounded-2xl font-black hover:bg-emerald-100 transition-all flex items-center justify-center gap-2">
                   <Home size={20} />
                   Home
                 </button>
               </Link>
-              <Link to="/category/all" className="flex-1">
-                <button className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black shadow-xl shadow-slate-200 hover:bg-black transition-all flex items-center justify-center gap-2">
-                  <ShoppingBag size={20} />
-                  Shop More
-                  <ArrowRight size={20} />
+              <Link to="/my-orders" className="flex-1">
+                <button className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2">
+                  <Package size={20} />
+                  My Orders
                 </button>
               </Link>
             </div>
+            <Link to="/category/all" className="block mt-4 text-slate-400 hover:text-emerald-600 font-bold text-sm transition-colors">
+               Continue Shopping
+            </Link>
           </motion.div>
         </div>
       </div>

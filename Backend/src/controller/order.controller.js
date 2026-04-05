@@ -17,6 +17,7 @@ exports.createOrder = async (req, res) => {
 
     res.json({ order, totalAmount });
   } catch (err) {
+    console.error("RAZORPAY ORDER ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -40,10 +41,17 @@ exports.verifyPayment = async (req, res) => {
       .update(body)
       .digest("hex");
 
+       console.log("ORDER ID:", razorpay_order_id);
+       console.log("PAYMENT ID:", razorpay_payment_id);
+       console.log("SIGNATURE:", razorpay_signature);
+
+       console.log("EXPECTED:", expected);
+
     if (expected !== razorpay_signature) {
       return res.status(400).json({ success: false });
     }
 
+    console.log("Creating payment order in DB...");
     const order = await Order.create({
       userId: req.user.id,
       items,
@@ -57,8 +65,11 @@ exports.verifyPayment = async (req, res) => {
 
     res.json({ success: true, order });
   } catch (err) {
+    console.error("VERIFY PAYMENT ERROR:", err);
     res.status(500).json({ message: err.message });
   }
+
+ 
 };
 
 // COD Order
@@ -69,6 +80,7 @@ exports.codOrder = async (req, res) => {
     let totalAmount = 0;
     items.forEach((i) => (totalAmount += i.price * i.quantity));
 
+    console.log("Creating COD order in DB...");
     const order = await Order.create({
       userId: req.user.id,
       items,
@@ -79,17 +91,17 @@ exports.codOrder = async (req, res) => {
       status: "Pending",
     });
 
+
     res.json({ success: true, order });
   } catch (err) {
+    console.error("COD ORDER ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
 // Get My Orders
 exports.getMyOrders = async (req, res) => {
-  const orders = await Order.find({ userId: req.user.id }).populate(
-    "items.productId",
-  );
+  const orders = await Order.find({ userId: req.user.id });
 
   res.json(orders);
 };
