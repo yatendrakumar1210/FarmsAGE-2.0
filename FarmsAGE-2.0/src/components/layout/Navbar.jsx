@@ -10,7 +10,8 @@ import {
   Search,
   ChevronDown,
   Leaf,
-  Package
+  Package,
+  ShieldCheck
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
@@ -122,7 +123,7 @@ const Navbar = () => {
             </Link>
           )}
           
-          {user && (
+          {user && !routerLocation.pathname.startsWith('/admin') && (
             <Link
               to="/my-orders"
               className="hidden lg:flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600 transition-colors"
@@ -132,18 +133,30 @@ const Navbar = () => {
             </Link>
           )}
 
-          <Link
-            to="/cart"
-            className="relative p-3 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 group"
-          >
-            <div className="flex items-center gap-2">
-              <ShoppingCart size={20} className="group-hover:shake" />
-              <span className="text-sm font-bold hidden md:block">My Cart</span>
-            </div>
-            <span className="absolute -top-1 -right-1 bg-amber-400 text-slate-900 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
-              {cartCount}
-            </span>
-          </Link>
+          {user && user.role?.toLowerCase() === 'admin' && (
+            <Link
+              to="/admin"
+              className="hidden lg:flex items-center gap-2 font-bold text-amber-600 hover:text-amber-700 transition-colors bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100"
+            >
+              <ShieldCheck size={18} />
+              <span className="text-sm">Admin Panel</span>
+            </Link>
+          )}
+
+          {!routerLocation.pathname.startsWith('/admin') && (
+            <Link
+              to="/cart"
+              className="relative p-3 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 group"
+            >
+              <div className="flex items-center gap-2">
+                <ShoppingCart size={20} className="group-hover:shake" />
+                <span className="text-sm font-bold hidden md:block">My Cart</span>
+              </div>
+              <span className="absolute -top-1 -right-1 bg-amber-400 text-slate-900 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
+                {cartCount}
+              </span>
+            </Link>
+          )}
 
           {/* Mobile Menu Toggle */}
           <button
@@ -177,14 +190,26 @@ const Navbar = () => {
         } md:hidden`}
       >
         <div className="p-6 flex flex-col gap-6 font-bold text-xl text-slate-800">
-          <Link to="/home">Home</Link>
-          <Link to="/my-orders">My Orders</Link>
-          <Link to="/category/fruits">Seasonal Fruits</Link>
-          <Link to="/category/vegetables">Fresh Vegetables</Link>
-          <Link to="/category/dairy">Dairy Products</Link>
-          <Link to="/category/organic">Organic Selection</Link>
-          <Link to="/offers">Daily Deals</Link>
-          <Link to="/contact">Help & Support</Link>
+          {routerLocation.pathname.startsWith('/admin') ? (
+            <>
+              <Link to="/admin/dashboard">Dashboard</Link>
+              <Link to="/admin/products">Inventory</Link>
+              <Link to="/admin/orders">Order Management</Link>
+              <Link to="/admin/users">User Base</Link>
+              <Link to="/">Exit Admin</Link>
+            </>
+          ) : (
+            <>
+              <Link to="/home">Home</Link>
+              <Link to="/my-orders">My Orders</Link>
+              <Link to="/category/fruits">Seasonal Fruits</Link>
+              <Link to="/category/vegetables">Fresh Vegetables</Link>
+              <Link to="/category/dairy">Dairy Products</Link>
+              <Link to="/category/organic">Organic Selection</Link>
+              <Link to="/offers">Daily Deals</Link>
+              <Link to="/contact">Help & Support</Link>
+            </>
+          )}
           <hr />
           <div className="flex items-center gap-3 text-emerald-600 text-sm">
             <MapPin size={18} />

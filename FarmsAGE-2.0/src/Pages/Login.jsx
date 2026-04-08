@@ -211,6 +211,21 @@ const Login = () => {
             </Link>
           </p>
 
+          <div className="mt-8 pt-8 border-t border-slate-100 flex justify-center">
+            <Link 
+              to="/admin" 
+              className="group flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-emerald-600 transition-all duration-300"
+            >
+              <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-all">
+                <ShieldCheck size={14} />
+              </div>
+              <div className="flex flex-col">
+                <span className="leading-none">Staff Member?</span>
+                <span className="text-[10px] opacity-60">Access Admin Dashboard</span>
+              </div>
+            </Link>
+          </div>
+
           {/* Trust Footer */}
           <div className="mt-12 flex items-center justify-center gap-2 text-slate-400">
             <ShieldCheck size={16} />

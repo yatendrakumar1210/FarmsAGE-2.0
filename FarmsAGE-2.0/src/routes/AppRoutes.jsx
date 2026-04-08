@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../Pages/Home";
 import Cart from "../Pages/Cart";
 import Contact from "../pages/Contact";
@@ -12,6 +12,14 @@ import CompleteProfile from "../Pages/CompleteProfile";
 import Checkout from "../Pages/Checkout";
 import OrderSuccess from "../Pages/OrderSuccess";
 import MyOrders from "../Pages/MyOrders";
+
+// Admin Imports
+import AdminLayout from "../Pages/Admin/AdminLayout";
+import Dashboard from "../Pages/Admin/Dashboard";
+import ManageProducts from "../Pages/Admin/ManageProducts";
+import ManageOrders from "../Pages/Admin/ManageOrders";
+import ManageUsers from "../Pages/Admin/ManageUsers";
+import AdminRoute from "./AdminRoute";
 
 const AppRoutes = () => {
   return (
@@ -30,8 +38,22 @@ const AppRoutes = () => {
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/order-success" element={<OrderSuccess />} />
       <Route path="/my-orders" element={<MyOrders />} />
+
+      {/* Admin Panel Routes */}
+      <Route path="/admin" element={
+        <AdminRoute>
+          <AdminLayout />
+        </AdminRoute>
+      }>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="products" element={<ManageProducts />} />
+        <Route path="orders" element={<ManageOrders />} />
+        <Route path="users" element={<ManageUsers />} />
+      </Route>
     </Routes>
   );
 };
 
 export default AppRoutes;
+

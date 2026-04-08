@@ -3,6 +3,10 @@ const User = require("../models/user.model");
 const generateOTP = require("../utils/generateOtp");
 const jwt = require("jsonwebtoken");
 
+
+//ADMIN 
+ 
+
 // SEND OTP
 exports.sendOTP = async (req, res) => {
   try {
