@@ -12,11 +12,11 @@ const Products = () => {
   // Filter logic
   const filteredProducts =
     activeFilter === "All"
-      ? products.slice(0, 8)
+      ? products.slice(0, 10)
       : products.filter((p) => p.category === activeFilter).slice(0, 8);
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-12">
+    <section className="max-w-7xl mx-auto px-6 py-6">
       {/* 1. Enhanced Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
@@ -55,7 +55,7 @@ const Products = () => {
       {/* 3. Responsive Product Grid with Animations */}
       <motion.div
         layout
-        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8"
+        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
       >
         <AnimatePresence mode="popLayout">
           {filteredProducts.map((item) => (
@@ -74,7 +74,7 @@ const Products = () => {
       </motion.div>
 
       {/* 4. Bottom CTA: "View More" */}
-      <div className="mt-16 text-center">
+      <div className="mt-8 text-center">
         <button 
           onClick={() => window.location.href = '/category/all'}
           className="group inline-flex items-center gap-3 bg-white border-2 border-slate-200 px-10 py-4 rounded-2xl font-black text-slate-800 hover:border-emerald-500 hover:text-emerald-600 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-emerald-50/50"

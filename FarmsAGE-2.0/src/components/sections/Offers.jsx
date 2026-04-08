@@ -28,7 +28,7 @@ const offerCards = [
 
 const Offers = () => {
   return (
-    <section className="max-w-7xl mx-auto px-6 py-12">
+    <section className="max-w-7xl mx-auto px-6 py-6">
       <div className="flex items-center gap-3 mb-8">
         <div className="p-2 bg-amber-100 rounded-lg text-amber-600">
           <Ticket size={24} />

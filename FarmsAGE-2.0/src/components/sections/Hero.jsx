@@ -11,7 +11,7 @@ import Button from "../common/Button";
 
 const Hero = () => {
   return (
-    <section className="relative overflow-hidden bg-[#FDFDFF] pt-32 pb-20 lg:pt-48 lg:pb-32">
+    <section className="relative overflow-hidden bg-[#FDFDFF] pt-8 pb-8 lg:pt-12 lg:pb-12">
       {/* 1. Dynamic Background Elements */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[60%] bg-emerald-100/40 blur-[120px] rounded-full" />
@@ -37,7 +37,7 @@ const Hero = () => {
               </span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] tracking-tight">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 leading-[1.1] tracking-tight">
               Freshness that <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-green-500">
                 Empowers Farmers.

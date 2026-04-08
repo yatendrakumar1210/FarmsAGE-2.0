@@ -35,7 +35,7 @@ const trustFeatures = [
 
 const Trust = () => {
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section className="py-10 relative overflow-hidden">
       {/* Subtle Background Decoration */}
       <div className="absolute top-1/2 left-0 -translate-y-1/2 w-64 h-64 bg-emerald-50 blur-[100px] rounded-full opacity-50" />
 
@@ -74,7 +74,7 @@ const Trust = () => {
       </div>
 
       {/* Trust Quote / Stats Strip */}
-      <div className="max-w-5xl mx-auto px-6 mt-16">
+      <div className="max-w-5xl mx-auto px-6 mt-8">
         <div className="bg-slate-900 rounded-[3rem] p-8 md:p-12 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <Leaf size={120} className="text-emerald-500 rotate-45" />

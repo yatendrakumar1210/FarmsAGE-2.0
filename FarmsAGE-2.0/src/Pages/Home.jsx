@@ -6,10 +6,13 @@ import Trust from "../components/sections/Trust";
 import MainLayout from "../components/layout/MainLayout";
 import NearbyVendors from "../components/sections/NearbyVendors";
 
+
 const Home = () => {
   return (
     <MainLayout>
+
       <Hero />
+      {/* <AllProducts/> */}
       <NearbyVendors />
       <Categories />
       <Offers />

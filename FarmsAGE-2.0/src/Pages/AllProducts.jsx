@@ -40,28 +40,7 @@ const AllProducts = () => {
     <>
       <Navbar />
       
-      {/* Category Menu Bar */}
-      <div className="bg-white border-b border-gray-100 pt-28 shadow-sm relative z-30">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex gap-4 overflow-x-auto py-4 scrollbar-hide">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 ${
-                  activeTab === tab 
-                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-200 translate-y-0" 
-                    : "bg-gray-50 text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 border border-transparent shadow-sm"
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="-mt-20">
+      <div className="pt-0">
         <CategoryProducts
           title={activeTab === 'All' ? "All Products" : `${activeTab} Collection`}
           productsData={categoryMap[activeTab]}

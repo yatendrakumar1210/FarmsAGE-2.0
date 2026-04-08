@@ -43,7 +43,7 @@ const NearbyVendors = () => {
 
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-12 bg-emerald-50 rounded-3xl my-12 relative overflow-hidden">
+    <section className="max-w-7xl mx-auto px-6 py-8 bg-emerald-50 rounded-3xl my-6 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-emerald-100 rounded-full blur-3xl opacity-50 z-0"></div>
       

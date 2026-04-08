@@ -84,7 +84,7 @@ const Categories = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-16">
+    <section className="max-w-7xl mx-auto px-6 py-8">
       {/* Header with "View All" */}
       <div className="flex justify-between items-end mb-10">
         <div>
