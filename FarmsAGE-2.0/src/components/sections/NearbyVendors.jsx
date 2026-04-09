@@ -20,13 +20,15 @@ const NearbyVendors = () => {
           const lon = position.coords.longitude;
           setUserLocation({ lat, lon });
           
-          // Calculate distance and sort
-          const vWithDistance = vendors.map(v => ({
-            ...v,
-            distance: calculateDistance(lat, lon, v.latitude, v.longitude)
-          }));
+          // Calculate distance and filter by 10km
+          const vWithDistance = vendors
+            .map(v => ({
+              ...v,
+              distance: calculateDistance(lat, lon, v.latitude, v.longitude)
+            }))
+            .filter(v => v.distance <= 10) // Only vendors within 10km
+            .sort((a, b) => a.distance - b.distance);
           
-          vWithDistance.sort((a, b) => a.distance - b.distance);
           setSortedVendors(vWithDistance);
           setLocationStatus("success");
         },
@@ -87,42 +89,56 @@ const NearbyVendors = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           <AnimatePresence>
-            {sortedVendors.slice(0, 6).map((vendor) => (
-              <motion.div
-                key={vendor.id}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                onClick={() => navigate('/category/all')}
-                className="bg-white rounded-3xl p-5 shadow-sm hover:shadow-xl transition-all duration-300 border border-emerald-100 flex gap-4 items-center group cursor-pointer"
-              >
-                <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0">
-                  <img 
-                    src={vendor.image} 
-                    alt={vendor.name} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    
-                  />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-slate-800 text-lg line-clamp-1">{vendor.name}</h3>
-                  <p className="text-sm text-gray-500 mb-2 line-clamp-1">{vendor.specialty}</p>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-sm font-bold text-amber-500">
-                      <Star size={14} className="fill-amber-500" />
-                      {vendor.rating}
-                    </div>
-                    {vendor.distance !== undefined && (
-                      <div className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg">
-                        {vendor.distance.toFixed(1)} km
-                      </div>
-                    )}
+            {sortedVendors.length > 0 ? (
+              sortedVendors.slice(0, 6).map((vendor) => (
+                <motion.div
+                  key={vendor.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4 }}
+                  onClick={() => navigate('/category/all')}
+                  className="bg-white rounded-3xl p-5 shadow-sm hover:shadow-xl transition-all duration-300 border border-emerald-100 flex gap-4 items-center group cursor-pointer"
+                >
+                  <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0">
+                    <img 
+                      src={vendor.image} 
+                      alt={vendor.name} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                   </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-slate-800 text-lg line-clamp-1">{vendor.name}</h3>
+                    <p className="text-sm text-gray-500 mb-2 line-clamp-1">{vendor.specialty}</p>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1 text-sm font-bold text-amber-500">
+                        <Star size={14} className="fill-amber-500" />
+                        {vendor.rating}
+                      </div>
+                      {vendor.distance !== undefined && (
+                        <div className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg">
+                          {vendor.distance.toFixed(1)} km
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))
+            ) : locationStatus === "success" ? (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="col-span-full py-12 text-center"
+              >
+                <div className="bg-white/50 inline-block p-6 rounded-[2.5rem] border border-dashed border-emerald-200">
+                  <Store size={48} className="text-emerald-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-slate-700 mb-2">No Vendors within 10km</h3>
+                  <p className="text-slate-500">We're expanding fast! Try checking again later or exploring all categories.</p>
                 </div>
               </motion.div>
-            ))}
+            ) : null}
           </AnimatePresence>
         </motion.div>
       </div>

@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
+import DetectLocation from "../components/location/DetectLocation";
 
 const Checkout = () => {
   const { cart, clearCart } = useCart();
@@ -200,6 +201,14 @@ const Checkout = () => {
                   <div>
                     <h2 className="text-xl font-black text-slate-800">Delivery Address</h2>
                     <p className="text-slate-500 text-sm">Where should we deliver your fresh produce?</p>
+                    <DetectLocation onLocationDetected={(data) => {
+                      setAddress(prev => ({
+                        ...prev,
+                        street: data.street || data.fullAddress,
+                        city: data.city,
+                        pincode: data.pincode
+                      }));
+                    }}/>
                   </div>
                 </div>
 
