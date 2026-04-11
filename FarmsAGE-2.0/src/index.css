@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+@layer base {
+  html, body {
+    font-family: 'Inter', sans-serif;
+    @apply antialiased text-slate-900;
+  }
+
+  h1, h2, h3, h4, h5, h6, .heading-font {
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}

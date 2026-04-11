@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { Phone, ArrowRight, ShieldCheck, Leaf } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Phone, ArrowRight, ShieldCheck, Leaf, ChevronDown, Mail, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logo from "../assets/logo.jpg"
 
 const Login = () => {
   const [phone, setPhone] = useState("");
@@ -73,168 +74,174 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] relative overflow-hidden">
-      {/* 1. Background Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-full z-0 opacity-40">
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-200 blur-[120px] rounded-full" />
-        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-amber-200 blur-[120px] rounded-full" />
+    <div className="min-h-screen bg-white flex flex-col items-center selection:bg-rose-50 font-sans">
+      {/* 1. Hero Background Section (Zomato Style) */}
+      <div className="relative w-full h-[45vh] lg:h-[40vh] overflow-hidden">
+        <img
+          src="https://media.istockphoto.com/id/188081154/photo/fruit-market-with-various-colorful-fresh-fruits-and-vegetables.jpg?s=1024x1024&w=is&k=20&c=QoyIKOQXCb7l33tZVCWLtZELfCv39YuRHop4jUHWW0k="
+          alt="Fresh Farm"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-white" />
+
+        {/* Branding */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center w-full px-4">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="flex flex-col items-center"
+          >
+            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl mb-4 border-4 border-emerald-50">
+              <img className="rounded-full" src={logo} />
+                {/* className="text-emerald-600"
+                size={40}
+                fill="currentColor"
+               */}
+            </div>
+            <h1 className="text-white text-5xl font-bold tracking-tighter mb-2 drop-shadow-lg font-['Outfit']">
+              Farms<span className="text-emerald-400">AGE</span>
+            </h1>
+            <p className="text-white/90 font-semibold text-lg tracking-tight drop-shadow-md">
+              India's #1 Fresh & Organic Harvest App
+            </p>
+          </motion.div>
+        </div>
       </div>
 
-      <div className="max-w-5xl w-full mx-6 grid lg:grid-cols-2 bg-white rounded-[3rem] shadow-2xl shadow-emerald-100/50 overflow-hidden relative z-10 border border-gray-100">
-        {/* Left Side: Visual/Branding (Hidden on mobile) */}
-        <div className="hidden lg:block relative bg-emerald-900 overflow-hidden">
-          <img
-            src="https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&q=80&w=800"
-            alt="Farm background"
-            className="absolute inset-0 w-full h-full object-cover opacity-60 scale-110 hover:scale-100 transition-transform duration-1000"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-emerald-900 via-emerald-900/20 to-transparent" />
-
-          <div className="absolute bottom-12 left-12 right-12 text-white">
-            <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6">
-              <Leaf className="text-emerald-400" size={32} />
-            </div>
-            <h2 className="text-4xl font-black leading-tight mb-4">
-              Freshness is just <br />a tap away.
+      {/* 2. Login Card Section */}
+      <motion.div
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="w-full max-w-md px-6 -mt-10 relative z-20"
+      >
+        <div className="bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] p-8 md:p-10 border border-slate-50">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
+              Login or Signup
             </h2>
-            <p className="text-emerald-100/80 font-medium">
-              Join 10,000+ families in Faridabad & Noida getting farm-fresh joy
-              daily.
-            </p>
-          </div>
-        </div>
-
-        {/* Right Side: Login Form */}
-        <div className="p-8 md:p-16 flex flex-col justify-center">
-          <div className="mb-10">
-            <h1 className="text-3xl font-black text-slate-800">Welcome Back</h1>
-            <p className="text-slate-500 mt-2 font-medium">
-              Login to access your fresh basket
-            </p>
           </div>
 
           <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
-                Phone Number
-              </label>
-              <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 transition-colors">
-                  <span className="font-bold text-sm">+91</span>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 w-full bg-white border-2 border-slate-100 rounded-2xl px-4 py-4 focus-within:border-emerald-500 transition-all">
+                <div className="flex items-center gap-1 border-r border-slate-200 pr-3 cursor-pointer hover:bg-slate-50 rounded-lg transition-colors p-1">
+                  <img
+                    src="https://flagcdn.com/w20/in.png"
+                    alt="India"
+                    className="w-5 h-4 rounded-sm object-cover"
+                  />
+                  <span className="font-bold text-slate-700 text-sm ml-1">
+                    +91
+                  </span>
+                  <ChevronDown size={14} className="text-slate-400" />
                 </div>
                 <input
                   type="tel"
                   maxLength={10}
-                  placeholder="9876543210"
+                  placeholder="Enter Phone Number"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   disabled={isOtpSent || loading}
-                  className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 pl-14 pr-6 focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-800 tracking-widest disabled:opacity-50"
+                  className="flex-1 bg-transparent border-none outline-none font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-medium tracking-widest disabled:opacity-50"
                 />
               </div>
+
+              <AnimatePresence>
+                {isOtpSent && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="space-y-2 pt-2">
+                      <input
+                        type="text"
+                        maxLength={6}
+                        placeholder="Enter 6-digit OTP"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        disabled={loading}
+                        className="w-full bg-emerald-50/30 border-2 border-emerald-100/50 rounded-2xl py-4 px-6 focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-800 tracking-[0.5em] text-center placeholder:tracking-normal placeholder:font-medium"
+                      />
+                      <p className="text-[10px] text-center text-slate-400 font-bold uppercase tracking-widest mt-2">
+                        OTP sent to +91 {phone}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {isOtpSent && (
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
-                  Enter OTP
-                </label>
-                <div className="relative group">
-                  <input
-                    type="text"
-                    maxLength={6}
-                    placeholder="123456"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    disabled={loading}
-                    className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-800 tracking-widest disabled:opacity-50"
-                  />
-                </div>
-              </div>
+            {error && (
+              <p className="text-rose-500 text-xs font-bold text-center">
+                {error}
+              </p>
             )}
-
-            {error && <p className="text-red-500 text-sm font-bold">{error}</p>}
 
             <button
               onClick={isOtpSent ? handleVerifyOtp : handleSendOtp}
               disabled={loading}
-              className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-95 flex items-center justify-center gap-3 group disabled:opacity-70 disabled:active:scale-100"
+              className="w-full bg-emerald-600 text-white py-4.5 rounded-2xl font-bold text-lg shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-[0.98] disabled:opacity-70"
             >
-              {loading ? "Processing..." : isOtpSent ? "Verify OTP" : "Send OTP"}
-              {!loading && (
-                <ArrowRight
-                  size={20}
-                  className="group-hover:translate-x-1 transition-transform"
-                />
-              )}
+              {loading ? "Please wait..." : "Continue"}
             </button>
 
-            {/* Social Logins */}
-            <div className="relative py-4">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-100"></div>
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-4 text-slate-400 font-bold tracking-widest">
-                  Or continue with
-                </span>
-              </div>
+            {/* Zomato Style Divider */}
+            <div className="relative flex items-center gap-4 py-4">
+              <div className="flex-1 border-t border-slate-100" />
+              <span className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em] bg-white px-2">
+                or
+              </span>
+              <div className="flex-1 border-t border-slate-100" />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <button className="flex items-center justify-center gap-2 border-2 border-slate-100 py-3 rounded-xl hover:bg-slate-50 transition-all font-bold text-slate-700 text-sm">
+            <div className="flex justify-center gap-8">
+              <button
+                type="button"
+                className="w-12 h-12 rounded-full border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm"
+              >
                 <img
                   src="https://www.svgrepo.com/show/475656/google-color.svg"
-                  className="h-5"
+                  className="w-6 h-6"
                   alt="Google"
                 />
-                Google
               </button>
-              <button className="flex items-center justify-center gap-2 border-2 border-slate-100 py-3 rounded-xl hover:bg-slate-50 transition-all font-bold text-slate-700 text-sm">
-                <img
-                  src="https://www.svgrepo.com/show/475647/facebook-color.svg"
-                  className="h-5"
-                  alt="FB"
-                />
-                Facebook
+              <button
+                type="button"
+                className="w-12 h-12 rounded-full border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm"
+              >
+                <Mail className="text-slate-400" size={20} />
               </button>
             </div>
           </form>
 
-          <p className="mt-10 text-center text-slate-500 font-medium text-sm">
-            New to FarmsAge?{" "}
-            <Link
-              to="/signup"
-              className="text-emerald-600 font-black hover:underline underline-offset-4"
-            >
-              Create Account
-            </Link>
-          </p>
-
-          <div className="mt-8 pt-8 border-t border-slate-100 flex justify-center">
-            <Link 
-              to="/admin" 
-              className="group flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-emerald-600 transition-all duration-300"
-            >
-              <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-all">
-                <ShieldCheck size={14} />
-              </div>
-              <div className="flex flex-col">
-                <span className="leading-none">Staff Member?</span>
-                <span className="text-[10px] opacity-60">Access Admin Dashboard</span>
-              </div>
-            </Link>
-          </div>
-
-          {/* Trust Footer */}
-          <div className="mt-12 flex items-center justify-center gap-2 text-slate-400">
-            <ShieldCheck size={16} />
-            <span className="text-[10px] font-bold uppercase tracking-widest">
-              Secure 256-bit encrypted login
+          <p className="mt-8 text-center text-slate-400 text-xs font-medium">
+            By continuing, you agree to our <br />
+            <span className="text-slate-600 font-bold border-b border-dotted border-slate-400 cursor-pointer">
+              Terms of Service
+            </span>{" "}
+            &
+            <span className="text-slate-600 font-bold border-b border-dotted border-slate-400 cursor-pointer ml-1">
+              Privacy Policy
             </span>
-          </div>
+          </p>
         </div>
-      </div>
+
+        {/* Footer Links */}
+        <div className="mt-8 flex flex-col items-center gap-4 pb-12">
+          <Link
+            to="/admin"
+            className="group flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-emerald-600 transition-colors"
+          >
+            <div className="w-8 h-8 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-emerald-50 group-hover:border-emerald-100 transition-all">
+              <ShieldCheck size={14} />
+            </div>
+            Admin Portal
+          </Link>
+        </div>
+      </motion.div>
     </div>
   );
 };

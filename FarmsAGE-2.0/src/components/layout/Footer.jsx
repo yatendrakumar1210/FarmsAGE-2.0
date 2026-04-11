@@ -30,13 +30,13 @@ const Footer = () => {
               harvest alerts.
             </p>
           </div>
-          <div className="relative">
+          <div className="flex flex-col sm:flex-row gap-4">
             <input
               type="email"
               placeholder="Enter your email"
-              className="w-full bg-slate-800/50 border border-slate-700 rounded-2xl py-4 px-6 focus:outline-none focus:border-emerald-500 transition-all text-white"
+              className="w-full sm:flex-1 bg-slate-800/50 border border-slate-700 rounded-2xl py-4 px-6 focus:outline-none focus:border-emerald-500 transition-all text-white"
             />
-            <button className="absolute right-2 top-2 bottom-2 bg-emerald-600 hover:bg-emerald-500 text-white px-6 rounded-xl transition-all flex items-center gap-2 font-semibold">
+            <button className="bg-emerald-600 hover:bg-emerald-500 text-white py-4 px-8 rounded-2xl transition-all flex items-center justify-center gap-2 font-semibold whitespace-nowrap">
               <Send size={16} />
               Subscribe
             </button>
@@ -47,12 +47,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Brand Column */}
           <div className="space-y-6">
-            <div className="flex items-center gap-2 group cursor-pointer">
+            <div className="flex items-center gap-2 group cursor-pointer font-['Outfit']">
               <div className="p-2 bg-emerald-500/10 rounded-lg group-hover:bg-emerald-500/20 transition-all">
                 <Leaf className="text-emerald-500" size={24} />
               </div>
               <h2 className="text-2xl font-bold text-white tracking-tight">
-                Farms<span className="text-emerald-500">Age</span>
+                farms<span className="text-emerald-500 font-extrabold uppercase">age</span>
               </h2>
             </div>
             <p className="text-sm leading-relaxed text-gray-400">
@@ -150,24 +150,24 @@ const Footer = () => {
         </div>
 
         {/* Contact Strip */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-slate-800/30 rounded-3xl border border-slate-800/50">
-          <div className="flex items-center gap-4 px-4 border-r border-slate-800/50 last:border-0">
+        <div className="mt-16 flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 sm:p-8 bg-slate-800/30 rounded-3xl border border-slate-800/50">
+          <div className="flex items-center gap-4 px-2 sm:px-4 border-b md:border-b-0 md:border-r border-slate-800/50 pb-6 md:pb-0 md:pr-10 w-full md:w-auto">
             <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
               <MapPin className="text-emerald-500" size={18} />
             </div>
-            <p className="text-xs">Sector 15, NCR Region, India</p>
+            <p className="text-sm">Sector 15, NCR Region, India</p>
           </div>
-          <div className="flex items-center gap-4 px-4 border-r border-slate-800/50 last:border-0">
+          <div className="flex items-center gap-4 px-2 sm:px-4 border-b md:border-b-0 md:border-r border-slate-800/50 pb-6 md:pb-0 md:pr-10 w-full md:w-auto">
             <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
               <Phone className="text-emerald-500" size={18} />
             </div>
-            <p className="text-xs">+91 98765 43210</p>
+            <p className="text-sm">+91 98765 43210</p>
           </div>
-          <div className="flex items-center gap-4 px-4 last:border-0">
+          <div className="flex items-center gap-4 px-2 sm:px-4 w-full md:w-auto">
             <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
               <Mail className="text-emerald-500" size={18} />
             </div>
-            <p className="text-xs">support@farmsage.com</p>
+            <p className="text-sm">support@farmsage.com</p>
           </div>
         </div>
 

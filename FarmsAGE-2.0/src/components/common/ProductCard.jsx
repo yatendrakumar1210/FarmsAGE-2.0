@@ -47,7 +47,7 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="group bg-white rounded-xl hover:shadow-md transition-all duration-300 flex flex-col relative w-full h-full min-h-[290px] border border-transparent hover:border-gray-100 p-2">
+    <div className="group bg-white rounded-xl hover:shadow-md transition-all duration-300 flex flex-col relative w-full h-full min-h-[270px] sm:min-h-[290px] border border-transparent hover:border-gray-100 p-2">
       {/* Product Image Container */}
       <div className="relative bg-[#f4f6f8] rounded-xl mb-3 p-3 h-36 flex items-center justify-center">
         <img
@@ -59,7 +59,7 @@ const ProductCard = ({ product }) => {
         {/* Absolute Positioned ADD Button */}
         <button
           onClick={handleAddToCart}
-          className={`absolute -bottom-3 right-2 px-6 py-1.5 rounded-lg border font-black text-xs transition-all shadow-sm ${
+          className={`absolute -bottom-3 right-1 sm:right-2 px-4 sm:px-6 py-1.5 rounded-lg border font-bold text-[10px] sm:text-xs transition-all shadow-sm ${
             added
               ? "bg-pink-50 border-pink-500 text-pink-600"
               : "bg-white border-pink-600 text-pink-600 hover:bg-pink-50"
@@ -90,7 +90,7 @@ const ProductCard = ({ product }) => {
         )}
 
         {/* Title */}
-        <h3 className="font-semibold text-gray-800 text-sm leading-tight line-clamp-2 mb-1">
+        <h3 className="font-semibold text-gray-800 text-xs sm:text-sm leading-tight line-clamp-2 mb-1">
           {product.name}
         </h3>
         

@@ -103,12 +103,11 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between gap-4">
         {/* 1. Logo Section */}
         <Link to="/" className="flex items-center gap-2 shrink-0 group">
-          <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform duration-300 shadow-lg shadow-emerald-200">
-            {/* <Leaf className="text-white" size={22} /> */}
-            <img  className="w-10 h-10 rounded-full bg-white"  src={logo} alt="" />
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center overflow-hidden border border-slate-100 shadow-sm group-hover:scale-110 transition-transform duration-300">
+            <img className="w-full h-full object-cover" src={logo} alt="FarmsAge Logo" />
           </div>
-          <h2 className="text-2xl font-black tracking-tighter text-slate-800 hidden sm:block">
-            Farms<span className="text-emerald-600">Age</span>
+          <h2 className="text-2xl font-bold tracking-tighter text-slate-800 hidden sm:block font-['Outfit']">
+            farms<span className="text-emerald-600 font-extrabold">AGE</span>
           </h2>
         </Link>
 
@@ -249,9 +248,9 @@ const Navbar = () => {
 
       {/* 6. Mobile Drawer with Slide-in Animation */}
       <div
-        className={`fixed inset-0 top-[110px] bg-white z-[100] transition-transform duration-500 ease-in-out ${
+        className={`fixed inset-0 top-[120px] bg-white z-[100] transition-transform duration-500 ease-in-out ${
           open ? "translate-x-0" : "translate-x-full"
-        } md:hidden`}
+        } md:hidden overflow-y-auto pb-24`}
       >
         <div className="p-6 flex flex-col gap-6 font-bold text-xl text-slate-800">
           {routerLocation.pathname.startsWith('/admin') ? (

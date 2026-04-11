@@ -97,7 +97,12 @@ const Checkout = () => {
             const verifyResult = await verifyRes.json();
             if (verifyResult.success) {
               clearCart();
-              navigate("/order-success", { state: { orderId: verifyResult.order._id } });
+              navigate("/order-success", { 
+                state: { 
+                  orderId: verifyResult.order._id,
+                  paymentMethod: 'online'
+                } 
+              });
             } else {
               alert("Payment verification failed");
             }
@@ -159,7 +164,12 @@ const Checkout = () => {
       const result = await res.json();
       if (result.success) {
         clearCart();
-        navigate("/order-success", { state: { orderId: result.order._id } });
+        navigate("/order-success", { 
+          state: { 
+            orderId: result.order._id,
+            paymentMethod: 'cod'
+          } 
+        });
       } else {
         alert("Failed to place COD order");
       }

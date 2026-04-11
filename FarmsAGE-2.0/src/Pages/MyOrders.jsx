@@ -12,7 +12,11 @@ import {
   Search,
   Truck,
   CreditCard,
-  ExternalLink
+  FileText,
+  RefreshCcw,
+  Sparkles,
+  Calendar,
+  Box
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
@@ -23,6 +27,7 @@ const MyOrders = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const getProductDetails = (id) => {
     return products.find(p => p.id == id) || { name: "Organic Produce", image: "" };
@@ -39,7 +44,6 @@ const MyOrders = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
-      // Sort orders by most recent first
       setOrders(Array.isArray(data) ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : []);
     } catch (err) {
       console.error("Failed to fetch orders", err);
@@ -53,188 +57,219 @@ const MyOrders = () => {
       case "Delivered": 
         return { 
           color: "bg-emerald-50 text-emerald-600 border-emerald-100", 
-          icon: <CheckCircle2 size={14} />,
+          dot: "bg-emerald-500",
+          icon: <CheckCircle2 size={12} className="shrink-0" />,
           text: "Delivered"
         };
       case "Processing": 
         return { 
           color: "bg-amber-50 text-amber-600 border-amber-100", 
-          icon: <Clock size={14} />,
+          dot: "bg-amber-500",
+          icon: <Clock size={12} className="shrink-0 animate-pulse" />,
           text: "Processing"
         };
       case "OutForDelivery": 
         return { 
           color: "bg-blue-50 text-blue-600 border-blue-100", 
-          icon: <Truck size={14} />,
+          dot: "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]",
+          icon: <Truck size={12} className="shrink-0" />,
           text: "Out for Delivery"
         };
       case "Cancelled": 
         return { 
           color: "bg-rose-50 text-rose-600 border-rose-100", 
-          icon: <XCircle size={14} />,
+          dot: "bg-rose-500",
+          icon: <XCircle size={12} className="shrink-0" />,
           text: "Cancelled"
         };
       default: 
         return { 
           color: "bg-slate-50 text-slate-600 border-slate-100", 
-          icon: <Package size={14} />,
+          dot: "bg-slate-500",
+          icon: <Package size={12} className="shrink-0" />,
           text: status 
         };
     }
   };
 
+  const filteredOrders = orders.filter(order => 
+    order._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    order.items.some(item => item.name?.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-            <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-            <p className="font-black text-slate-800 uppercase tracking-widest text-xs">Fetching Freshness...</p>
+      <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">
+        <div className="flex flex-col items-center gap-6 relative z-10">
+            <motion.div 
+               animate={{ rotate: 360 }}
+               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+               className="w-12 h-12 border-2 border-slate-100 border-t-emerald-600 rounded-full"
+            />
+            <div className="text-center">
+              <p className="font-semibold text-slate-900 tracking-wider text-[10px] mb-1">FARMSAGE</p>
+              <p className="text-slate-400 font-medium text-xs">Getting your orders...</p>
+            </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen">
+    <div className="bg-[#fcfdfd] min-h-screen flex flex-col font-sans selection:bg-emerald-100">
       <Navbar />
       
-      <main className="max-w-5xl mx-auto px-4 md:px-8 pt-10 pb-24">
-        {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-          <div className="flex items-center gap-6">
-            <button 
-              onClick={() => navigate('/home')}
-              className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-black/5 hover:-translate-x-1 transition-transform border border-gray-100"
-            >
-              <ArrowLeft size={24} className="text-slate-800" />
-            </button>
-            <div>
-              <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none mb-2">Order History</h1>
-              <p className="text-slate-500 font-medium text-sm flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-                Total {orders.length} orders placed
-              </p>
+      <main className="flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 md:px-8 pt-10 pb-24">
+        {/* Header Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Link
+                to="/home"
+                className="p-2.5 bg-white rounded-xl border border-slate-100 shadow-sm hover:bg-slate-50 transition-all group"
+              >
+                <ArrowLeft size={18} className="text-slate-600" />
+              </Link>
+              <span className="text-slate-400 font-semibold text-[11px] uppercase tracking-widest">Order History</span>
             </div>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+              My <span className="text-emerald-600">Orders</span>
+            </h1>
           </div>
 
-          <div className="flex items-center bg-white p-2 rounded-2xl border border-gray-100 shadow-sm md:w-64">
-            <Search size={18} className="text-slate-400 ml-2" />
+          <div className="relative group md:max-w-xs w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
             <input 
               type="text" 
-              placeholder="Search by ID or Product" 
-              className="bg-transparent border-none outline-none px-3 text-sm font-medium w-full"
+              placeholder="Search orders..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-slate-100 rounded-xl py-3.5 pl-12 pr-4 text-sm font-medium shadow-sm focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-300"
             />
           </div>
-        </div>
+        </motion.div>
 
-        {orders.length === 0 ? (
+        {filteredOrders.length === 0 ? (
           <motion.div 
-             initial={{ opacity: 0, scale: 0.95 }}
-             animate={{ opacity: 1, scale: 1 }}
-             className="bg-white rounded-[3rem] p-16 text-center border border-gray-100 shadow-2xl shadow-emerald-100/20"
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             className="bg-white rounded-[2rem] p-16 text-center border border-slate-50 shadow-sm"
           >
-            <div className="w-36 h-36 bg-emerald-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 relative">
-              <ShoppingBag size={56} className="text-emerald-300" />
-              <div className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full border-4 border-emerald-50 flex items-center justify-center text-emerald-600">
-                <Package size={16} />
-              </div>
+            <div className="w-32 h-32 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 relative">
+               <ShoppingBag size={48} className="text-slate-200" />
             </div>
-            <h2 className="text-3xl font-black text-slate-900 mb-4">No orders joined yet!</h2>
-            <p className="text-slate-500 max-w-sm mx-auto mb-10 font-medium">
-              Start your organic journey today. Explore our fresh harvests and direct-from-farm products.
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">No orders yet</h2>
+            <p className="text-slate-400 max-w-xs mx-auto mb-8 text-sm font-medium">
+              Looks like you haven't placed any orders from our farms.
             </p>
             <Link to="/category/all">
-              <button className="bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black shadow-xl shadow-emerald-200 hover:bg-emerald-700 hover:scale-105 transition-all">
-                 Browse Marketplace
+              <button className="bg-emerald-600 text-white px-8 py-3.5 rounded-xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-95">
+                 Start Shopping
               </button>
             </Link>
           </motion.div>
         ) : (
-          <div className="grid gap-8">
+          <div className="space-y-6">
             <AnimatePresence>
-              {orders.map((order, idx) => {
+              {filteredOrders.map((order, idx) => {
                 const status = getStatusConfig(order.status);
+                const orderDate = new Date(order.createdAt).toLocaleDateString('en-GB', {
+                  day: 'numeric', month: 'short', year: 'numeric'
+                });
+
                 return (
                   <motion.div
                     key={order._id}
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="group bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-emerald-100/30 transition-all duration-500"
+                    transition={{ delay: idx * 0.05 }}
+                    className="bg-white rounded-2xl border border-slate-100 overflow-hidden hover:border-emerald-100 transition-all group lg:flex"
                   >
-                    {/* Header: ID, Date, Amount */}
-                    <div className="p-8 pb-4 flex flex-wrap items-start justify-between gap-6">
-                      <div className="flex gap-4">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border ${status.color}`}>
-                          {status.icon}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-3 mb-1">
-                            <span className="text-xl font-black text-slate-900">Order #{order._id.slice(-6).toUpperCase()}</span>
-                            <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${status.color}`}>
+                    {/* Left Section: Meta Box */}
+                    <div className="p-6 md:p-8 lg:w-72 bg-slate-50/50 border-r border-slate-100 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Order ID</span>
+                           <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border bg-white ${status.color}`}>
                               {status.text}
                             </div>
-                          </div>
-                          <div className="flex items-center gap-4 text-slate-400 text-xs font-bold uppercase tracking-tighter">
-                            <span className="flex items-center gap-1.5"><Clock size={12}/> {new Date(order.createdAt).toLocaleDateString()}</span>
-                            <span className="flex items-center gap-1.5"><MapPin size={12}/> {order.deliveryAddress.city}</span>
-                          </div>
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900 mb-4 tracking-tight">#{order._id.slice(-6).toUpperCase()}</h3>
+                        
+                        <div className="space-y-3">
+                           <div className="flex items-center gap-2.5 text-slate-500 font-medium text-xs">
+                              <Calendar size={14} className="text-slate-300" />
+                              {orderDate}
+                           </div>
+                           <div className="flex items-center gap-2.5 text-slate-500 font-medium text-xs">
+                              <CreditCard size={14} className="text-slate-300" />
+                              {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid Online'}
+                           </div>
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Paid</p>
-                        <p className="text-3xl font-black text-emerald-600 tracking-tighter leading-none">₹{order.totalAmount}</p>
-                        <div className="flex items-center justify-end gap-1.5 mt-2 text-slate-400">
-                          <CreditCard size={14} />
-                          <span className="text-[10px] font-bold uppercase tracking-widest">{order.paymentMethod}</span>
-                        </div>
+                      <div className="mt-8 pt-6 border-t border-slate-200/50">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Order Amount</p>
+                        <p className="text-2xl font-bold text-slate-900 tracking-tight">₹{order.totalAmount}</p>
                       </div>
                     </div>
 
-                    {/* Order Items Horizontal Scroll / List */}
-                    <div className="px-8 py-6">
-                      <div className="space-y-4">
-                        {order.items.map((item, iIdx) => {
-                          const name = item.name || getProductDetails(item.productId).name;
-                          const image = item.image || getProductDetails(item.productId).image;
+                    {/* Right Section: Items & Actions */}
+                    <div className="flex-1 flex flex-col p-6 md:p-8">
+                       <div className="flex-1">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Order Items ({order.items.length})</p>
+                          <div className="space-y-5">
+                            {order.items.map((item, iIdx) => {
+                              const name = item.name || getProductDetails(item.productId).name;
+                              const image = item.image || getProductDetails(item.productId).image;
 
-                          return (
-                            <div key={iIdx} className="flex items-center gap-5 p-3 rounded-2xl border border-transparent hover:border-emerald-50 hover:bg-emerald-50/10 transition-all group/item">
-                              <div className="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden border border-gray-100 shrink-0">
-                                <img src={image} alt={name} className="w-full h-full object-contain p-2" />
-                              </div>
-                              <div className="flex-1">
-                                <h4 className="font-bold text-slate-800">{name}</h4>
-                                <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-                                  <span>{item.weight}</span>
-                                  <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
-                                  <span>Qty: {item.quantity}</span>
+                              return (
+                                <div key={iIdx} className="flex items-center gap-4">
+                                  <div className="w-12 h-12 bg-slate-50 rounded-xl overflow-hidden border border-slate-100 shrink-0 p-1.5 grayscale-[0.2] hover:grayscale-0 transition-all">
+                                    <img src={image} alt={name} className="w-full h-full object-contain" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="font-semibold text-slate-800 text-sm truncate">{name}</h4>
+                                    <p className="text-[11px] font-medium text-slate-400 mt-0.5">
+                                      {item.weight} <span className="mx-1.5 text-slate-200">|</span> Qty: {item.quantity}
+                                    </p>
+                                  </div>
+                                  <div className="text-right">
+                                     <p className="font-bold text-slate-700 text-sm">₹{item.price * item.quantity}</p>
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-black text-slate-900 text-sm">₹{item.price * item.quantity}</p>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Footer / Actions */}
-                    <div className="px-8 py-5 bg-gray-50/50 flex flex-wrap items-center justify-between gap-4 border-t border-gray-100/50">
-                       <div className="flex items-center gap-2 text-emerald-600 font-bold text-xs uppercase tracking-widest">
-                         <MapPin size={14} />
-                         Deliver to: <span className="text-slate-700">{order.deliveryAddress.addressLine}, {order.deliveryAddress.city}</span>
+                              );
+                            })}
+                          </div>
                        </div>
-                       
-                       <div className="flex items-center gap-4">
-                          <button className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-black text-slate-800 hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2">
-                             Request Invoice <ExternalLink size={14} />
-                          </button>
-                          <button className="px-6 py-2.5 bg-white border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl text-xs font-black transition-all shadow-sm flex items-center gap-2">
-                             Reorder <ChevronRight size={14} />
-                          </button>
+
+                       <div className="mt-10 pt-8 border-t border-slate-50 flex flex-wrap items-center justify-between gap-6">
+                         <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                               <MapPin size={14} />
+                            </div>
+                            <div>
+                               <p className="text-[10px] font-bold text-slate-400 uppercase">Ships to</p>
+                               <p className="text-[11px] font-semibold text-slate-600 truncate max-w-[150px] md:max-w-xs">{order.deliveryAddress.city}</p>
+                            </div>
+                         </div>
+                         
+                         <div className="flex items-center gap-3 w-full sm:w-auto">
+                            <button className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-100 text-xs font-bold text-slate-600 hover:bg-slate-50 flex items-center justify-center gap-2">
+                               <FileText size={14} /> Invoice
+                            </button>
+                            <button 
+                              onClick={() => navigate('/category/all')}
+                              className="flex-1 sm:flex-none px-6 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-lg shadow-emerald-50 transition-all flex items-center justify-center gap-2"
+                            >
+                               Reorder
+                               <ChevronRight size={14} />
+                            </button>
+                         </div>
                        </div>
                     </div>
                   </motion.div>
