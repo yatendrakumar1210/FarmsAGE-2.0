@@ -30,7 +30,6 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
-   
     vendorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

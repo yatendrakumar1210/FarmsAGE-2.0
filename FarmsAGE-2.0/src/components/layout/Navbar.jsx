@@ -11,16 +11,22 @@ import {
   ChevronDown,
   Leaf,
   Package,
-  ShieldCheck
+  ShieldCheck,
+  Loader2
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
+import { getAddressFromCoords } from "../../utils/getAddress";
+import { saveAddress } from "../../services/locationServices";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [locationName, setLocationName] = useState("Bulandshahr");
+  const [locationName, setLocationName] = useState(
+    () => localStorage.getItem("detectedLocation") || "Detect Location"
+  );
+  const [loadingLocation, setLoadingLocation] = useState(false);
   const routerLocation = useLocation();
   const { cart } = useCart();
   const { user, logout } = useAuth();
@@ -35,6 +41,56 @@ const Navbar = () => {
 
   // Close mobile menu on route change
   useEffect(() => setOpen(false), [routerLocation]);
+
+  // Clear detected location if user logs out
+  useEffect(() => {
+    if (!user) {
+      localStorage.removeItem("detectedLocation");
+      setLocationName("Detect Location");
+    }
+  }, [user]);
+
+  const handleDetectLocation = () => {
+    setLoadingLocation(true);
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      setLoadingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const addressData = await getAddressFromCoords(latitude, longitude);
+
+          if (addressData) {
+            const locName = addressData.city || addressData.fullAddress;
+            setLocationName(locName);
+            localStorage.setItem("detectedLocation", locName);
+            
+            // Optional: Save to backend if user is logged in
+            if (user) {
+              await saveAddress({ 
+                address: addressData.fullAddress, 
+                latitude, 
+                longitude 
+              });
+            }
+          }
+        } catch (err) {
+          console.error("Location error:", err);
+        } finally {
+          setLoadingLocation(false);
+        }
+      },
+      (err) => {
+        console.error(err);
+        setLoadingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+    );
+  };
 
   return (
     <nav
@@ -57,11 +113,19 @@ const Navbar = () => {
         </Link>
 
         {/* 2. Delivery Location (Desktop) */}
-        <div className="hidden lg:flex flex-col border-l border-gray-200 pl-4 ml-2 cursor-pointer group">
+        <div 
+          onClick={handleDetectLocation}
+          className="hidden lg:flex flex-col border-l border-gray-200 pl-4 ml-2 cursor-pointer group hover:bg-emerald-50/50 py-1 transition-colors rounded-r-lg"
+        >
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter leading-none">
-            Delivery in 30 mins
+            {loadingLocation ? "Detecting..." : "Delivery in 30 mins"}
           </span>
           <div className="flex items-center gap-1 text-slate-800">
+            {loadingLocation ? (
+              <Loader2 size={14} className="animate-spin text-emerald-600" />
+            ) : (
+              <MapPin size={14} className="text-emerald-600" />
+            )}
             <span className="text-sm font-bold truncate max-w-[120px]">
               {locationName}
             </span>
@@ -211,9 +275,18 @@ const Navbar = () => {
             </>
           )}
           <hr />
-          <div className="flex items-center gap-3 text-emerald-600 text-sm">
-            <MapPin size={18} />
-            <span>Deliver to: {locationName}</span>
+          <div 
+            onClick={handleDetectLocation}
+            className="flex items-center gap-3 text-emerald-600 text-sm cursor-pointer hover:bg-emerald-50 p-2 rounded-xl transition-colors"
+          >
+            {loadingLocation ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <MapPin size={18} />
+            )}
+            <span className="font-bold">
+              {loadingLocation ? "Detecting location..." : `Deliver to: ${locationName}`}
+            </span>
           </div>
         </div>
       </div>

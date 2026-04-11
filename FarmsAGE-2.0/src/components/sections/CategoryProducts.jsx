@@ -64,14 +64,14 @@ const CategoryProducts = ({ title, productsData }) => {
                 <button
                   key={cat.id}
                   onClick={() => navigate(cat.path)}
-                  className={`flex items-center gap-3 px-6 py-3 transition-transform border-r-4 ${
+                  className={`flex items-center gap-3 px-6 py-3 transition-colors border-l-4 ${
                     isActive
-                      ? "bg-emerald-50 border-emerald-500 text-emerald-800 font-black shadow-sm"
-                      : "border-transparent text-gray-500 hover:bg-gray-50"
+                      ? "bg-pink-50 border-pink-500 text-pink-700 font-bold"
+                      : "border-transparent text-gray-600 hover:bg-gray-50"
                   }`}
                 >
                   <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center p-2 ${isActive ? "bg-white shadow-xl shadow-emerald-100" : "bg-gray-50"}`}
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center p-1.5 ${isActive ? "opacity-100" : "opacity-80 grayscale"}`}
                   >
                     <img
                       src={cat.icon}
@@ -107,7 +107,7 @@ const CategoryProducts = ({ title, productsData }) => {
                   }`}
                 >
                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center p-2.5 ${
-                    isActive ? "bg-emerald-600 shadow-lg shadow-emerald-200" : "bg-white border border-gray-100"
+                    isActive ? "bg-pink-600 shadow-lg shadow-pink-200" : "bg-white border border-gray-100"
                   }`}>
                     <img
                       src={cat.icon}
@@ -117,7 +117,7 @@ const CategoryProducts = ({ title, productsData }) => {
                     />
                   </div>
                   <span className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${
-                    isActive ? "text-emerald-600" : "text-gray-400"
+                    isActive ? "text-pink-600" : "text-gray-400"
                   }`}>
                     {cat.id === "all" ? "All" : cat.name.split(' ').pop()}
                   </span>
@@ -141,7 +141,7 @@ const CategoryProducts = ({ title, productsData }) => {
           </div>
 
           {/* Product Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 gap-y-6">
             {productsData.map((item) => (
               <motion.div
                 key={item.id}
