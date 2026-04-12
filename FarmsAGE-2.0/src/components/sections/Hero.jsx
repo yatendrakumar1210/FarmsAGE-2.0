@@ -53,8 +53,8 @@ const Hero = () => {
                 </div>
 
                 <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white tracking-tight leading-[1.05] font-['Outfit']">
-                  Local Vendors <br />
-                  <span className="text-emerald-400">Nearby You</span> <br />
+                  Freshness <br />
+                  <span className="text-emerald-400">Delivered</span> <br />
                   in{" "}
                   <span className="underline decoration-amber-400 decoration-8 underline-offset-4">
                     Minutes.
