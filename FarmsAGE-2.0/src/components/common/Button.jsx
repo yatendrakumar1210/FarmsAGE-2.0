@@ -14,18 +14,23 @@ const Button = () => {
   };
 
   return (
-    <div className="flex gap-5 justify-center text-white brightness-100  ">
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full">
+      {/* Order Now */}
       <button
         onClick={handleOrderNow}
-        className="rounded-full bg-green-600 w-30 h-10 active:scale-95 hover:bg-green-700 "
+        className="w-full sm:w-auto px-6 py-2.5 sm:py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-all active:scale-95 flex items-center justify-center gap-2"
       >
         Order Now
+        <ArrowRight size={16} />
       </button>
+
+      {/* Vendor */}
       <button
         onClick={handleVendor}
-        className="rounded-full bg-green-600 w-35 h-10 active:scale-95 hover:bg-green-700"
+        className="w-full sm:w-auto px-6 py-2.5 sm:py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-all active:scale-95 flex items-center justify-center gap-2"
       >
         Become a Vendor
+        <ArrowRight size={16} />
       </button>
     </div>
   );

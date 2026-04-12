@@ -54,9 +54,9 @@ const CategoryProducts = ({ title, productsData }) => {
 
   return (
     <section className="bg-white min-h-screen">
-      <div className="max-w-[1400px] mx-auto flex pt-4">
-        {/* Left Sidebar - Categories */}
-        <aside className="w-64 flex-shrink-0 border-r border-gray-100 hidden md:block sticky top-20 h-[calc(100vh-80px)] overflow-y-auto pt-4 shadow-sm">
+      <div className="w-full max-w-7xl mx-auto flex">
+        {/* Sidebar */}
+        <aside className="hidden md:flex flex-col w-56 lg:w-64 flex-shrink-0 border-r border-gray-100 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto pt-4 bg-white">
           <div className="flex flex-col">
             {SIDEBAR_CATEGORIES.map((cat) => {
               const isActive = location.pathname === cat.path;
@@ -64,26 +64,25 @@ const CategoryProducts = ({ title, productsData }) => {
                 <button
                   key={cat.id}
                   onClick={() => navigate(cat.path)}
-                  className={`flex items-center gap-3 px-6 py-3 transition-colors border-l-4 ${
+                  className={`flex items-center gap-3 px-4 lg:px-6 py-2.5 transition-all border-l-4 ${
                     isActive
-                      ? "bg-pink-50 border-pink-500 text-pink-700 font-bold"
+                      ? "bg-pink-50 border-pink-500 text-pink-700 font-semibold"
                       : "border-transparent text-gray-600 hover:bg-gray-50"
                   }`}
                 >
                   <div
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center p-1.5 ${isActive ? "opacity-100" : "opacity-80 grayscale"}`}
+                    className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center p-1.5 ${
+                      isActive ? "opacity-100" : "opacity-80 grayscale"
+                    }`}
                   >
                     <img
                       src={cat.icon}
                       className="w-full h-full object-contain"
                       alt={cat.name}
-                      onError={(e) => {
-                        e.target.src =
-                          "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-                      }}
                     />
                   </div>
-                  <span className="text-sm text-left leading-tight font-medium max-w-[100px]">
+
+                  <span className="text-xs lg:text-sm text-left leading-tight font-medium truncate">
                     {cat.name}
                   </span>
                 </button>
@@ -92,47 +91,60 @@ const CategoryProducts = ({ title, productsData }) => {
           </div>
         </aside>
 
-        {/* Right Section - Header + Grid */}
-        <div className="flex-1 px-4 md:px-8 py-6 bg-gray-50/30">
-          {/* Mobile Category Picker */}
-          <div className="md:hidden flex overflow-x-auto gap-3 pb-6 scrollbar-hide -mx-4 px-4">
+        {/* Right Content */}
+        <div className="flex-1 w-full px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 bg-gray-50/30">
+          {/* Mobile Categories */}
+          <div className="md:hidden flex overflow-x-auto gap-3 pb-4 scrollbar-hide snap-x snap-mandatory">
             {SIDEBAR_CATEGORIES.map((cat) => {
               const isActive = location.pathname === cat.path;
               return (
                 <button
                   key={cat.id}
                   onClick={() => navigate(cat.path)}
-                  className={`flex flex-col items-center gap-2 shrink-0 transition-all ${
+                  className={`flex flex-col items-center gap-1.5 shrink-0 snap-start ${
                     isActive ? "scale-105" : "opacity-70"
                   }`}
                 >
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center p-2.5 ${
-                    isActive ? "bg-pink-600 shadow-lg shadow-pink-200" : "bg-white border border-gray-100"
-                  }`}>
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center p-2 ${
+                      isActive
+                        ? "bg-pink-600 shadow-md"
+                        : "bg-white border border-gray-100"
+                    }`}
+                  >
                     <img
                       src={cat.icon}
-                      className={`w-full h-full object-contain ${isActive ? "brightness-0 invert" : ""}`}
+                      className={`w-full h-full object-contain ${
+                        isActive ? "brightness-0 invert" : ""
+                      }`}
                       alt={cat.name}
-                      onError={(e) => { e.target.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png"; }}
                     />
                   </div>
-                  <span className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${
-                    isActive ? "text-pink-600" : "text-gray-400"
-                  }`}>
-                    {cat.id === "all" ? "All" : cat.name.split(' ').pop()}
+
+                  <span
+                    className={`text-[10px] font-bold whitespace-nowrap ${
+                      isActive ? "text-pink-600" : "text-gray-400"
+                    }`}
+                  >
+                    {cat.id === "all" ? "All" : cat.name.split(" ").pop()}
                   </span>
                 </button>
               );
             })}
           </div>
 
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-black text-gray-900">{title}</h2>
-            <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-100 shadow-sm">
-              <span className="text-xs text-gray-400 font-bold uppercase tracking-tighter">
-                Sort By:
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+            <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">
+              {title}
+            </h2>
+
+            <div className="flex items-center gap-2 bg-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-gray-100 shadow-sm w-fit">
+              <span className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase">
+                Sort:
               </span>
-              <select className="text-xs font-black text-emerald-600 bg-transparent cursor-pointer outline-none">
+
+              <select className="text-[10px] sm:text-xs font-bold text-emerald-600 bg-transparent cursor-pointer outline-none">
                 <option>Relevance</option>
                 <option>Price: Low to High</option>
                 <option>Price: High to Low</option>
@@ -141,7 +153,7 @@ const CategoryProducts = ({ title, productsData }) => {
           </div>
 
           {/* Product Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 gap-y-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-5 md:gap-6">
             {productsData.map((item) => (
               <motion.div
                 key={item.id}
@@ -149,6 +161,7 @@ const CategoryProducts = ({ title, productsData }) => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3 }}
+                className="h-full"
               >
                 <ProductCard product={item} />
               </motion.div>
