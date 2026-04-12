@@ -155,8 +155,8 @@ const Navbar = () => {
         {/* 4. Action Icons */}
         <div className="flex items-center gap-2 sm:gap-6">
           {user ? (
-            <div className="relative group hidden sm:flex items-center gap-2 font-bold text-slate-700 cursor-pointer">
-              <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+            <div className="relative group flex items-center gap-2 font-bold text-slate-700 cursor-pointer">
+              <div className="w-8 h-8 sm:w-8 sm:h-8 w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
                 <User size={16} />
               </div>
               <span className="text-sm truncate max-w-[100px]">{user.name || "User"}</span>
@@ -179,7 +179,7 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="hidden sm:flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600 transition-colors"
             >
               <User size={20} />
               <span className="text-sm">Login</span>
@@ -264,13 +264,15 @@ const Navbar = () => {
           ) : (
             <>
               <Link to="/home">Home</Link>
-              <Link to="/my-orders">My Orders</Link>
+              {!user && <Link to="/login" className="text-emerald-600">Login / Signup</Link>}
+              {user && <Link to="/my-orders">My Orders</Link>}
               <Link to="/category/fruits">Seasonal Fruits</Link>
               <Link to="/category/vegetables">Fresh Vegetables</Link>
               <Link to="/category/dairy">Dairy Products</Link>
               <Link to="/category/organic">Organic Selection</Link>
               <Link to="/offers">Daily Deals</Link>
               <Link to="/contact">Help & Support</Link>
+              {user && <button onClick={logout} className="text-left text-red-500">Logout</button>}
             </>
           )}
           <hr />
