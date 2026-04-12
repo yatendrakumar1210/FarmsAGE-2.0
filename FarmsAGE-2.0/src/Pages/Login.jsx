@@ -6,6 +6,9 @@ import { useAuth } from "../context/AuthContext";
 import { useGoogleLogin } from '@react-oauth/google';
 import logo from "../assets/logo.jpg"
 
+const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+
+
 const Login = () => {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -20,7 +23,7 @@ const Login = () => {
       try {
         setLoading(true);
         setError("");
-        const res = await fetch("https://farmsage-2-0-2.onrender.com/api/auth/google", {
+        const res = await fetch(`${API}/api/auth/google`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ access_token: tokenResponse.access_token }),
@@ -56,7 +59,7 @@ const Login = () => {
     setLoading(true);
     setError("");
     try {
-      const resp = await fetch("https://farmsage-2-0-2.onrender.com/api/auth/send-otp", {
+      const resp = await fetch(`${API}/api/auth/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone })
@@ -83,7 +86,7 @@ const Login = () => {
     setLoading(true);
     setError("");
     try {
-      const resp = await fetch("https://farmsage-2-0-2.onrender.com/api/auth/verify-otp", {
+      const resp = await fetch(`${API}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, otp })
@@ -281,4 +284,5 @@ const Login = () => {
 };
 
 export default Login;
+
 

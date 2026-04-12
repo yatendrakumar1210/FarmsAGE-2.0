@@ -16,3 +16,4 @@ export const getAddressFromCoords = async (lat, lng) => {
   }
 };
 
+

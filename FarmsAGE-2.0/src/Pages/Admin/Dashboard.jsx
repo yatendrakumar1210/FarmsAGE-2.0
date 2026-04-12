@@ -3,6 +3,9 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { ShoppingBag, Users, Apple, TrendingUp, Package, Plus, Megaphone, Settings } from 'lucide-react';
 
+const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+
+
 const Dashboard = () => {
   const [stats, setStats] = useState({
     orders: 0,
@@ -23,9 +26,9 @@ const Dashboard = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [ordersRes, productsRes, usersRes] = await Promise.all([
-        axios.get('https://farmsage-2-0-2.onrender.com/api/admin/orders', { headers }),
-        axios.get('https://farmsage-2-0-2.onrender.com/api/admin/products', { headers }).catch(() => ({ data: [] })),
-        axios.get('https://farmsage-2-0-2.onrender.com/api/admin/users', { headers })
+        axios.get(`${API}/api/admin/orders`, { headers }),
+        axios.get(`${API}/api/admin/products`, { headers }).catch(() => ({ data: [] })),
+        axios.get(`${API}/api/admin/users`, { headers })
       ]);
 
       const totalSales = ordersRes.data.reduce((acc, order) => acc + (order.totalAmount || 0), 0);
@@ -167,4 +170,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
 

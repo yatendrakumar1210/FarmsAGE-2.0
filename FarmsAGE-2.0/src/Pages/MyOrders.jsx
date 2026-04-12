@@ -23,6 +23,9 @@ import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import products from "../data/products";
 
+const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+
+
 const MyOrders = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
@@ -40,7 +43,7 @@ const MyOrders = () => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("https://farmsage-2-0-2.onrender.com/api/orders/get-order", {
+      const res = await fetch(`${API}/api/orders/get-order`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -286,4 +289,5 @@ const MyOrders = () => {
 };
 
 export default MyOrders;
+
 

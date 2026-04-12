@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+
+
 const ManageOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -12,7 +15,7 @@ const ManageOrders = () => {
     const fetchOrders = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('https://farmsage-2-0-2.onrender.com/api/admin/orders', {
+            const res = await axios.get(`${API}/api/admin/orders`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setOrders(res.data);
@@ -100,4 +103,5 @@ const ManageOrders = () => {
 };
 
 export default ManageOrders;
+
 

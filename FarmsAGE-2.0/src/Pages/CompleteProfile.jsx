@@ -3,6 +3,9 @@ import { ArrowRight, UserCircle, Leaf } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+
+
 const CompleteProfile = () => {
   const [name, setName] = useState("");
   const [role, setRole] = useState("user");
@@ -21,7 +24,7 @@ const CompleteProfile = () => {
     setError("");
     try {
       const token = localStorage.getItem("token");
-      const resp = await fetch("https://farmsage-2-0-2.onrender.com/api/auth/complete-profile", {
+      const resp = await fetch(`${API}/api/auth/complete-profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -143,4 +146,5 @@ const CompleteProfile = () => {
 };
 
 export default CompleteProfile;
+
 

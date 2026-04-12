@@ -96,3 +96,4 @@ export const CartProvider = ({ children }) => {
   );
 };
 
+

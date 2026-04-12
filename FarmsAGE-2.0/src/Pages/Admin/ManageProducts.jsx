@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+
+
 const ManageProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -22,7 +25,7 @@ const ManageProducts = () => {
     const fetchProducts = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('https://farmsage-2-0-2.onrender.com/api/admin/products', {
+            const res = await axios.get(`${API}/api/admin/products`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Fallback for public products if admin specific fails
@@ -76,7 +79,7 @@ const ManageProducts = () => {
             if (editingProduct) {
                 await axios.put(`https://farmsage-2-0-2.onrender.com/api/admin/products/${editingProduct._id}`, formData, { headers });
             } else {
-                await axios.post('https://farmsage-2-0-2.onrender.com/api/admin/products', formData, { headers });
+                await axios.post(`${API}/api/admin/products`, formData, { headers });
             }
             setShowModal(false);
             fetchProducts();
@@ -194,4 +197,5 @@ const ManageProducts = () => {
 };
 
 export default ManageProducts;
+
 

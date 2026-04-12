@@ -100,3 +100,4 @@ const DetectLocation = ({ onLocationDetected }) => {
 
 export default DetectLocation;
 
+

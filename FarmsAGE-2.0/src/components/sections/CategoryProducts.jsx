@@ -175,3 +175,4 @@ const CategoryProducts = ({ title, productsData }) => {
 
 export default CategoryProducts;
 
+

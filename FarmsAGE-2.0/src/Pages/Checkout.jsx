@@ -7,6 +7,9 @@ import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import DetectLocation from "../components/location/DetectLocation";
 
+const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+
+
 const Checkout = () => {
   const { cart, clearCart } = useCart();
   const navigate = useNavigate();
@@ -53,7 +56,7 @@ const Checkout = () => {
         }))
       };
 
-      const res = await fetch("https://farmsage-2-0-2.onrender.com/api/orders/create", {
+      const res = await fetch(`${API}/api/orders/create`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -85,7 +88,7 @@ const Checkout = () => {
               totalAmount: total
             };
 
-            const verifyRes = await fetch("https://farmsage-2-0-2.onrender.com/api/orders/verify-payment", {
+            const verifyRes = await fetch(`${API}/api/orders/verify-payment`, {
               method: "POST",
               headers: { 
                 "Content-Type": "application/json",
@@ -152,7 +155,7 @@ const Checkout = () => {
         totalAmount: total
       };
 
-      const res = await fetch("https://farmsage-2-0-2.onrender.com/api/orders/cod", {
+      const res = await fetch(`${API}/api/orders/cod`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -380,4 +383,5 @@ const Checkout = () => {
 };
 
 export default Checkout;
+
 

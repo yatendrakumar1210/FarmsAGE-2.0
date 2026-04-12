@@ -1,7 +1,9 @@
+const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+
 export const saveAddress = async (payload) => {
   const token = localStorage.getItem("token");
 
-  const res = await fetch("https://farmsage-2-0-2.onrender.com/api/address/save-address", {
+  const res = await fetch(`${API}/api/address/save-address`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -11,4 +13,5 @@ export const saveAddress = async (payload) => {
   });
   return await res.json();
 };
+
 
