@@ -25,3 +25,4 @@ const Vegetables = () => {
 }
 
 export default Vegetables
+

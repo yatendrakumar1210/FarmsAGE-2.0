@@ -23,9 +23,9 @@ const Dashboard = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [ordersRes, productsRes, usersRes] = await Promise.all([
-        axios.get('http://localhost:3000/api/admin/orders', { headers }),
-        axios.get('http://localhost:3000/api/admin/products', { headers }).catch(() => ({ data: [] })),
-        axios.get('http://localhost:3000/api/admin/users', { headers })
+        axios.get('https://farmsage-2-0-2.onrender.com/api/admin/orders', { headers }),
+        axios.get('https://farmsage-2-0-2.onrender.com/api/admin/products', { headers }).catch(() => ({ data: [] })),
+        axios.get('https://farmsage-2-0-2.onrender.com/api/admin/users', { headers })
       ]);
 
       const totalSales = ordersRes.data.reduce((acc, order) => acc + (order.totalAmount || 0), 0);
@@ -167,3 +167,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

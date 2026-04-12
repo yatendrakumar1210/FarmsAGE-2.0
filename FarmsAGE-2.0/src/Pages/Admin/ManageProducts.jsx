@@ -22,7 +22,7 @@ const ManageProducts = () => {
     const fetchProducts = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:3000/api/admin/products', {
+            const res = await axios.get('https://farmsage-2-0-2.onrender.com/api/admin/products', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Fallback for public products if admin specific fails
@@ -74,9 +74,9 @@ const ManageProducts = () => {
 
         try {
             if (editingProduct) {
-                await axios.put(`http://localhost:3000/api/admin/products/${editingProduct._id}`, formData, { headers });
+                await axios.put(`https://farmsage-2-0-2.onrender.com/api/admin/products/${editingProduct._id}`, formData, { headers });
             } else {
-                await axios.post('http://localhost:3000/api/admin/products', formData, { headers });
+                await axios.post('https://farmsage-2-0-2.onrender.com/api/admin/products', formData, { headers });
             }
             setShowModal(false);
             fetchProducts();
@@ -90,7 +90,7 @@ const ManageProducts = () => {
         if (window.confirm("Are you sure you want to delete this product?")) {
             try {
                 const token = localStorage.getItem('token');
-                await axios.delete(`http://localhost:3000/api/admin/products/${id}`, {
+                await axios.delete(`https://farmsage-2-0-2.onrender.com/api/admin/products/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 fetchProducts();
@@ -194,3 +194,4 @@ const ManageProducts = () => {
 };
 
 export default ManageProducts;
+

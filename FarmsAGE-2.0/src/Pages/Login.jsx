@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Phone, ArrowRight, ShieldCheck, Leaf, ChevronDown, Mail, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useGoogleLogin } from '@react-oauth/google';
 import logo from "../assets/logo.jpg"
 
 const Login = () => {
@@ -14,6 +15,38 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setLoading(true);
+        setError("");
+        const res = await fetch("https://farmsage-2-0-2.onrender.com/api/auth/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ access_token: tokenResponse.access_token }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          login(data.user, data.token);
+          if (data.isNewUser) {
+            navigate("/complete-profile");
+          } else {
+            navigate("/");
+          }
+        } else {
+          setError(data.message || "Google Login failed");
+        }
+      } catch (err) {
+        setError("Server error during Google Login");
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      setError("Google Login failed");
+    }
+  });
+
   const handleSendOtp = async (e) => {
     e.preventDefault();
     if (!phone || phone.length !== 10) {
@@ -23,7 +56,7 @@ const Login = () => {
     setLoading(true);
     setError("");
     try {
-      const resp = await fetch("http://localhost:3000/api/auth/send-otp", {
+      const resp = await fetch("https://farmsage-2-0-2.onrender.com/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone })
@@ -50,7 +83,7 @@ const Login = () => {
     setLoading(true);
     setError("");
     try {
-      const resp = await fetch("http://localhost:3000/api/auth/verify-otp", {
+      const resp = await fetch("https://farmsage-2-0-2.onrender.com/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, otp })
@@ -200,6 +233,7 @@ const Login = () => {
             <div className="flex justify-center gap-8">
               <button
                 type="button"
+                onClick={() => handleGoogleLogin()}
                 className="w-12 h-12 rounded-full border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm"
               >
                 <img
@@ -247,3 +281,4 @@ const Login = () => {
 };
 
 export default Login;
+

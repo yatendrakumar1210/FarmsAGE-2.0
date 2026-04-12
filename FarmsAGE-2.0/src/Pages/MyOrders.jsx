@@ -40,7 +40,7 @@ const MyOrders = () => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:3000/api/orders/get-order", {
+      const res = await fetch("https://farmsage-2-0-2.onrender.com/api/orders/get-order", {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -286,3 +286,4 @@ const MyOrders = () => {
 };
 
 export default MyOrders;
+

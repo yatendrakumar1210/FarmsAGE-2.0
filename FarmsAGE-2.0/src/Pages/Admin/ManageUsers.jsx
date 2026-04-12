@@ -12,7 +12,7 @@ const ManageUsers = () => {
     const fetchUsers = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:3000/api/admin/users', {
+            const res = await axios.get('https://farmsage-2-0-2.onrender.com/api/admin/users', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUsers(res.data);
@@ -64,3 +64,4 @@ const ManageUsers = () => {
 };
 
 export default ManageUsers;
+

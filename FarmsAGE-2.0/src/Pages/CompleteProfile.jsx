@@ -21,7 +21,7 @@ const CompleteProfile = () => {
     setError("");
     try {
       const token = localStorage.getItem("token");
-      const resp = await fetch("http://localhost:3000/api/auth/complete-profile", {
+      const resp = await fetch("https://farmsage-2-0-2.onrender.com/api/auth/complete-profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -143,3 +143,4 @@ const CompleteProfile = () => {
 };
 
 export default CompleteProfile;
+

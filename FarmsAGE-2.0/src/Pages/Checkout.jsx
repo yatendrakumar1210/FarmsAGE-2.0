@@ -53,7 +53,7 @@ const Checkout = () => {
         }))
       };
 
-      const res = await fetch("http://localhost:3000/api/orders/create", {
+      const res = await fetch("https://farmsage-2-0-2.onrender.com/api/orders/create", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -85,7 +85,7 @@ const Checkout = () => {
               totalAmount: total
             };
 
-            const verifyRes = await fetch("http://localhost:3000/api/orders/verify-payment", {
+            const verifyRes = await fetch("https://farmsage-2-0-2.onrender.com/api/orders/verify-payment", {
               method: "POST",
               headers: { 
                 "Content-Type": "application/json",
@@ -152,7 +152,7 @@ const Checkout = () => {
         totalAmount: total
       };
 
-      const res = await fetch("http://localhost:3000/api/orders/cod", {
+      const res = await fetch("https://farmsage-2-0-2.onrender.com/api/orders/cod", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -380,3 +380,4 @@ const Checkout = () => {
 };
 
 export default Checkout;
+

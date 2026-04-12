@@ -164,3 +164,4 @@ const NearbyVendors = () => {
 };
 
 export default NearbyVendors;
+

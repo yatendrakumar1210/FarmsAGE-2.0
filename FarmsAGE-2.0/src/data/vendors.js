@@ -79,3 +79,4 @@ const vendors = [
 ];
 
 export default vendors;
+

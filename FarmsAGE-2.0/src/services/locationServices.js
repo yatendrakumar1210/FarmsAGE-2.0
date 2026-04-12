@@ -1,7 +1,7 @@
 export const saveAddress = async (payload) => {
   const token = localStorage.getItem("token");
 
-  const res = await fetch("http://localhost:3000/api/address/save-address", {
+  const res = await fetch("https://farmsage-2-0-2.onrender.com/api/address/save-address", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -11,3 +11,4 @@ export const saveAddress = async (payload) => {
   });
   return await res.json();
 };
+

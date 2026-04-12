@@ -12,7 +12,7 @@ const ManageOrders = () => {
     const fetchOrders = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:3000/api/admin/orders', {
+            const res = await axios.get('https://farmsage-2-0-2.onrender.com/api/admin/orders', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setOrders(res.data);
@@ -26,7 +26,7 @@ const ManageOrders = () => {
     const updateStatus = async (id, status) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:3000/api/admin/orders/${id}`, { status }, {
+            await axios.put(`https://farmsage-2-0-2.onrender.com/api/admin/orders/${id}`, { status }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchOrders();
@@ -100,3 +100,4 @@ const ManageOrders = () => {
 };
 
 export default ManageOrders;
+
