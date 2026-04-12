@@ -27,12 +27,6 @@ exports.addProduct = async (req, res) => {
   res.json(product);
 };
 
-// 🛒 Get all products
-exports.getProducts = async (req, res) => {
-  const products = await Product.find().sort({ createdAt: -1 });
-  res.json(products);
-};
-
 // ✏️ Update product
 exports.updateProduct = async (req, res) => {
   const product = await Product.findByIdAndUpdate(req.params.id, req.body, {

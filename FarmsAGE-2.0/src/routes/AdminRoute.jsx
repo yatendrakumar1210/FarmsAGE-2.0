@@ -7,7 +7,10 @@ const AdminRoute = ({ children }) => {
   const storedUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
   const adminUser = user || storedUser;
 
+  console.log("AdminRoute - Current User:", adminUser);
+
   if (!adminUser || adminUser.role?.toLowerCase() !== 'admin') {
+    console.warn("Access denied. Redirecting to login...");
     return <Navigate to="/login" replace />;
   }
 

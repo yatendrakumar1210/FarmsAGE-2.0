@@ -53,8 +53,8 @@ const Hero = () => {
                 </div>
 
                 <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white tracking-tight leading-[1.05] font-['Outfit']">
-                  Freshness <br />
-                  <span className="text-emerald-400">Delivered</span> <br />
+                  Local Vendors <br />
+                  <span className="text-emerald-400">Nearby You</span> <br />
                   in{" "}
                   <span className="underline decoration-amber-400 decoration-8 underline-offset-4">
                     Minutes.
@@ -62,8 +62,7 @@ const Hero = () => {
                 </h1>
 
                 <p className="mt-8 text-white/80 text-sm sm:text-base md:text-lg lg:text-xl font-medium max-w-lg leading-relaxed">
-                  Experience the joy of farm-to-table shopping. Get organic
-                  produce hand-picked for your kitchen.
+                  Supporting local fruit & vegetable vendors directly. No warehouses, no middlemen—just fresh produce from your neighborhood sellers.
                 </p>
 
                 <div className="mt-6 sm:mt-8 md:mt-10 flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 w-full sm:w-auto">
@@ -98,15 +97,15 @@ const Hero = () => {
                 </div>
              </div>
              <div className="w-px h-10 bg-white/10" />
-             <div className="flex items-center gap-3 text-white">
+              <div className="flex items-center gap-3 text-white">
                 <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center">
                    <ShieldCheck size={18} className="text-amber-400" />
                 </div>
                 <div>
-                   <p className="text-[10px] font-bold uppercase tracking-widest opacity-60">Certified Organic</p>
-                   <p className="text-sm font-bold">100% Quality Assurance</p>
+                   <p className="text-[10px] font-bold uppercase tracking-widest opacity-60">No Midddlemen</p>
+                   <p className="text-sm font-bold">Direct Vendor Support</p>
                 </div>
-             </div>
+              </div>
              <div className="w-px h-10 bg-white/10" />
              <div className="flex items-center gap-3 text-white">
                 <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
@@ -158,10 +157,10 @@ const Hero = () => {
                 <ShoppingBag size={24} />
               </div>
               <h2 className="text-3xl font-bold text-white tracking-tight font-['Outfit']">
-                Daily Harvest
+                Support Local
               </h2>
               <p className="text-amber-50 text-sm font-medium mt-2">
-                Directly from curated local farms.
+                Empowering neighborhood sellers directly.
               </p>
             </div>
           </motion.div>

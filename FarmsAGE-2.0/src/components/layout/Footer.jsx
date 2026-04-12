@@ -26,8 +26,7 @@ const Footer = () => {
               Join our Green Newsletter
             </h3>
             <p className="text-gray-400">
-              Get 20% off your first order and stay updated with seasonal
-              harvest alerts.
+              Get 20% off your first order and stay updated with local neighborhood vendor alerts.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
@@ -59,9 +58,7 @@ const Footer = () => {
               </h2>
             </div>
             <p className="text-sm leading-relaxed text-gray-400">
-              Revolutionizing the way you buy groceries. From the rich soils of
-              Indian farms directly to your doorstep within 60 minutes. Pure.
-              Organic. Handpicked.
+              Empowering local fruit & vegetable vendors. Connecting you directly to your neighborhood markets with fair prices and instant delivery. No warehouses, no middlemen.
             </p>
             <div className="flex flex-wrap gap-2 sm:gap-3">
               {[Instagram, Facebook, Twitter].map((Icon, index) => (

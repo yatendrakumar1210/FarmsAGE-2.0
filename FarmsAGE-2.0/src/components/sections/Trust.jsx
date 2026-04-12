@@ -12,8 +12,8 @@ const trustFeatures = [
   },
   {
     icon: <Leaf size={28} />,
-    title: "100% Organic",
-    desc: "Pure nature, zero chemical pesticides",
+    title: "Hyperlocal Model",
+    desc: "Connecting you directly to vendors within 10km",
     color: "text-emerald-600",
     bg: "bg-emerald-50",
   },
@@ -26,8 +26,8 @@ const trustFeatures = [
   },
   {
     icon: <Heart size={28} />,
-    title: "Farmer Choice",
-    desc: "Supporting the backbone of our nation",
+    title: "Support Local",
+    desc: "Helping neighborhood vendors grow digitally",
     color: "text-rose-600",
     bg: "bg-rose-50",
   },
@@ -76,8 +76,7 @@ const Trust = () => {
             households in India.
           </h4>
           <p className="text-slate-400 text-xs sm:text-sm md:text-base lg:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-            FarmsAge is more than a marketplace; it's a movement to bridge the
-            gap between rural abundance and urban wellness.
+            FarmsAge is a hyperlocal platform bridging the gap between local fruit & vegetable vendors and urban customers. No warehouses—just fresh produce from your neighbors.
           </p>
         </div>
       </div>

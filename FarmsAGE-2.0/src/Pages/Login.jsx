@@ -15,8 +15,26 @@ const Login = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
+
+  const handleAdminClick = (e) => {
+    e.preventDefault();
+    const storedUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+    const adminUser = user || storedUser;
+
+    if (!adminUser) {
+      setError("Please login first to access the Admin Portal.");
+      return;
+    }
+    
+    if (adminUser.role?.toLowerCase() !== 'admin') {
+      setError("Access Denied: You do not have admin privileges.");
+      return;
+    }
+
+    navigate("/admin");
+  };
 
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -268,15 +286,15 @@ const Login = () => {
 
         {/* Footer Links */}
         <div className="mt-8 flex flex-col items-center gap-4 pb-12">
-          <Link
-            to="/admin"
+          <button
+            onClick={handleAdminClick}
             className="group flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-emerald-600 transition-colors"
           >
             <div className="w-8 h-8 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-emerald-50 group-hover:border-emerald-100 transition-all">
               <ShieldCheck size={14} />
             </div>
             Admin Portal
-          </Link>
+          </button>
         </div>
       </motion.div>
     </div>

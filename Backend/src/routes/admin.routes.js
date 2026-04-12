@@ -4,7 +4,6 @@ const {
   getOrders,
   updateOrder,
   addProduct,
-  getProducts,
   updateProduct,
   deleteProduct,
   getUsers,
@@ -20,7 +19,6 @@ router.use(authMiddleware , adminMiddleware);
 router.get("/orders", getOrders);
 router.put("/orders/:id", updateOrder);
 
-router.get("/products", getProducts);
 router.post("/products", addProduct);
 router.put("/products/:id", updateProduct);
 router.delete("/products/:id", deleteProduct);

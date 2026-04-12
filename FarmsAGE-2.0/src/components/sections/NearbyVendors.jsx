@@ -52,11 +52,11 @@ const NearbyVendors = () => {
             <div>
               <div className="flex items-center gap-2 text-emerald-600 font-bold text-[10px] uppercase tracking-[0.2em] mb-3">
                 <MapPin size={14} />
-                <span>Harvesting Near You</span>
+                <span>Markets Near You</span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight font-['Outfit']">
-                Directly from{" "}
-                <span className="text-emerald-600">Local Farms</span>
+                Shop from{" "}
+                <span className="text-emerald-600">Local Vendors</span>
               </h2>
             </div>
 
@@ -67,7 +67,7 @@ const NearbyVendors = () => {
                   className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 text-white px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-semibold shadow-md hover:bg-emerald-700 transition-all text-xs sm:text-sm active:scale-95"
                 >
                   <Navigation2 size={16} />
-                  Find Farms Near Me
+                  Find Vendors Near Me
                 </button>
               ) : locationStatus === "loading" ? (
                 <div className="flex items-center gap-3 text-emerald-600 font-bold px-8 py-3.5 bg-emerald-50 rounded-2xl">
@@ -146,11 +146,10 @@ const NearbyVendors = () => {
                       <Store size={32} className="text-slate-300" />
                     </div>
                     <h3 className="text-xl font-bold text-slate-800 mb-2">
-                      No Farms Nearby Yet
+                      No Vendors Nearby Yet
                     </h3>
                     <p className="text-slate-500 max-w-xs mx-auto text-sm font-medium">
-                      We're onboarding more farmers daily. Check out our global
-                      selection in the meantime!
+                      We're onboarding more local sellers daily. Supporting neighborhood vendors made easier!
                     </p>
                   </div>
                 </motion.div>

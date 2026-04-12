@@ -7,6 +7,8 @@ import {
   ShoppingCart,
   Users,
   LogOut,
+  Menu,
+  X
 } from "lucide-react";
 import "./admin.css";
 
@@ -24,14 +26,20 @@ const AdminLayout = () => {
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
       <aside
-        className={`fixed md:static top-0 left-0 z-50 h-full w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ${
+        className={`fixed md:static top-0 left-0 z-[120] h-full w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="px-6 py-4 border-b font-bold text-lg">
-            FarmsAGE Admin
+          <div className="px-6 py-6 border-b border-gray-100 flex items-center justify-between">
+            <span className="font-bold text-xl text-slate-800 tracking-tight">Farms<span className="text-emerald-600">AGE</span> Admin</span>
+            <button 
+              className="md:hidden text-gray-500 hover:text-emerald-600"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <X size={24} />
+            </button>
           </div>
 
           {/* Nav */}
@@ -39,10 +47,10 @@ const AdminLayout = () => {
             <NavLink
               to="/admin/dashboard"
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
                   isActive
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                 }`
               }
             >
@@ -53,10 +61,10 @@ const AdminLayout = () => {
             <NavLink
               to="/admin/products"
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
                   isActive
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                 }`
               }
             >
@@ -67,10 +75,10 @@ const AdminLayout = () => {
             <NavLink
               to="/admin/orders"
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
                   isActive
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                 }`
               }
             >
@@ -81,10 +89,10 @@ const AdminLayout = () => {
             <NavLink
               to="/admin/users"
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
                   isActive
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                 }`
               }
             >

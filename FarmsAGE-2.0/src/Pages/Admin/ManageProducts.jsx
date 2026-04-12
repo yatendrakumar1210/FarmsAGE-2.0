@@ -155,8 +155,8 @@ const ManageProducts = () => {
                                 <label>Product Name</label>
                                 <input type="text" name="name" value={formData.name} onChange={handleInputChange} required />
                             </div>
-                            <div className="form-group-row" style={{display: 'flex', gap: '15px'}}>
-                                <div className="form-group" style={{flex: 1}}>
+                            <div className="form-grid">
+                                <div className="form-group">
                                     <label>Category</label>
                                     <select name="category" value={formData.category} onChange={handleInputChange}>
                                         <option value="Fruits">Fruits</option>
@@ -165,7 +165,7 @@ const ManageProducts = () => {
                                         <option value="Dairy">Dairy</option>
                                     </select>
                                 </div>
-                                <div className="form-group" style={{flex: 1}}>
+                                <div className="form-group">
                                     <label>Price (₹)</label>
                                     <input type="number" name="price" value={formData.price} onChange={handleInputChange} required />
                                 </div>
@@ -174,14 +174,14 @@ const ManageProducts = () => {
                                 <label>Image URL</label>
                                 <input type="text" name="image" value={formData.image} onChange={handleInputChange} required />
                             </div>
-                            <div className="form-group-row" style={{display: 'flex', gap: '15px', alignItems: 'center'}}>
-                                <div className="form-group" style={{flex: 1}}>
+                            <div className="form-grid items-center">
+                                <div className="form-group">
                                     <label>Discount (%)</label>
                                     <input type="number" name="discount" value={formData.discount} onChange={handleInputChange} />
                                 </div>
-                                <div className="form-group" style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                                <div className="form-group checkbox-group">
                                     <input type="checkbox" name="isOrganic" checked={formData.isOrganic} onChange={handleInputChange} id="check-organic" />
-                                    <label htmlFor="check-organic" style={{marginBottom: 0}}>Is Organic?</label>
+                                    <label htmlFor="check-organic">Is Organic?</label>
                                 </div>
                             </div>
                             <div className="modal-footer">

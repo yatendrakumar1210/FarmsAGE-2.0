@@ -106,7 +106,7 @@ const Navbar = () => {
           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center overflow-hidden border border-slate-100 shadow-sm group-hover:scale-110 transition-transform duration-300">
             <img className="w-full h-full object-cover" src={logo} alt="FarmsAge Logo" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tighter text-slate-800 hidden sm:block font-['Outfit']">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tighter text-slate-800 font-['Outfit']">
             Farms<span className="text-emerald-600 font-extrabold">AGE</span>
           </h2>
         </Link>
@@ -117,7 +117,7 @@ const Navbar = () => {
           className="hidden lg:flex flex-col border-l border-gray-200 pl-4 ml-2 cursor-pointer group hover:bg-emerald-50/50 py-1 transition-colors rounded-r-lg"
         >
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter leading-none">
-            {loadingLocation ? "Detecting..." : "Delivery in 30 mins"}
+            {loadingLocation ? "Detecting..." : "Direct from Local Vendors"}
           </span>
           <div className="flex items-center gap-1 text-slate-800">
             {loadingLocation ? (
@@ -160,7 +160,7 @@ const Navbar = () => {
                 <User size={16} />
               </div>
               <span className="text-sm truncate max-w-[100px]">{user.name || "User"}</span>
-              <ChevronDown size={14} className="text-slate-400 group-hover:-rotate-180 transition-transform" />
+              
               
               {/* Dropdown menu */}
               <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden z-50">
@@ -199,7 +199,7 @@ const Navbar = () => {
           {user && user.role?.toLowerCase() === 'admin' && (
             <Link
               to="/admin"
-              className="hidden lg:flex items-center gap-2 font-bold text-amber-600 hover:text-amber-700 transition-colors bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100"
+              className="hidden md:flex items-center gap-2 font-bold text-amber-600 hover:text-amber-700 transition-colors bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100"
             >
               <ShieldCheck size={18} />
               <span className="text-sm">Admin Panel</span>
@@ -212,7 +212,7 @@ const Navbar = () => {
               className="relative p-3 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 group"
             >
               <div className="flex items-center gap-2">
-                <ShoppingCart size={20} className="group-hover:shake" />
+                <ShoppingCart size={12} className="group-hover:shake" />
                 <span className="text-sm font-bold hidden md:block">My Cart</span>
               </div>
               <span className="absolute -top-1 -right-1 bg-amber-400 text-slate-900 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
@@ -264,6 +264,9 @@ const Navbar = () => {
           ) : (
             <>
               <Link to="/home">Home</Link>
+              {user && user.role?.toLowerCase() === 'admin' && (
+                <Link to="/admin" className="text-amber-600">Admin Panel</Link>
+              )}
               {!user && <Link to="/login" className="text-emerald-600">Login / Signup</Link>}
               {user && <Link to="/my-orders">My Orders</Link>}
               <Link to="/category/fruits">Seasonal Fruits</Link>
