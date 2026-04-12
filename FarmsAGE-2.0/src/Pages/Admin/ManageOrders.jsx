@@ -29,7 +29,7 @@ const ManageOrders = () => {
     const updateStatus = async (id, status) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`https://farmsage-2-0-2.onrender.com/api/admin/orders/${id}`, { status }, {
+            await axios.put(`${API}/api/admin/orders/${id}`, { status }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchOrders();

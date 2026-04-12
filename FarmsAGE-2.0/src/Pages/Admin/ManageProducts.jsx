@@ -77,7 +77,7 @@ const ManageProducts = () => {
 
         try {
             if (editingProduct) {
-                await axios.put(`https://farmsage-2-0-2.onrender.com/api/admin/products/${editingProduct._id}`, formData, { headers });
+                await axios.put(`${API}/api/admin/products/${editingProduct._id}`, formData, { headers });
             } else {
                 await axios.post(`${API}/api/admin/products`, formData, { headers });
             }
@@ -93,7 +93,7 @@ const ManageProducts = () => {
         if (window.confirm("Are you sure you want to delete this product?")) {
             try {
                 const token = localStorage.getItem('token');
-                await axios.delete(`https://farmsage-2-0-2.onrender.com/api/admin/products/${id}`, {
+                await axios.delete(`${API}/api/admin/products/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 fetchProducts();
