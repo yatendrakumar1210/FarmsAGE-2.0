@@ -7,6 +7,7 @@ const authSystem = require('./routes/auth.routes')
 const paymentSystem = require('./routes/order.routes')
 const adminSystem = require('./routes/admin.routes')
 const addressSystem = require('./routes/address.routes');
+const googleAuth = require('./routes/auth.routes');
 
 const app = express();
 app.use(express.json())
@@ -19,6 +20,7 @@ app.use('/api/auth' , authSystem);
 app.use('/api/orders', paymentSystem); 
 app.use('/api/admin' , adminSystem);
 app.use('/api/address', addressSystem);
+app.use('api/email', googleAuth)
 
 
 app.get('/' ,(req, res)=>{

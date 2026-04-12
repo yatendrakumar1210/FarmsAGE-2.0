@@ -555,3 +555,92 @@ export const apiRequest = async (endpoint, options = {}) => {
 4. Verify redirect to Order Success page
 5. Check MongoDB — order should have `paymentStatus: "Paid"` and Razorpay IDs populated
 
+
+
+GOOGLE AUTH SYSTEM----------------------
+
+# Implementation Plan: Google Authorization (OAuth2)
+
+This plan outlines the steps to integrate Google Sign-In into the FarmsAge application.
+
+## 1. Prerequisites (Manual Setup)
+Before coding, you must set up the Google Cloud Console:
+- Go to [Google Cloud Console](https://console.cloud.google.com/).
+- Create a new project named **FarmsAge**.
+- Navigate to **APIs & Services > OAuth consent screen**.
+  - Internal or External? Select **External**.
+  - Fill in App Name, User Support Email, and Developer Contact Info.
+- Navigate to **APIs & Services > Credentials**.
+  - Click **Create Credentials > OAuth client ID**.
+  - Application type: **Web application**.
+  - Name: **FarmsAge Client**.
+  - Authorized JavaScript origins: `http://localhost:5173`.
+  - Authorized redirect URIs: `http://localhost:5173`.
+- Copy your **Client ID** and **Client Secret**.
+
+## 2. Environment Configuration
+Update the `.env` files in both Backend and Frontend.
+
+**Backend (`Backend/.env`):**
+```env
+GOOGLE_CLIENT_ID=your_client_id_here
+```
+
+**Frontend (`FarmsAGE-2.0/.env` or `.env.local`):**
+```env
+VITE_GOOGLE_CLIENT_ID=your_client_id_here
+```
+
+## 3. Backend Implementation
+
+### Dependencies
+Install the required library in the `Backend` directory:
+```bash
+npm install google-auth-library
+```
+
+### Route Updates
+Add a new route to `Backend/src/routes/auth.routes.js`:
+```javascript
+router.post("/google-login", googleLogin);
+```
+
+### Controller Implementation
+Implement `googleLogin` in `Backend/src/controller/auth.controller.js`:
+- Verify the ID Token using `OAuth2Client`.
+- Extract user info (email, name, picture).
+- Check if user exists in MongoDB.
+- If not, create a new user.
+- Generate a JWT and return it to the frontend.
+
+## 4. Frontend Implementation
+
+### Dependencies
+Install the required library in the `FarmsAGE-2.0` directory:
+```bash
+npm install @react-oauth/google
+```
+
+### Provider Setup
+Wrap the application in `main.jsx`:
+```javascript
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+    <App />
+  </GoogleOAuthProvider>
+);
+```
+
+### Login Button Integration
+Update the Login page (likely `FarmsAGE-2.0/src/Pages/Auth/Login.jsx`):
+- Add the `GoogleLogin` component.
+- On success, call the backend `/api/auth/google-login` with the `credential`.
+- Update `AuthContext` to handle the returned token.
+
+## 5. Testing
+- Verify that a user can sign in with their Google account.
+- Check that the user is correctly saved in the database.
+- Ensure the profile information (name, email) is populated.
+- Test both new user registration and existing user login via Google.

@@ -62,8 +62,7 @@ const products = [
     price: 30,
     oldPrice: 45,
     discount: "33% OFF",
-    image:
-      "https://media.istockphoto.com/id/1223956229/photo/fresh-cabbage-on-white-background.jpg?s=1024x1024&w=is&k=20&c=ZdvqpVr22Ldn0IULtYouKS8dWFJxwHTCJEY9873N9nc=",
+    image: "https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?w=600",
   },
   {
     id: 9,

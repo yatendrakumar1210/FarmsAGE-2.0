@@ -4,13 +4,31 @@ const userSchema = new mongoose.Schema(
   {
     phone: {
       type: String,
-      required: true,
       unique: true,
+      sparse: true, // ✅ allows null values
+    },
+
+    email: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    googleId: {
+      type: String,
     },
 
     name: {
       type: String,
       default: "",
+    },
+
+    profilePic: String,
+
+    authProvider: {
+      type: String,
+      enum: ["otp", "google"],
+      default: "otp",
     },
 
     role: {
@@ -26,7 +44,7 @@ const userSchema = new mongoose.Schema(
 
     isVerified: {
       type: Boolean,
-      default: false,
+      default: true, // ✅ Google users are already verified
     },
 
     addresses: [

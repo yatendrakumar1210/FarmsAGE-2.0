@@ -187,7 +187,7 @@ const MyOrders = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
-                    className="bg-white rounded-2xl border border-slate-100 overflow-hidden hover:border-emerald-100 transition-all group lg:flex"
+                    className="bg-amber-50 rounded-2xl border border-slate-100 overflow-hidden hover:border-emerald-100 transition-all group lg:flex"
                   >
                     {/* Left Section: Meta Box */}
                     <div className="p-6 md:p-8 lg:w-72 bg-slate-50/50 border-r border-slate-100 flex flex-col justify-between">

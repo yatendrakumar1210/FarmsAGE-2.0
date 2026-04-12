@@ -5,7 +5,7 @@ const organic = [
     price: 40,
     oldPrice: 55,
     discount: "27% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/8/89/Tomato_je.jpg",
+    image: "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=600",
   },
   {
     id: 2,
@@ -13,7 +13,7 @@ const organic = [
     price: 30,
     oldPrice: 45,
     discount: "33% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Patates.jpg",
+    image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600",
   },
   {
     id: 3,
@@ -21,8 +21,7 @@ const organic = [
     price: 45,
     oldPrice: 60,
     discount: "25% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/2/25/Onion_on_White.JPG",
+    image: "https://images.unsplash.com/photo-1508747703725-719777637510?w=600",
   },
   {
     id: 4,
@@ -30,8 +29,7 @@ const organic = [
     price: 50,
     oldPrice: 70,
     discount: "28% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/7/7e/Carrots_of_many_colors.jpg",
+    image: "https://images.unsplash.com/photo-1447175008436-054170c2e979?w=600",
   },
   {
     id: 5,
@@ -39,8 +37,7 @@ const organic = [
     price: 35,
     oldPrice: 50,
     discount: "30% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/6/6f/Cabbage_and_cross_section_on_white.jpg",
+    image: "https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?w=600",
   },
   {
     id: 6,
@@ -48,8 +45,7 @@ const organic = [
     price: 48,
     oldPrice: 65,
     discount: "26% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/2/2f/Head_of_cauliflower.jpg",
+    image: "https://images.unsplash.com/photo-1638901592594-04adaef61b80?w=600",
   },
   {
     id: 7,
@@ -57,8 +53,7 @@ const organic = [
     price: 25,
     oldPrice: 35,
     discount: "28% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/0/0c/Spinach_leaves.jpg",
+    image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=600",
   },
   {
     id: 8,
@@ -66,7 +61,7 @@ const organic = [
     price: 52,
     oldPrice: 70,
     discount: "25% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/f/fb/Aubergine.jpg",
+    image: "https://images.unsplash.com/photo-1613881553903-4543f5f2cac9?w=600",
   },
   {
     id: 9,
@@ -74,8 +69,7 @@ const organic = [
     price: 95,
     oldPrice: 120,
     discount: "21% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/8/85/Capsicum_annuum_fruits.jpg",
+    image: "https://images.unsplash.com/photo-1723110569384-800b1641c8a3?w=600",
   },
   {
     id: 10,
@@ -83,8 +77,7 @@ const organic = [
     price: 60,
     oldPrice: 80,
     discount: "25% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/4/4b/Green_Chillies.jpg",
+    image: "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=600",
   },
   {
     id: 11,
@@ -92,7 +85,7 @@ const organic = [
     price: 28,
     oldPrice: 40,
     discount: "30% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/0/05/Radishes.jpg",
+    image: "https://images.unsplash.com/photo-1582515073490-39981397c445?w=600",
   },
   {
     id: 12,
@@ -100,8 +93,7 @@ const organic = [
     price: 38,
     oldPrice: 55,
     discount: "31% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/5/59/Bottle_gourd.jpg",
+    image: "https://images.unsplash.com/photo-1603048297172-c92544798d1b?w=600",
   },
   {
     id: 13,
@@ -109,7 +101,7 @@ const organic = [
     price: 45,
     oldPrice: 65,
     discount: "30% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/5/5c/Pumpkins.jpg",
+    image: "https://images.unsplash.com/photo-1506806732259-39c2d0268443?w=600",
   },
   {
     id: 14,
@@ -117,8 +109,7 @@ const organic = [
     price: 58,
     oldPrice: 75,
     discount: "22% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/3/3b/Okra_fruits.jpg",
+    image: "https://images.unsplash.com/photo-1594282418429-7e6c2f20e671?w=600",
   },
   {
     id: 15,
@@ -126,8 +117,7 @@ const organic = [
     price: 120,
     oldPrice: 150,
     discount: "20% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/0/03/Broccoli_and_cross_section_edit.jpg",
+    image: "https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=600",
   },
   {
     id: 16,
@@ -135,7 +125,7 @@ const organic = [
     price: 110,
     oldPrice: 140,
     discount: "21% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/0/0b/Mushroom.jpg",
+    image: "https://images.unsplash.com/photo-1505576633757-0ac1084af824?w=600",
   },
   {
     id: 17,
@@ -143,7 +133,7 @@ const organic = [
     price: 90,
     oldPrice: 120,
     discount: "25% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Ginger.jpg",
+    image: "https://images.unsplash.com/photo-1603048588665-791ca7a8d6a5?w=600",
   },
   {
     id: 18,
@@ -151,7 +141,7 @@ const organic = [
     price: 95,
     oldPrice: 130,
     discount: "27% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Garlic.jpg",
+    image: "https://images.unsplash.com/photo-1615486361962-59c4f3d8b15a?w=600",
   },
   {
     id: 19,
@@ -159,8 +149,7 @@ const organic = [
     price: 35,
     oldPrice: 50,
     discount: "30% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/9/96/Cucumis_sativus.jpg",
+    image: "https://images.unsplash.com/photo-1604977042946-1eecc30f269e?w=600",
   },
   {
     id: 20,
@@ -168,7 +157,7 @@ const organic = [
     price: 30,
     oldPrice: 45,
     discount: "33% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Lemon.jpg",
+    image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?w=600",
   },
   {
     id: 21,
@@ -176,8 +165,7 @@ const organic = [
     price: 47,
     oldPrice: 62,
     discount: "24% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/2/2f/Beets-Bundle.jpg",
+    image: "https://images.unsplash.com/photo-1587486912758-4367d2015d6c?w=600",
   },
   {
     id: 22,
@@ -185,7 +173,7 @@ const organic = [
     price: 40,
     oldPrice: 55,
     discount: "27% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/4/49/Corncobs.jpg",
+    image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600",
   },
   {
     id: 23,
@@ -193,8 +181,7 @@ const organic = [
     price: 65,
     oldPrice: 90,
     discount: "28% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/3/3b/Peas_in_pods.jpg",
+    image: "https://images.unsplash.com/photo-1615485925763-1fdf0e1c1a11?w=600",
   },
   {
     id: 24,
@@ -202,8 +189,7 @@ const organic = [
     price: 20,
     oldPrice: 30,
     discount: "33% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/3/3a/Mentha_spicata.jpg",
+    image: "https://images.unsplash.com/photo-1628556270448-4d4e5c1b6d61?w=600",
   },
   {
     id: 25,
@@ -211,8 +197,7 @@ const organic = [
     price: 22,
     oldPrice: 32,
     discount: "31% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/1/19/Coriander_Leaves.jpg",
+    image: "https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=600",
   },
   {
     id: 26,
@@ -220,8 +205,7 @@ const organic = [
     price: 32,
     oldPrice: 45,
     discount: "29% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/7/7b/Spring_onions.jpg",
+    image: "https://images.unsplash.com/photo-1587735243615-c03f25aaff15?w=600",
   },
   {
     id: 27,
@@ -229,7 +213,7 @@ const organic = [
     price: 110,
     oldPrice: 150,
     discount: "27% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/5/5f/Red_pepper.jpg",
+    image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=600",
   },
   {
     id: 28,
@@ -237,8 +221,7 @@ const organic = [
     price: 115,
     oldPrice: 150,
     discount: "23% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/f/f2/Yellow_pepper.jpg",
+    image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600",
   },
   {
     id: 29,
@@ -246,7 +229,7 @@ const organic = [
     price: 60,
     oldPrice: 80,
     discount: "25% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Zucchini.jpg",
+    image: "https://images.unsplash.com/photo-1593922338166-5e04f056d6a2?w=600",
   },
   {
     id: 30,
@@ -254,9 +237,7 @@ const organic = [
     price: 40,
     oldPrice: 55,
     discount: "27% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/2/2d/Lettuce_May_2010-1.jpg",
+    image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=600",
   },
 ];
-
-export default organic;
+ export default organic;

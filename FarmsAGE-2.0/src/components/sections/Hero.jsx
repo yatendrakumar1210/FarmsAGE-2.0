@@ -72,8 +72,9 @@ const Hero = () => {
             </div>
           </div>
 
+          
           {/* Bottom Trust Strip */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white/5 backdrop-blur-md border-t border-white/10 hidden md:flex items-center justify-around py-6">
+          <div className="absolute bottom-0 left-0 right-0 h-4 bg-white/5 backdrop-blur-md border-t border-white/10 hidden md:flex items-center justify-around py-6">
              <div className="flex items-center gap-3 text-white">
                 <div className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">
                    <Clock size={18} className="text-emerald-400" />

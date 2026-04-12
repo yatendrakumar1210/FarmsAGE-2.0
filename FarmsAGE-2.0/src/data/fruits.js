@@ -5,7 +5,7 @@ const fruits = [
     price: 140,
     oldPrice: 180,
     discount: "22% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg",
+    image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6bc6c?w=600",
   },
   {
     id: 2,
@@ -13,8 +13,7 @@ const fruits = [
     price: 50,
     oldPrice: 65,
     discount: "23% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg",
+    image: "https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=600",
   },
   {
     id: 3,
@@ -22,8 +21,7 @@ const fruits = [
     price: 80,
     oldPrice: 100,
     discount: "20% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/c/c4/Orange-Fruit-Pieces.jpg",
+    image: "https://images.unsplash.com/photo-1547514701-42782101795e?w=600",
   },
   {
     id: 4,
@@ -31,8 +29,7 @@ const fruits = [
     price: 120,
     oldPrice: 150,
     discount: "20% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/9/90/Hapus_Mango.jpg",
+    image: "https://images.unsplash.com/photo-1553279768-865429fa0078?w=600",
   },
   {
     id: 5,
@@ -40,8 +37,7 @@ const fruits = [
     price: 90,
     oldPrice: 120,
     discount: "25% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/c/cb/Pineapple_and_cross_section.jpg",
+    image: "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=600",
   },
   {
     id: 6,
@@ -49,8 +45,7 @@ const fruits = [
     price: 160,
     oldPrice: 200,
     discount: "20% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/2/29/PerfectStrawberry.jpg",
+    image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=600",
   },
   {
     id: 7,
@@ -58,8 +53,7 @@ const fruits = [
     price: 70,
     oldPrice: 90,
     discount: "22% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/f/fb/Watermelon_cross_BNC.jpg",
+    image: "https://images.unsplash.com/photo-1587049352847-ec5611df5b12?w=600",
   },
   {
     id: 8,
@@ -67,8 +61,7 @@ const fruits = [
     price: 60,
     oldPrice: 80,
     discount: "25% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/9/9b/Papaya_cross_section_BNC.jpg",
+    image: "https://images.unsplash.com/photo-1517282009859-f000ec3b26af?w=600",
   },
   {
     id: 9,
@@ -76,7 +69,7 @@ const fruits = [
     price: 55,
     oldPrice: 75,
     discount: "27% OFF",
-    image: "https://upload.wikimedia.org/wikipedia/commons/0/02/Guava_ID.jpg",
+    image: "https://images.unsplash.com/photo-1536510444557-0b5c90b07eff?w=600",
   },
   {
     id: 10,
@@ -84,67 +77,88 @@ const fruits = [
     price: 150,
     oldPrice: 190,
     discount: "21% OFF",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/1/1b/Pomegranate_fruit_-_whole_and_piece.jpg",
+    image: "https://images.unsplash.com/photo-1615485499978-0cb933f72e35?w=600",
   },
   {
     id: 11,
     name: "Kiwi",
-    image: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Kiwi_aka.jpg",
+    price: 180,
+    oldPrice: 220,
+    discount: "18% OFF",
+    image: "https://images.unsplash.com/photo-1585060416973-51fb264f3478?w=600",
   },
   {
     id: 12,
     name: "Blueberry",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/1/15/Blueberries.jpg",
+    price: 250,
+    oldPrice: 300,
+    discount: "16% OFF",
+    image: "https://images.unsplash.com/photo-1425082661705-1834bfd08dca?w=600",
   },
   {
     id: 13,
     name: "Cherry",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/b/bb/Cherry_Stella444.jpg",
+    price: 320,
+    oldPrice: 400,
+    discount: "20% OFF",
+    image: "https://images.unsplash.com/photo-1528821128474-27f963b062bf?w=600",
   },
   {
     id: 14,
     name: "Grapes",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/1/1e/Table_grapes_on_white.jpg",
+    price: 110,
+    oldPrice: 140,
+    discount: "21% OFF",
+    image: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=600",
   },
   {
     id: 15,
     name: "Pear",
-    image: "https://upload.wikimedia.org/wikipedia/commons/c/cf/Pears.jpg",
+    price: 130,
+    oldPrice: 160,
+    discount: "18% OFF",
+    image: "https://images.unsplash.com/photo-1631160299919-6a175aa6d18e?w=600",
   },
   {
     id: 16,
     name: "Peach",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/9/9f/Peach_and_cross_section.jpg",
+    price: 160,
+    oldPrice: 200,
+    discount: "20% OFF",
+    image: "https://images.unsplash.com/photo-1594910243685-618d3637fe31?w=600",
   },
   {
     id: 17,
     name: "Plum",
-    image: "https://upload.wikimedia.org/wikipedia/commons/9/90/Plums.jpg",
+    price: 140,
+    oldPrice: 180,
+    discount: "22% OFF",
+    image: "https://images.unsplash.com/photo-1627918544833-8a3cdbd9116e?w=600",
   },
   {
     id: 18,
     name: "Dragon Fruit",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/8/89/Pitaya_cross_section_ed2.jpg",
+    price: 200,
+    oldPrice: 250,
+    discount: "20% OFF",
+    image: "https://images.unsplash.com/photo-1616853612503-b0fd5e7cc8fc?w=600",
   },
   {
     id: 19,
     name: "Coconut",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/2/2e/Coconut_halves.jpg",
+    price: 40,
+    oldPrice: 50,
+    discount: "20% OFF",
+    image: "https://images.unsplash.com/photo-1550186196-8eb5ed2dd863?w=600",
   },
   {
     id: 20,
     name: "Avocado",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/5/5d/Avocado_cut_open.jpg",
+    price: 250,
+    oldPrice: 320,
+    discount: "21% OFF",
+    image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=600",
   },
 ];
-
 
 export default fruits;

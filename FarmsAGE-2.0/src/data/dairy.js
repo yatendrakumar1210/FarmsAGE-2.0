@@ -5,7 +5,7 @@ const dairy = [
     price: 60,
     oldPrice: 75,
     discount: "20% OFF",
-    image: "iTurn0search11", // Amul Taaza Milk Blinkit
+    image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600",
   },
   {
     id: 2,
@@ -13,7 +13,7 @@ const dairy = [
     price: 120,
     oldPrice: 150,
     discount: "20% OFF",
-    image: "iTurn0search9", // Butter Popcorn/Butter Blinkit
+    image: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=600",
   },
   {
     id: 3,
@@ -21,7 +21,7 @@ const dairy = [
     price: 180,
     oldPrice: 220,
     discount: "18% OFF",
-    image: "iTurn0search1", // Mother Dairy Cheese Blinkit
+    image: "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=600",
   },
   {
     id: 4,
@@ -29,7 +29,7 @@ const dairy = [
     price: 220,
     oldPrice: 260,
     discount: "15% OFF",
-    image: "iTurn0search4", // Gowardhan Paneer Blinkit
+    image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc3?w=600",
   },
   {
     id: 5,
@@ -37,7 +37,7 @@ const dairy = [
     price: 50,
     oldPrice: 65,
     discount: "23% OFF",
-    image: "iTurn0search13", // Curd vs Yogurt Blinkit
+    image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600",
   },
   {
     id: 6,
@@ -45,7 +45,7 @@ const dairy = [
     price: 95,
     oldPrice: 120,
     discount: "21% OFF",
-    image: "iTurn0search16", // Cream Blinkit
+    image: "https://images.unsplash.com/photo-1632054045580-c17cebe16d44?w=600",
   },
   {
     id: 7,
@@ -53,7 +53,7 @@ const dairy = [
     price: 550,
     oldPrice: 620,
     discount: "11% OFF",
-    image: "iTurn0search19", // Amul Cow Ghee Blinkit
+    image: "https://images.unsplash.com/photo-1616422285623-14b3ff28ffcd?w=600",
   },
   {
     id: 8,
@@ -61,7 +61,7 @@ const dairy = [
     price: 35,
     oldPrice: 50,
     discount: "30% OFF",
-    image: "iTurn0search22", // Amul Masti Buttermilk Blinkit
+    image: "https://images.unsplash.com/photo-1559598467-f8b76c8155d0?w=600",
   },
   {
     id: 9,
@@ -69,7 +69,7 @@ const dairy = [
     price: 210,
     oldPrice: 260,
     discount: "19% OFF",
-    image: "iTurn0search25", // Britannia Mozzarella Blinkit
+    image: "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?w=600",
   },
   {
     id: 10,
@@ -77,7 +77,7 @@ const dairy = [
     price: 230,
     oldPrice: 280,
     discount: "18% OFF",
-    image: "iTurn0search28", // Cheddar Cheese Blinkit
+    image: "https://images.unsplash.com/photo-1611599537845-1c7ce0070d13?w=600",
   },
   {
     id: 11,
@@ -85,7 +85,7 @@ const dairy = [
     price: 95,
     oldPrice: 120,
     discount: "21% OFF",
-    image: "iTurn0search35", // Condensed Milk Blinkit
+    image: "https://images.unsplash.com/photo-1596647366965-f938f72a6b22?w=600",
   },
   {
     id: 12,
@@ -93,7 +93,7 @@ const dairy = [
     price: 320,
     oldPrice: 360,
     discount: "11% OFF",
-    image: "iTurn0search32", // Mother Dairy Milk Powder Blinkit
+    image: "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=600",
   },
   {
     id: 13,
@@ -101,7 +101,7 @@ const dairy = [
     price: 120,
     oldPrice: 150,
     discount: "20% OFF",
-    image: "iTurn0search39", // Greek Yogurt Blinkit
+    image: "https://images.unsplash.com/photo-1571212515416-f283282b0e9f?w=600",
   },
   {
     id: 14,
@@ -109,7 +109,7 @@ const dairy = [
     price: 260,
     oldPrice: 310,
     discount: "16% OFF",
-    image: "iTurn0search45", // Galbani Ricotta Blinkit
+    image: "https://images.unsplash.com/photo-1627063071850-25e408ecbb96?w=600",
   },
   {
     id: 15,
@@ -117,7 +117,7 @@ const dairy = [
     price: 150,
     oldPrice: 190,
     discount: "21% OFF",
-    image: "iTurn0search41", // Cottage Cheese Blinkit
+    image: "https://images.unsplash.com/photo-1598218683569-808fbca4b531?w=600",
   },
   {
     id: 16,
@@ -125,7 +125,7 @@ const dairy = [
     price: 45,
     oldPrice: 60,
     discount: "25% OFF",
-    image: "iTurn0search53", // Amul Flavored Milk Blinkit
+    image: "https://images.unsplash.com/photo-1541795059-4dca5bc4e5b4?w=600",
   },
   {
     id: 17,
@@ -133,7 +133,7 @@ const dairy = [
     price: 160,
     oldPrice: 200,
     discount: "20% OFF",
-    image: "iTurn0search31", // Milk/Kefir Blinkit
+    image: "https://images.unsplash.com/photo-1629851720892-4b21ee271db8?w=600",
   },
   {
     id: 18,
@@ -141,7 +141,7 @@ const dairy = [
     price: 120,
     oldPrice: 150,
     discount: "20% OFF",
-    image: "iTurn0search47", // Blinkit Ice Cream Flyer
+    image: "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=600",
   },
   {
     id: 19,
@@ -149,7 +149,7 @@ const dairy = [
     price: 140,
     oldPrice: 170,
     discount: "18% OFF",
-    image: "iTurn0search58", // Amul Whipping Cream Blinkit
+    image: "https://images.unsplash.com/photo-1583091157158-94ed1cfde41c?w=600",
   },
   {
     id: 20,
@@ -157,7 +157,7 @@ const dairy = [
     price: 40,
     oldPrice: 55,
     discount: "27% OFF",
-    image: "iTurn0search55", // Amul Lassi Blinkit
+    image: "https://images.unsplash.com/photo-1580927909062-7de166e921d7?w=600",
   },
 ];
 

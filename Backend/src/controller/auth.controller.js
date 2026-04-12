@@ -3,8 +3,84 @@ const User = require("../models/user.model");
 const generateOTP = require("../utils/generateOtp");
 const jwt = require("jsonwebtoken");
 
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-//ADMIN 
+exports.googleLogin = async (req, res) => {
+  try {
+    const { idToken, access_token } = req.body;
+
+    if (!idToken && !access_token) {
+      return res.status(400).json({ message: "Token required" });
+    }
+
+    let email, name, picture, sub;
+
+    // ✅ Handle either idToken or access_token
+    if (idToken) {
+      const ticket = await client.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      email = payload.email;
+      name = payload.name;
+      picture = payload.picture;
+      sub = payload.sub;
+    } else if (access_token) {
+      const response = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: { Authorization: `Bearer ${access_token}` },
+      });
+      if (!response.ok) {
+        return res.status(400).json({ message: "Invalid access token" });
+      }
+      const data = await response.json();
+      email = data.email;
+      name = data.name;
+      picture = data.picture;
+      sub = data.sub;
+    }
+
+    // ✅ Check user by email
+    let user = await User.findOne({ email });
+
+    let isNewUser = false;
+    if (!user) {
+      // ✅ Create new Google user
+      user = await User.create({
+        email,
+        name,
+        profilePic: picture,
+        googleId: sub,
+        authProvider: "google",
+        isVerified: true,
+      });
+      isNewUser = true;
+    }
+
+    // ✅ Update last login
+    user.lastLogin = new Date();
+    await user.save();
+
+    // ✅ Generate JWT
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Google login success",
+      token,
+      user,
+      isNewUser,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Google login failed" });
+  }
+};
  
 
 // SEND OTP

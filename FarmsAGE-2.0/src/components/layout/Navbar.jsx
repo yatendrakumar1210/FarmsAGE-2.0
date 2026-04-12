@@ -107,7 +107,7 @@ const Navbar = () => {
             <img className="w-full h-full object-cover" src={logo} alt="FarmsAge Logo" />
           </div>
           <h2 className="text-2xl font-bold tracking-tighter text-slate-800 hidden sm:block font-['Outfit']">
-            farms<span className="text-emerald-600 font-extrabold">AGE</span>
+            Farms<span className="text-emerald-600 font-extrabold">AGE</span>
           </h2>
         </Link>
 
