@@ -16,20 +16,20 @@ const SIDEBAR_CATEGORIES = [
     id: "fruits",
     icon: "https://cdn-icons-png.flaticon.com/512/590/590685.png",
   },
+  // {
+  //   name: "Exotics",
+  //   path: "/category/exotics",
+  //   id: "exotics",
+  //   icon: "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+  // },
+  // {
+  //   name: "Seasonal",
+  //   path: "/category/seasonal",
+  //   id: "seasonal",
+  //   icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png",
+  // },
   {
-    name: "Exotics",
-    path: "/category/exotics",
-    id: "exotics",
-    icon: "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
-  },
-  {
-    name: "Seasonal",
-    path: "/category/seasonal",
-    id: "seasonal",
-    icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png",
-  },
-  {
-    name: "Organic Store",
+    name: "Organic",
     path: "/category/organic",
     id: "organic",
     icon: "https://cdn-icons-png.flaticon.com/512/1046/1046857.png",
@@ -94,7 +94,7 @@ const CategoryProducts = ({ title, productsData }) => {
         {/* Right Content */}
         <div className="flex-1 w-full px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 bg-gray-50/30">
           {/* Mobile Categories */}
-          <div className="md:hidden flex overflow-x-auto gap-3 pb-4 scrollbar-hide snap-x snap-mandatory">
+          <div className="md:hidden flex overflow-x-auto gap-7 pb-4 scrollbar-hide snap-x snap-mandatory">
             {SIDEBAR_CATEGORIES.map((cat) => {
               const isActive = location.pathname === cat.path;
               return (
@@ -102,13 +102,13 @@ const CategoryProducts = ({ title, productsData }) => {
                   key={cat.id}
                   onClick={() => navigate(cat.path)}
                   className={`flex flex-col items-center gap-1.5 shrink-0 snap-start ${
-                    isActive ? "scale-105" : "opacity-70"
+                    isActive ? "scale-105" : "opacity-100"
                   }`}
                 >
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center p-2 ${
                       isActive
-                        ? "bg-pink-600 shadow-md"
+                        ? "bg-green-400 shadow-md"
                         : "bg-white border border-gray-100"
                     }`}
                   >

@@ -9,9 +9,10 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product, selectedWeight) => {
     setCart((prevCart) => {
+      const pId = product._id || product.id;
       // Check if item already exists in cart with the same weight
       const existingItemIndex = prevCart.findIndex(
-        (item) => item.id === product.id && item.weight === selectedWeight
+        (item) => (item._id || item.id) === pId && item.weight === selectedWeight
       );
 
       if (existingItemIndex >= 0) {
@@ -31,14 +32,14 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = (productId, weight) => {
     setCart((prevCart) =>
-      prevCart.filter((item) => !(item.id === productId && item.weight === weight))
+      prevCart.filter((item) => !((item._id || item.id) === productId && item.weight === weight))
     );
   };
 
   const updateQuantity = (productId, weight, delta) => {
     setCart((prevCart) => {
       return prevCart.map((item) => {
-        if (item.id === productId && item.weight === weight) {
+        if ((item._id || item.id) === productId && item.weight === weight) {
           const newQuantity = item.quantity + delta;
           return { ...item, quantity: newQuantity > 0 ? newQuantity : 1 };
         }
@@ -50,13 +51,13 @@ export const CartProvider = ({ children }) => {
   const updateItemWeight = (productId, oldWeight, newWeight, newPrice) => {
     setCart((prevCart) => {
       const itemToUpdateIndex = prevCart.findIndex(
-        (item) => item.id === productId && item.weight === oldWeight
+        (item) => (item._id || item.id) === productId && item.weight === oldWeight
       );
       if (itemToUpdateIndex === -1) return prevCart;
 
       const itemToUpdate = prevCart[itemToUpdateIndex];
       const existingNewWeightIndex = prevCart.findIndex(
-        (item) => item.id === productId && item.weight === newWeight
+        (item) => (item._id || item.id) === productId && item.weight === newWeight
       );
 
       if (

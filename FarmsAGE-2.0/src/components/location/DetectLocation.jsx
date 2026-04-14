@@ -6,8 +6,14 @@ import { motion } from "framer-motion";
 
 const DetectLocation = ({ onLocationDetected }) => {
   const [loading, setLoading] = useState(false);
+  const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   const detectLocation = () => {
+    if (!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY === "YOUR_GOOGLE_MAPS_API_KEY_HERE") {
+      alert("Google Maps API Key is not configured. Please add it to your .env file.");
+      // We will still try with the fallback if they click OK, but warning is better.
+    }
+
     setLoading(true);
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser");

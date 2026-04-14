@@ -13,7 +13,7 @@ const NearbyVendors = () => {
 
   const requestLocation = () => {
     setLocationStatus("loading");
-    if ("geolocation" in navigator) {
+    if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const lat = position.coords.latitude;
@@ -35,6 +35,7 @@ const NearbyVendors = () => {
           console.error("Error obtaining location", error);
           setLocationStatus("error");
         },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       );
     } else {
       setLocationStatus("error");
@@ -97,7 +98,7 @@ const NearbyVendors = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.4 }}
-                    onClick={() => navigate("/category/all")}
+                    onClick={() => navigate("/category/all", { state: { vendorName: vendor.name } })}
                     className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-100 flex gap-3 sm:gap-4 items-center group cursor-pointer"
                   >
                     <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0">

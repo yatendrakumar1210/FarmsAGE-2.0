@@ -47,7 +47,7 @@ const Checkout = () => {
       // 1. Create Razorpay Order
       const orderData = {
         items: cart.map(item => ({
-          productId: item.id,
+          productId: item._id || item.id,
           price: item.price,
           quantity: item.quantity,
           weight: item.weight,
@@ -144,7 +144,7 @@ const Checkout = () => {
       const token = localStorage.getItem('token');
       const orderData = {
         items: cart.map(item => ({
-          productId: item.id,
+          productId: item._id || item.id,
           price: item.price,
           quantity: item.quantity,
           weight: item.weight,

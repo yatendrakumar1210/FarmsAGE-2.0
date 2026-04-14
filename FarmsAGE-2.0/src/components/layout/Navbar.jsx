@@ -269,7 +269,7 @@ const Navbar = () => {
               )}
               {!user && <Link to="/login" className="text-emerald-600">Login / Signup</Link>}
               {user && <Link to="/my-orders">My Orders</Link>}
-              <Link to="/category/fruits">Seasonal Fruits</Link>
+              {/* <Link to="/category/fruits">Seasonal Fruits</Link> */}
               <Link to="/category/vegetables">Fresh Vegetables</Link>
               <Link to="/category/dairy">Dairy Products</Link>
               <Link to="/category/organic">Organic Selection</Link>

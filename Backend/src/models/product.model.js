@@ -8,7 +8,7 @@ const productSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ['Fruits', 'Vegetables' , 'Organic', 'Dairy' ],
+        enum: ['Fruits', 'Vegetables', 'Organic', 'Dairy'],
         required: true
     },
     image: {
@@ -27,7 +27,20 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    oldPrice: {
+        type: Number,
+        default: null
+    },
+    quantity: {
+        type: Number,
+        default: 100,
+        min: 0
+    },
+    unit: {
+        type: String,
+        default: '1 kg'
+    }
 
-})
+}, { timestamps: true });
 
-module.exports = mongoose.model('Product', productSchema);
+module.exports = mongoose.model('Product', productSchema);

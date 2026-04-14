@@ -11,7 +11,6 @@ const weightOptions = [
 ];
 
 const ProductCard = ({ product }) => {
-  // Try to match the product's unit if it exists
   const defaultWeightIndex = product.unit
     ? weightOptions.findIndex(
         (w) => w.label.toLowerCase() === product.unit.toLowerCase(),
@@ -22,14 +21,16 @@ const ProductCard = ({ product }) => {
   const [added, setAdded] = useState(false);
   const { addToCart } = useCart();
 
+  const isOutOfStock = product.quantity === 0;
+
   const currentWeight = weightOptions[selectedWeight];
   const currentPrice = Math.round(product.price * currentWeight.multiplier);
-  // Give some realistic old price if not present
   const baseOldPrice = product.oldPrice || Math.round(product.price * 1.25);
   const originalPrice = Math.round(baseOldPrice * currentWeight.multiplier);
   const discountAmount = originalPrice - currentPrice;
 
   const handleAddToCart = () => {
+    if (isOutOfStock) return;
     addToCart(
       {
         ...product,
@@ -42,11 +43,10 @@ const ProductCard = ({ product }) => {
     setTimeout(() => setAdded(false), 2000);
   };
 
-  // Extract a mock tag from name or category if product doesn't have one
   const getTag = () => {
     if (product.isOrganic) return "Organic";
     if (product.category === "Fruits") return "Fresh";
-    if (product.name.toLowerCase().includes("leaf")) return "Fresh Leaf";
+    if (product.name?.toLowerCase().includes("leaf")) return "Fresh Leaf";
     return "Fresh";
   };
 
@@ -57,26 +57,44 @@ const ProductCard = ({ product }) => {
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+          className={`w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500 ${isOutOfStock ? 'opacity-40 grayscale' : ''}`}
         />
 
-        {/* ADD Button */}
-        <button
-          onClick={handleAddToCart}
-          className={`absolute bottom-2 right-2 sm:bottom-3 sm:right-3 px-3 sm:px-4 py-1.5 rounded-lg border font-bold text-[10px] sm:text-xs transition-all shadow-sm ${
-            added
-              ? "bg-pink-50 border-pink-500 text-pink-600"
-              : "bg-white border-pink-600 text-pink-600 hover:bg-pink-50"
-          }`}
-        >
-          {added ? "ADDED" : "ADD"}
-        </button>
+        {/* OUT OF STOCK overlay */}
+        {isOutOfStock ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span style={{
+              background: 'rgba(220,38,38,0.9)',
+              color: '#fff',
+              fontWeight: 800,
+              fontSize: '0.65rem',
+              letterSpacing: '0.08em',
+              padding: '5px 12px',
+              borderRadius: '6px',
+              textTransform: 'uppercase'
+            }}>
+              Out of Stock
+            </span>
+          </div>
+        ) : (
+          /* ADD Button */
+          <button
+            onClick={handleAddToCart}
+            className={`absolute bottom-2 right-2 sm:bottom-3 sm:right-3 px-3 sm:px-4 py-1.5 rounded-lg border font-bold text-[10px] sm:text-xs transition-all shadow-sm ${
+              added
+                ? "bg-pink-50 border-pink-500 text-pink-600"
+                : "bg-white border-pink-600 text-pink-600 hover:bg-pink-50"
+            }`}
+          >
+            {added ? "ADDED" : "ADD"}
+          </button>
+        )}
       </div>
 
       <div className="flex-1 flex flex-col">
         {/* Price */}
         <div className="flex items-center gap-1.5 mb-1 mt-1 flex-wrap">
-          <span className="bg-[#138f4d] text-white px-1.5 py-0.5 rounded text-[11px] sm:text-xs font-bold">
+          <span className={`px-1.5 py-0.5 rounded text-[11px] sm:text-xs font-bold ${isOutOfStock ? 'bg-gray-200 text-gray-500' : 'bg-[#138f4d] text-white'}`}>
             ₹{currentPrice}
           </span>
 
@@ -88,7 +106,7 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Discount */}
-        {discountAmount > 0 && (
+        {discountAmount > 0 && !isOutOfStock && (
           <div className="text-[#138f4d] text-[10px] sm:text-xs font-bold mb-1">
             ₹{discountAmount} OFF
           </div>
@@ -104,11 +122,17 @@ const ProductCard = ({ product }) => {
           {product.unit || currentWeight.label}
         </p>
 
-        {/* Tag */}
+        {/* Tag / Stock indicator */}
         <div className="mt-auto pt-2">
-          <span className="text-teal-600 text-[10px] sm:text-xs font-bold">
-            {getTag()}
-          </span>
+          {isOutOfStock ? (
+            <span className="text-red-500 text-[10px] sm:text-xs font-bold">
+              Currently Unavailable
+            </span>
+          ) : (
+            <span className="text-teal-600 text-[10px] sm:text-xs font-bold">
+              {getTag()}
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -116,5 +140,3 @@ const ProductCard = ({ product }) => {
 };
 
 export default ProductCard;
-
-

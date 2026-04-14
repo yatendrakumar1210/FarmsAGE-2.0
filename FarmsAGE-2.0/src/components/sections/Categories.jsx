@@ -27,13 +27,13 @@ const categories = [
     path: "organic",
     bgColor: "bg-amber-50",
   },
-  {
-    name: "Atta & Dal",
-    image:
-      "https://media.istockphoto.com/id/686747322/photo/food-in-a-market-in-fes-morocco-the-market-is-one-of-the-most-important-attractions-of-the-city.jpg",
-    path: "grains",
-    bgColor: "bg-orange-50",
-  },
+  // {
+  //   name: "Atta & Dal",
+  //   image:
+  //     "https://media.istockphoto.com/id/686747322/photo/food-in-a-market-in-fes-morocco-the-market-is-one-of-the-most-important-attractions-of-the-city.jpg",
+  //   path: "grains",
+  //   bgColor: "bg-orange-50",
+  // },
   {
     name: "Daily Deals",
     image: "https://images.unsplash.com/photo-1542838132-92c53300491e",
