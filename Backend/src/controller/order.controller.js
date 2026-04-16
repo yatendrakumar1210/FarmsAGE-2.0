@@ -54,6 +54,7 @@ exports.verifyPayment = async (req, res) => {
     console.log("Creating payment order in DB...");
     const order = await Order.create({
       userId: req.user.id,
+      vendorId: req.body.vendorId || null,
       items,
       deliveryAddress,
       totalAmount,
@@ -83,6 +84,7 @@ exports.codOrder = async (req, res) => {
     console.log("Creating COD order in DB...");
     const order = await Order.create({
       userId: req.user.id,
+      vendorId: req.body.vendorId || null,
       items,
       deliveryAddress,
       totalAmount,

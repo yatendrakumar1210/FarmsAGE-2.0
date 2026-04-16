@@ -303,6 +303,10 @@
 .status-completed { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
 .status-canceled { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
 
+.role-user { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; text-transform: uppercase; }
+.role-vendor { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; text-transform: uppercase; }
+.role-admin { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; text-transform: uppercase; }
+
 .action-btns {
   display: flex;
   gap: 8px;

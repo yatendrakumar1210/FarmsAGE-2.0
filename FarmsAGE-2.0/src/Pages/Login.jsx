@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, ArrowRight, ShieldCheck, Leaf, ChevronDown, Mail, Search } from "lucide-react";
+import { Phone, ArrowRight, ShieldCheck, Leaf, ChevronDown, Mail, Search, Store } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useGoogleLogin } from '@react-oauth/google';
@@ -34,6 +34,24 @@ const Login = () => {
     }
 
     navigate("/admin");
+  };
+
+  const handleVendorClick = (e) => {
+    e.preventDefault();
+    const storedUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+    const vendorUser = user || storedUser;
+
+    if (!vendorUser) {
+      setError("Please login first to access the Vendor Portal.");
+      return;
+    }
+    
+    if (vendorUser.role?.toLowerCase() !== 'vendor' && vendorUser.role?.toLowerCase() !== 'admin') {
+      setError("Access Denied: You do not have vendor privileges.");
+      return;
+    }
+
+    navigate("/vendor");
   };
 
   const handleGoogleLogin = useGoogleLogin({
@@ -286,15 +304,26 @@ const Login = () => {
 
         {/* Footer Links */}
         <div className="mt-8 flex flex-col items-center gap-4 pb-12">
-          <button
-            onClick={handleAdminClick}
-            className="group flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-emerald-600 transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-emerald-50 group-hover:border-emerald-100 transition-all">
-              <ShieldCheck size={14} />
-            </div>
-            Admin Portal
-          </button>
+          <div className="flex items-center gap-6">
+            <button
+              onClick={handleAdminClick}
+              className="group flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-emerald-600 transition-colors"
+            >
+              <div className="w-8 h-8 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-emerald-50 group-hover:border-emerald-100 transition-all">
+                <ShieldCheck size={14} />
+              </div>
+              Admin Portal
+            </button>
+            <button
+              onClick={handleVendorClick}
+              className="group flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-emerald-600 transition-colors"
+            >
+              <div className="w-8 h-8 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-emerald-50 group-hover:border-emerald-100 transition-all">
+                <Store size={14} />
+              </div>
+              Vendor Portal
+            </button>
+          </div>
         </div>
       </motion.div>
     </div>

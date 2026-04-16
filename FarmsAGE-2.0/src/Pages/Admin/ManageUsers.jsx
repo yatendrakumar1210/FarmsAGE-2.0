@@ -26,6 +26,19 @@ const ManageUsers = () => {
         }
     };
 
+    const handleRoleChange = async (userId, newRole) => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(`${API}/api/admin/users/${userId}/role`, { role: newRole }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            fetchUsers();
+        } catch (error) {
+            console.error("Failed to update role", error);
+            alert("Failed to update role");
+        }
+    };
+
     return (
         <div className="fade-in">
             <div className="table-header">
@@ -52,9 +65,16 @@ const ManageUsers = () => {
                                 <td>{u.email}</td>
                                 <td>{u.phone || 'N/A'}</td>
                                 <td>
-                                    <span className={`status-badge role-${u.role?.toLowerCase()}`}>
-                                        {u.role}
-                                    </span>
+                                    <select 
+                                        value={u.role || 'user'} 
+                                        onChange={(e) => handleRoleChange(u._id, e.target.value)}
+                                        className={`status-badge role-${(u.role || 'user').toLowerCase()}`}
+                                        style={{ border: "none", outline: "none", cursor: "pointer" }}
+                                    >
+                                        <option value="user">USER</option>
+                                        <option value="vendor">VENDOR</option>
+                                        <option value="admin">ADMIN</option>
+                                    </select>
                                 </td>
                                 <td>{new Date(u.createdAt).toLocaleDateString()}</td>
                             </tr>

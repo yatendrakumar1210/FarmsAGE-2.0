@@ -508,7 +508,6 @@ export const apiRequest = async (endpoint, options = {}) => {
 ---
 
 ## File Summary
-
 | # | File | Action | Location |
 |---|------|--------|----------|
 | 1 | `package.json` | MODIFY | Backend |
@@ -644,3 +643,10 @@ Update the Login page (likely `FarmsAGE-2.0/src/Pages/Auth/Login.jsx`):
 - Check that the user is correctly saved in the database.
 - Ensure the profile information (name, email) is populated.
 - Test both new user registration and existing user login via Google.
+
+
+
+
+Viewed auth.controller.js:1-177
+Browser task: "Test Vendor Panel"
+i want that vendor panel work like when a vendor login for vendor role it and redirect to website in the vendor panel first it need to compltete the vendor shops registration to show in users view when vendor registered for vendors shop this request send to the admin , if admin approved the request vendors shop display in the website and now vendor can add or delete there own products, vendors all data show in admin panel also when user order from the vendors shop , order details will also show to the with vendors name and show to vendor and admin panel both 

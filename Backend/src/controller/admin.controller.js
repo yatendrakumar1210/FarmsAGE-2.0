@@ -7,6 +7,7 @@ exports.getOrders = async (req, res) => {
   try {
     const orders = await Order.find()
       .populate("userId", "name email phone")
+      .populate("vendorId", "name storeName")
       .sort({ createdAt: -1 });
     res.json(orders);
   } catch (err) {
@@ -92,5 +93,21 @@ exports.getUsers = async (req, res) => {
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch users", error: err.message });
+  }
+};
+
+// 👤 Update user role
+exports.updateUserRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { role },
+      { new: true, runValidators: true }
+    ).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update user role", error: err.message });
   }
 };

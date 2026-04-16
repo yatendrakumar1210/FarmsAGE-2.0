@@ -21,6 +21,15 @@ import ManageOrders from "../Pages/Admin/ManageOrders";
 import ManageUsers from "../Pages/Admin/ManageUsers";
 import AdminRoute from "./AdminRoute";
 
+// Vendor Imports
+import VendorLayout from "../Pages/Vendor/VendorLayout";
+import VendorDashboard from "../Pages/Vendor/VendorDashboard";
+import VendorProducts from "../Pages/Vendor/VendorProducts";
+import VendorOrders from "../Pages/Vendor/VendorOrders";
+import VendorProfile from "../Pages/Vendor/VendorProfile";
+import VendorRoute from "./VendorRoute";
+import VendorStore from "../Pages/VendorStore";
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -39,6 +48,9 @@ const AppRoutes = () => {
       <Route path="/order-success" element={<OrderSuccess />} />
       <Route path="/my-orders" element={<MyOrders />} />
 
+      {/* Public Vendor Store Page */}
+      <Route path="/vendor/:vendorId/store" element={<VendorStore />} />
+
       {/* Admin Panel Routes */}
       <Route path="/admin" element={
         <AdminRoute>
@@ -51,11 +63,21 @@ const AppRoutes = () => {
         <Route path="orders" element={<ManageOrders />} />
         <Route path="users" element={<ManageUsers />} />
       </Route>
+
+      {/* Vendor Panel Routes */}
+      <Route path="/vendor" element={
+        <VendorRoute>
+          <VendorLayout />
+        </VendorRoute>
+      }>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<VendorDashboard />} />
+        <Route path="products" element={<VendorProducts />} />
+        <Route path="orders" element={<VendorOrders />} />
+        <Route path="profile" element={<VendorProfile />} />
+      </Route>
     </Routes>
   );
 };
 
 export default AppRoutes;
-
-
-

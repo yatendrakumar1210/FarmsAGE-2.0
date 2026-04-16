@@ -1,26 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Navigation2, Store, Star, ChevronRight } from "lucide-react";
-import vendors from "../../data/vendors";
+import vendorsStatic from "../../data/vendors";
 import { calculateDistance } from "../../utils/location";
 import { useNavigate } from "react-router-dom";
+
+const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
 
 const NearbyVendors = () => {
   const navigate = useNavigate();
   const [userLocation, setUserLocation] = useState(null);
-  const [sortedVendors, setSortedVendors] = useState(vendors);
+  const [sortedVendors, setSortedVendors] = useState(vendorsStatic);
   const [locationStatus, setLocationStatus] = useState("idle"); // idle, loading, success, error
+  const [usingApi, setUsingApi] = useState(false);
 
   const requestLocation = () => {
     setLocationStatus("loading");
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
           setUserLocation({ lat, lon });
 
-          const vWithDistance = vendors
+          // Try API first
+          try {
+            const res = await fetch(`${API}/api/vendor/nearby?lat=${lat}&lng=${lon}`);
+            const apiVendors = await res.json();
+            if (Array.isArray(apiVendors) && apiVendors.length > 0) {
+              setSortedVendors(apiVendors);
+              setUsingApi(true);
+              setLocationStatus("success");
+              return;
+            }
+          } catch (err) {
+            console.warn("Vendor API unavailable, falling back to static data:", err.message);
+          }
+
+          // Fallback to static data
+          const vWithDistance = vendorsStatic
             .map((v) => ({
               ...v,
               distance: calculateDistance(lat, lon, v.latitude, v.longitude),
@@ -29,6 +47,7 @@ const NearbyVendors = () => {
             .sort((a, b) => a.distance - b.distance);
 
           setSortedVendors(vWithDistance);
+          setUsingApi(false);
           setLocationStatus("success");
         },
         (error) => {
@@ -39,6 +58,16 @@ const NearbyVendors = () => {
       );
     } else {
       setLocationStatus("error");
+    }
+  };
+
+  const handleVendorClick = (vendor) => {
+    if (usingApi && vendor._id) {
+      // Navigate to dynamic vendor store page
+      navigate(`/vendor/${vendor._id}/store`);
+    } else {
+      // Fallback: navigate to all products with vendor name filter
+      navigate("/category/all", { state: { vendorName: vendor.name } });
     }
   };
 
@@ -92,13 +121,13 @@ const NearbyVendors = () => {
               {sortedVendors.length > 0 ? (
                 sortedVendors.slice(0, 6).map((vendor) => (
                   <motion.div
-                    key={vendor.id}
+                    key={vendor._id || vendor.id}
                     layout
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.4 }}
-                    onClick={() => navigate("/category/all", { state: { vendorName: vendor.name } })}
+                    onClick={() => handleVendorClick(vendor)}
                     className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-100 flex gap-3 sm:gap-4 items-center group cursor-pointer"
                   >
                     <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0">
@@ -119,17 +148,22 @@ const NearbyVendors = () => {
                       </p>
 
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-sm font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">
-                          <Star size={12} fill="currentColor" />
-                          {vendor.rating}
-                        </div>
+                        {vendor.rating && (
+                          <div className="flex items-center gap-1.5 text-sm font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">
+                            <Star size={12} fill="currentColor" />
+                            {vendor.rating}
+                          </div>
+                        )}
                         {vendor.distance !== undefined && (
                           <div className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
                             <ChevronRight
                               size={10}
                               className="text-emerald-500"
                             />
-                            {vendor.distance.toFixed(1)} km away
+                            {typeof vendor.distance === "number"
+                              ? vendor.distance.toFixed(1)
+                              : vendor.distance}{" "}
+                            km away
                           </div>
                         )}
                       </div>
@@ -164,5 +198,3 @@ const NearbyVendors = () => {
 };
 
 export default NearbyVendors;
-
-

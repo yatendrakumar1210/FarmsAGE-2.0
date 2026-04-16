@@ -8,6 +8,7 @@ const {
   updateProduct,
   deleteProduct,
   getUsers,
+  updateUserRole,
 } = require("../controller/admin.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
@@ -24,5 +25,6 @@ router.put("/products/:id", updateProduct);
 router.delete("/products/:id", deleteProduct);
 
 router.get("/users", getUsers);
+router.put("/users/:id/role", updateUserRole);
 
 module.exports = router;

@@ -38,6 +38,27 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
 
+    // Vendor-specific fields
+    storeName: {
+      type: String,
+      default: "",
+    },
+
+    specialty: {
+      type: String,
+      default: "",
+    },
+
+    storeImage: {
+      type: String,
+      default: "",
+    },
+
+    coordinates: {
+      lat: { type: Number, default: null },
+      lng: { type: Number, default: null },
+    },
+
     isProfileComplete: {
       type: Boolean,
       default: false,

@@ -12,6 +12,7 @@ import {
   Leaf,
   Package,
   ShieldCheck,
+  Store,
   Loader2
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -206,6 +207,16 @@ const Navbar = () => {
             </Link>
           )}
 
+          {user && user.role?.toLowerCase() === 'vendor' && (
+            <Link
+              to="/vendor"
+              className="hidden md:flex items-center gap-2 font-bold text-emerald-700 hover:text-emerald-800 transition-colors bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100"
+            >
+              <Store size={18} />
+              <span className="text-sm">Vendor Panel</span>
+            </Link>
+          )}
+
           {!routerLocation.pathname.startsWith('/admin') && (
             <Link
               to="/cart"
@@ -266,6 +277,9 @@ const Navbar = () => {
               <Link to="/home">Home</Link>
               {user && user.role?.toLowerCase() === 'admin' && (
                 <Link to="/admin" className="text-amber-600">Admin Panel</Link>
+              )}
+              {user && user.role?.toLowerCase() === 'vendor' && (
+                <Link to="/vendor" className="text-emerald-600">Vendor Panel</Link>
               )}
               {!user && <Link to="/login" className="text-emerald-600">Login / Signup</Link>}
               {user && <Link to="/my-orders">My Orders</Link>}

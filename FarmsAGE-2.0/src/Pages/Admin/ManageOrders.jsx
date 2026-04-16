@@ -130,6 +130,14 @@ const ManageOrders = () => {
                                     <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{addr.phone || '—'}</div>
                                 </div>
 
+                                {/* Vendor */}
+                                <div style={{ minWidth: '110px' }}>
+                                    <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', marginBottom: '2px' }}>Vendor</div>
+                                    <div style={{ fontWeight: 600, fontSize: '0.82rem', color: order.vendorId ? '#7c3aed' : '#94a3b8' }}>
+                                        {order.vendorId ? (order.vendorId.storeName || order.vendorId.name || 'Vendor') : '—'}
+                                    </div>
+                                </div>
+
                                 {/* Items count */}
                                 <div style={{ minWidth: '80px', textAlign: 'center' }}>
                                     <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', marginBottom: '2px' }}>Items</div>
@@ -231,6 +239,11 @@ const ManageOrders = () => {
                                             <div>Status: <StatusBadge value={order.paymentStatus} /></div>
                                             {order.paymentId && <div style={{ fontSize: '0.75rem', color: '#64748b' }}>ID: {order.paymentId}</div>}
                                             <div>Total: <strong style={{ color: '#15803d' }}>₹{order.totalAmount}</strong></div>
+                                            {order.vendorId && (
+                                                <div style={{ marginTop: '4px', paddingTop: '4px', borderTop: '1px solid #f1f5f9' }}>
+                                                    Vendor: <strong style={{ color: '#7c3aed' }}>{order.vendorId.storeName || order.vendorId.name}</strong>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 

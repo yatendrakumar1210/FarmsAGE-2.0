@@ -85,7 +85,8 @@ const Checkout = () => {
               razorpay_signature: response.razorpay_signature,
               items: orderData.items,
               deliveryAddress: address,
-              totalAmount: total
+              totalAmount: total,
+              vendorId: cart[0]?.vendorId || null
             };
 
             const verifyRes = await fetch(`${API}/api/orders/verify-payment`, {
@@ -152,7 +153,8 @@ const Checkout = () => {
           image: item.image
         })),
         deliveryAddress: address,
-        totalAmount: total
+        totalAmount: total,
+        vendorId: cart[0]?.vendorId || null
       };
 
       const res = await fetch(`${API}/api/orders/cod`, {

@@ -39,6 +39,11 @@ const productSchema = new mongoose.Schema({
     unit: {
         type: String,
         default: '1 kg'
+    },
+    vendorId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
     }
 
 }, { timestamps: true });
