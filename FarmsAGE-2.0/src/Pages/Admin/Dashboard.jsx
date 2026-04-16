@@ -1,17 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
-import { ShoppingBag, Users, Apple, TrendingUp, Package, Plus, Megaphone, Settings } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
+import {
+  ShoppingBag,
+  Users,
+  Apple,
+  TrendingUp,
+  Package,
+  Plus,
+  Megaphone,
+  Settings,
+} from "lucide-react";
 
-const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
-
+const API =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:3000"
+    : "https://farmsage-2-0-2.onrender.com";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
     orders: 0,
     products: 0,
     users: 0,
-    sales: 0
+    sales: 0,
   });
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,22 +33,27 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
 
       const [ordersRes, productsRes, usersRes] = await Promise.all([
         axios.get(`${API}/api/admin/orders`, { headers }),
-        axios.get(`${API}/api/admin/products`, { headers }).catch(() => ({ data: [] })),
-        axios.get(`${API}/api/admin/users`, { headers })
+        axios
+          .get(`${API}/api/admin/products`, { headers })
+          .catch(() => ({ data: [] })),
+        axios.get(`${API}/api/admin/users`, { headers }),
       ]);
 
-      const totalSales = ordersRes.data.reduce((acc, order) => acc + (order.totalAmount || 0), 0);
+      const totalSales = ordersRes.data.reduce(
+        (acc, order) => acc + (order.totalAmount || 0),
+        0,
+      );
 
       setStats({
         orders: ordersRes.data.length,
         products: productsRes.data.length || 0,
         users: usersRes.data.length,
-        sales: totalSales.toFixed(2)
+        sales: totalSales.toFixed(2),
       });
 
       setRecentOrders(ordersRes.data.slice(0, 5));
@@ -50,117 +66,168 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="admin-loading" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh'}}>
+      <div
+        className="admin-loading"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "60vh",
+        }}
+      >
         <div className="loader ring"></div>
-        <p style={{marginTop: '20px', color: '#64748b', fontWeight: '500'}}>Analysing business intelligence...</p>
+        <p style={{ marginTop: "20px", color: "#64748b", fontWeight: "500" }}>
+          Analysing business intelligence...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="fade-in">
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon blue"><Package size={24} /></div>
-          <div className="stat-info">
-            <h3>Total Orders</h3>
-            <p>{stats.orders}</p>
+    <div className="space-y-6">
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          {
+            title: "Total Orders",
+            value: stats.orders,
+            icon: <Package size={18} />,
+            color: "bg-blue-100 text-blue-600",
+          },
+          {
+            title: "Total Sales",
+            value: `₹${stats.sales}`,
+            icon: <ShoppingBag size={18} />,
+            color: "bg-pink-100 text-pink-600",
+          },
+          {
+            title: "Total Users",
+            value: stats.users,
+            icon: <Users size={18} />,
+            color: "bg-green-100 text-green-600",
+          },
+          {
+            title: "Products",
+            value: stats.products,
+            icon: <Apple size={18} />,
+            color: "bg-yellow-100 text-yellow-600",
+          },
+        ].map((item, i) => (
+          <div
+            key={i}
+            className="bg-white p-4 rounded-xl shadow-sm border flex items-center gap-3"
+          >
+            <div
+              className={`w-9 h-9 flex items-center justify-center rounded-lg ${item.color}`}
+            >
+              {item.icon}
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">{item.title}</p>
+              <p className="text-lg font-bold">{item.value}</p>
+            </div>
           </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon pink"><ShoppingBag size={24} /></div>
-          <div className="stat-info">
-            <h3>Total Sales</h3>
-            <p>₹{stats.sales}</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon green"><Users size={24} /></div>
-          <div className="stat-info">
-            <h3>Total Users</h3>
-            <p>{stats.users}</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon yellow"><Apple size={24} /></div>
-          <div className="stat-info">
-            <h3>Products</h3>
-            <p>{stats.products}</p>
-          </div>
-        </div>
+        ))}
       </div>
 
-      <div className="dashboard-grid">
-        <div className="data-table-container">
-          <div className="table-header">
-            <h3>Recent Orders</h3>
-            <button className="view-all-btn" style={{background: 'none', border: 'none', color: '#3b82f6', fontWeight: '600', cursor: 'pointer'}}>View All</button>
+      {/* Dashboard Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Table */}
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-semibold">Recent Orders</h3>
+            <button className="text-blue-600 text-sm font-semibold hover:underline">
+              View All
+            </button>
           </div>
-          <table className="custom-table">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>User</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentOrders.map((order) => (
-                <tr key={order._id}>
-                  <td>#{order._id.substring(18, 24).toUpperCase()}</td>
-                  <td>{order.deliveryAddress?.name || 'Customer'}</td>
-                  <td style={{fontWeight: '700'}}>₹{order.totalAmount}</td>
-                  <td>
-                    <span className={`status-badge status-${order.status?.toLowerCase()}`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-[600px] w-full text-sm">
+              <thead>
+                <tr className="text-gray-500 border-b">
+                  <th className="py-2 text-left">Order ID</th>
+                  <th>User</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {recentOrders.map((order) => (
+                  <tr key={order._id} className="border-b">
+                    <td className="py-2 font-medium">
+                      #{order._id.substring(18, 24).toUpperCase()}
+                    </td>
+                    <td>{order.deliveryAddress?.name || "Customer"}</td>
+                    <td className="font-bold">₹{order.totalAmount}</td>
+                    <td>
+                      <span className="px-2 py-1 text-xs rounded bg-gray-100">
+                        {order.status}
+                      </span>
+                    </td>
+                    <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div className="info-card fade-in">
-          <div className="trend-header" style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem'}}>
-            <TrendingUp size={20} color="#3b82f6" />
-            <h3 style={{margin: 0}}>Quick Insights</h3>
+        {/* Insights */}
+        <div className="bg-white rounded-xl shadow-sm border p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp size={18} className="text-blue-600" />
+            <h3 className="font-semibold">Quick Insights</h3>
           </div>
 
-          <ul className="action-list" style={{listStyle: 'none', padding: 0}}>
-            <li className="action-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '10px', background: '#f8fafc', marginBottom: '10px', cursor: 'pointer'}}>
-              <div style={{background: '#e0f2fe', padding: '8px', borderRadius: '8px', color: '#0369a1'}}><Plus size={18} /></div>
-              <p style={{margin: 0, fontSize: '0.9rem', fontWeight: '500'}}>Add New Product</p>
-            </li>
-            <li className="action-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '10px', background: '#f8fafc', marginBottom: '10px', cursor: 'pointer'}}>
-              <div style={{background: '#fef3c7', padding: '8px', borderRadius: '8px', color: '#d97706'}}><Megaphone size={18} /></div>
-              <p style={{margin: 0, fontSize: '0.9rem', fontWeight: '500'}}>Send Announcements</p>
-            </li>
-            <li className="action-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '10px', background: '#f8fafc', marginBottom: '10px', cursor: 'pointer'}}>
-              <div style={{background: '#f1f5f9', padding: '8px', borderRadius: '8px', color: '#475569'}}><Settings size={18} /></div>
-              <p style={{margin: 0, fontSize: '0.9rem', fontWeight: '500'}}>Site Settings</p>
-            </li>
-          </ul>
+          <div className="space-y-3">
+            {[
+              {
+                label: "Add New Product",
+                icon: <Plus size={16} />,
+                color: "bg-blue-100 text-blue-600",
+              },
+              {
+                label: "Send Announcements",
+                icon: <Megaphone size={16} />,
+                color: "bg-yellow-100 text-yellow-600",
+              },
+              {
+                label: "Site Settings",
+                icon: <Settings size={16} />,
+                color: "bg-gray-100 text-gray-600",
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer"
+              >
+                <div className={`p-2 rounded ${item.color}`}>{item.icon}</div>
+                <p className="text-sm font-medium">{item.label}</p>
+              </div>
+            ))}
+          </div>
 
-          <div className="revenue-summary" style={{marginTop: '2rem'}}>
-            <h4 style={{fontSize: '0.85rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '1rem'}}>Sales Trend</h4>
-            <div className="dummy-chart" style={{display: 'flex', alignItems: 'flex-end', gap: '8px', height: '100px', paddingBottom: '10px', borderBottom: '1px solid #f1f5f9'}}>
-               <div className="bar" style={{height: '40%', width: '100%', background: '#e2e8f0', borderRadius: '4px'}}></div>
-               <div className="bar" style={{height: '60%', width: '100%', background: '#e2e8f0', borderRadius: '4px'}}></div>
-               <div className="bar" style={{height: '45%', width: '100%', background: '#e2e8f0', borderRadius: '4px'}}></div>
-               <div className="bar" style={{height: '80%', width: '100%', background: '#e2e8f0', borderRadius: '4px'}}></div>
-               <div className="bar active" style={{height: '95%', width: '100%', background: 'var(--primary-gradient)', borderRadius: '4px'}}></div>
-               <div className="bar" style={{height: '70%', width: '100%', background: '#e2e8f0', borderRadius: '4px'}}></div>
-               <div className="bar" style={{height: '55%', width: '100%', background: '#e2e8f0', borderRadius: '4px'}}></div>
+          {/* Chart */}
+          <div className="mt-6">
+            <p className="text-xs text-gray-500 mb-2">Sales Trend</p>
+
+            <div className="flex items-end gap-2 h-24">
+              {[40, 60, 45, 80, 95, 70, 55].map((h, i) => (
+                <div
+                  key={i}
+                  className="flex-1 bg-gray-200 rounded"
+                  style={{ height: `${h}%` }}
+                />
+              ))}
             </div>
-            <div className="chart-labels" style={{display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '0.7rem', color: '#94a3b8'}}>
-              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+
+            <div className="flex justify-between text-[10px] text-gray-400 mt-2">
+              {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
+                <span key={i}>{d}</span>
+              ))}
             </div>
           </div>
         </div>
@@ -170,5 +237,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
