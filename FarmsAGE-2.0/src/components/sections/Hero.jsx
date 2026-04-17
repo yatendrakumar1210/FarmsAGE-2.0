@@ -31,8 +31,9 @@ const Hero = () => {
                 repeatType: "reverse",
                 ease: "linear",
               }}
-              src="https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=80&w=1600"
+              src="https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=70&w=1600"
               alt="Fresh Harvest"
+              fetchpriority="high"
               className="w-full h-full object-cover"
             />
             {/* Overlay Gradient */}
@@ -126,9 +127,10 @@ const Hero = () => {
             className="relative min-h-[180px] sm:min-h-[200px] md:min-h-[220px] lg:min-h-[250px] rounded-[2rem] overflow-hidden bg-emerald-600 group cursor-pointer"
           >
             <img
-              src="https://images.unsplash.com/photo-1543362906-acfc16c67564?auto=format&fit=crop&q=80&w=800"
+              src="https://images.unsplash.com/photo-1543362906-acfc16c67564?auto=format&fit=crop&q=60&w=800"
               className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-700"
               alt="Discount"
+              loading="lazy"
             />
             <div className="absolute inset-0 p-6 sm:p-10 flex flex-col justify-center">
               <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-600 mb-4 shadow-lg">
@@ -148,9 +150,10 @@ const Hero = () => {
             className="relative min-h-[180px] sm:min-h-[200px] md:min-h-[220px] lg:min-h-[250px] rounded-[2rem] overflow-hidden bg-amber-500 group cursor-pointer"
           >
             <img
-              src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&q=80&w=800"
+              src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&q=60&w=800"
               className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-700"
               alt="Farmer"
+              loading="lazy"
             />
             <div className="absolute inset-0 p-6 sm:p-10 flex flex-col justify-center text-right items-end">
               <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-amber-600 mb-4 shadow-lg">

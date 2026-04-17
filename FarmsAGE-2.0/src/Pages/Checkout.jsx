@@ -22,6 +22,21 @@ const Checkout = () => {
     pincode: "",
   });
 
+  // Dynamically load Razorpay script
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const deliveryCharge = subtotal > 500 ? 0 : 40;
   const total = subtotal + deliveryCharge;
@@ -42,6 +57,12 @@ const Checkout = () => {
 
     setLoading(true);
     try {
+      const isLoaded = await loadRazorpay();
+      if (!isLoaded) {
+        alert("Razorpay SDK failed to load. Are you online?");
+        setLoading(false);
+        return;
+      }
       const token = localStorage.getItem('token');
       
       // 1. Create Razorpay Order

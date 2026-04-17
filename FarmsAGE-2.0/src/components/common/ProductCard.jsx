@@ -1,6 +1,7 @@
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useCart } from "../../context/CartContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 const weightOptions = [
   { label: "1 kg", multiplier: 1 },
@@ -10,15 +11,18 @@ const weightOptions = [
   { label: "1 Piece", multiplier: 1 },
 ];
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, priority = false }) => {
   const defaultWeightIndex = product.unit
     ? weightOptions.findIndex(
-        (w) => w.label.toLowerCase() === product.unit.toLowerCase(),
+        (w) => w.label.toLowerCase() === product.unit?.toLowerCase(),
       )
     : 0;
-  const safeWeightIndex = defaultWeightIndex >= 0 ? defaultWeightIndex : 0;
-  const [selectedWeight, setSelectedWeight] = useState(safeWeightIndex);
+
+  const [selectedWeight] = useState(
+    defaultWeightIndex >= 0 ? defaultWeightIndex : 0,
+  );
   const [added, setAdded] = useState(false);
+
   const { addToCart } = useCart();
 
   const isOutOfStock = product.quantity === 0;
@@ -29,8 +33,15 @@ const ProductCard = ({ product }) => {
   const originalPrice = Math.round(baseOldPrice * currentWeight.multiplier);
   const discountAmount = originalPrice - currentPrice;
 
-  const handleAddToCart = () => {
+  // 🔥 Optimized Image URL
+  const optimizedImage = product.image.includes("?")
+    ? `${product.image}&w=300&q=70&fm=webp`
+    : `${product.image}?w=300&q=70&fm=webp`;
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
     if (isOutOfStock) return;
+
     addToCart(
       {
         ...product,
@@ -39,8 +50,9 @@ const ProductCard = ({ product }) => {
       },
       currentWeight.label,
     );
+
     setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    setTimeout(() => setAdded(false), 1500);
   };
 
   const getTag = () => {
@@ -51,92 +63,122 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="group bg-white rounded-xl hover:shadow-md transition-all duration-300 flex flex-col relative w-full h-full border border-transparent hover:border-gray-100 p-2 sm:p-3 md:p-4">
-      {/* Product Image */}
-      <div className="relative bg-[#f4f6f8] rounded-xl mb-3 p-2 sm:p-3 aspect-square flex items-center justify-center overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4 }}
+      className="group bg-white rounded-2xl h-full border border-gray-100/60 shadow-sm hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-500 overflow-hidden flex flex-col"
+    >
+      {/* IMAGE */}
+      <div className="relative bg-slate-50/80 p-4 aspect-square flex items-center justify-center overflow-hidden">
         <img
-          src={product.image}
+          src={optimizedImage}
           alt={product.name}
-          className={`w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500 ${isOutOfStock ? 'opacity-40 grayscale' : ''}`}
+          loading={priority ? "eager" : "lazy"} // 🔥 smart loading
+          decoding="async"
+          width="150"
+          height="150"
+          onError={(e) => (e.target.src = "/fallback.png")}
+          className={`w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700 ${
+            isOutOfStock ? "opacity-40 grayscale" : ""
+          }`}
         />
 
-        {/* OUT OF STOCK overlay */}
-        {isOutOfStock ? (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span style={{
-              background: 'rgba(220,38,38,0.9)',
-              color: '#fff',
-              fontWeight: 800,
-              fontSize: '0.65rem',
-              letterSpacing: '0.08em',
-              padding: '5px 12px',
-              borderRadius: '6px',
-              textTransform: 'uppercase'
-            }}>
-              Out of Stock
+        {/* TAG */}
+        {!isOutOfStock && (
+          <div className="absolute top-2 left-2 flex flex-col gap-1">
+            <span className="bg-emerald-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase">
+              {getTag()}
+            </span>
+
+            {discountAmount > 0 && (
+              <span className="bg-amber-400 text-black text-[9px] font-black px-2 py-0.5 rounded-full">
+                Save ₹{discountAmount}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* OUT OF STOCK */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+            <span className="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">
+              Sold Out
             </span>
           </div>
-        ) : (
-          /* ADD Button */
-          <button
-            onClick={handleAddToCart}
-            className={`absolute bottom-2 right-2 sm:bottom-3 sm:right-3 px-3 sm:px-4 py-1.5 rounded-lg border font-bold text-[10px] sm:text-xs transition-all shadow-sm ${
-              added
-                ? "bg-pink-50 border-pink-500 text-pink-600"
-                : "bg-white border-pink-600 text-pink-600 hover:bg-pink-50"
-            }`}
-          >
-            {added ? "ADDED" : "ADD"}
-          </button>
+        )}
+
+        {/* QUICK ADD */}
+        {!isOutOfStock && (
+          <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+            <button
+              onClick={handleAddToCart}
+              className="bg-white text-emerald-600 p-3 rounded-full shadow hover:bg-emerald-600 hover:text-white transition"
+            >
+              <Plus size={20} />
+            </button>
+          </div>
         )}
       </div>
 
-      <div className="flex-1 flex flex-col">
-        {/* Price */}
-        <div className="flex items-center gap-1.5 mb-1 mt-1 flex-wrap">
-          <span className={`px-1.5 py-0.5 rounded text-[11px] sm:text-xs font-bold ${isOutOfStock ? 'bg-gray-200 text-gray-500' : 'bg-[#138f4d] text-white'}`}>
-            ₹{currentPrice}
-          </span>
-
-          {originalPrice > currentPrice && (
-            <span className="text-gray-500 line-through text-[11px] sm:text-xs font-medium">
-              ₹{originalPrice}
-            </span>
-          )}
-        </div>
-
-        {/* Discount */}
-        {discountAmount > 0 && !isOutOfStock && (
-          <div className="text-[#138f4d] text-[10px] sm:text-xs font-bold mb-1">
-            ₹{discountAmount} OFF
-          </div>
-        )}
-
-        {/* Title */}
-        <h3 className="font-semibold text-gray-800 text-sm sm:text-base leading-snug line-clamp-2 mb-1">
+      {/* CONTENT */}
+      <div className="p-3 flex flex-col flex-1">
+        <h3 className="font-bold text-sm text-slate-800 line-clamp-2 h-10">
           {product.name}
         </h3>
 
-        {/* Weight */}
-        <p className="text-gray-500 text-xs sm:text-sm mb-1">
+        <p className="text-xs text-gray-400">
           {product.unit || currentWeight.label}
         </p>
 
-        {/* Tag / Stock indicator */}
-        <div className="mt-auto pt-2">
-          {isOutOfStock ? (
-            <span className="text-red-500 text-[10px] sm:text-xs font-bold">
-              Currently Unavailable
-            </span>
-          ) : (
-            <span className="text-teal-600 text-[10px] sm:text-xs font-bold">
-              {getTag()}
-            </span>
+        {/* PRICE */}
+        <div className="mt-auto flex justify-between items-end pt-2">
+          <div>
+            <span className="font-bold text-lg">₹{currentPrice}</span>
+            {originalPrice > currentPrice && (
+              <span className="text-xs line-through text-gray-400 ml-2">
+                ₹{originalPrice}
+              </span>
+            )}
+          </div>
+
+          {!isOutOfStock && (
+            <button
+              onClick={handleAddToCart}
+              className={`px-3 py-1 rounded-lg text-xs font-bold border ${
+                added
+                  ? "bg-green-500 text-white border-green-500"
+                  : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+              }`}
+            >
+              <AnimatePresence mode="wait">
+                {added ? (
+                  <motion.span
+                    key="added"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    ✓ Added
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="add"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    ADD
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
-export default ProductCard;
+// 🔥 Prevent unnecessary re-renders
+export default memo(ProductCard);

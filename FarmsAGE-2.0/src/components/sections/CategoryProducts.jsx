@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "../common/ProductCard";
 import { useNavigate, useLocation } from "react-router-dom";
+import { ChevronRight, Filter, LayoutGrid, List } from "lucide-react";
 
 const SIDEBAR_CATEGORIES = [
   {
@@ -16,18 +17,6 @@ const SIDEBAR_CATEGORIES = [
     id: "fruits",
     icon: "https://cdn-icons-png.flaticon.com/512/590/590685.png",
   },
-  // {
-  //   name: "Exotics",
-  //   path: "/category/exotics",
-  //   id: "exotics",
-  //   icon: "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
-  // },
-  // {
-  //   name: "Seasonal",
-  //   path: "/category/seasonal",
-  //   id: "seasonal",
-  //   icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png",
-  // },
   {
     name: "Organic",
     path: "/category/organic",
@@ -51,122 +40,144 @@ const SIDEBAR_CATEGORIES = [
 const CategoryProducts = ({ title, productsData }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
 
   return (
-    <section className="bg-white min-h-screen">
-      <div className="w-full max-w-7xl mx-auto flex">
-        {/* Sidebar */}
-        <aside className="hidden md:flex flex-col w-56 lg:w-64 flex-shrink-0 border-r border-gray-100 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto pt-4 bg-white">
-          <div className="flex flex-col">
+    <section className="bg-[#F8FAFC] min-h-screen">
+      {/* Mobile Top Category Bar - Sticky */}
+      <div className="md:hidden sticky top-[64px] z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100 flex overflow-x-auto gap-1 px-4 py-3 scrollbar-hide snap-x">
+        {SIDEBAR_CATEGORIES.map((cat) => {
+          const isActive = location.pathname === cat.path;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => navigate(cat.path)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-2xl shrink-0 snap-start transition-all ${
+                isActive 
+                  ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200" 
+                  : "bg-gray-50 text-gray-500 border border-gray-100"
+              }`}
+            >
+              <img src={cat.icon} className={`w-5 h-5 object-contain ${isActive ? 'brightness-200' : ''}`} alt="" />
+              <span className="text-xs font-black uppercase tracking-wider">{cat.name.split(" ").pop()}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="w-full max-w-[1400px] mx-auto flex">
+        {/* Desktop Sidebar */}
+        <aside className="hidden md:flex flex-col w-64 lg:w-72 flex-shrink-0 border-r border-gray-100 sticky top-20 h-[calc(100vh-80px)] overflow-y-auto pt-8 px-4 bg-white">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 ml-4">Categories</h3>
+          <div className="flex flex-col gap-2">
             {SIDEBAR_CATEGORIES.map((cat) => {
               const isActive = location.pathname === cat.path;
               return (
                 <button
                   key={cat.id}
                   onClick={() => navigate(cat.path)}
-                  className={`flex items-center gap-3 px-4 lg:px-6 py-2.5 transition-all border-l-4 ${
+                  className={`flex items-center justify-between group px-5 py-4 rounded-[1.5rem] transition-all ${
                     isActive
-                      ? "bg-pink-50 border-pink-500 text-pink-700 font-semibold"
-                      : "border-transparent text-gray-600 hover:bg-gray-50"
+                      ? "bg-emerald-50 text-emerald-800"
+                      : "text-slate-600 hover:bg-slate-50"
                   }`}
                 >
-                  <div
-                    className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center p-1.5 ${
-                      isActive ? "opacity-100" : "opacity-80 grayscale"
-                    }`}
-                  >
-                    <img
-                      src={cat.icon}
-                      className="w-full h-full object-contain"
-                      alt={cat.name}
-                    />
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center p-2 transition-transform group-hover:scale-110 ${isActive ? 'bg-emerald-500 shadow-md' : 'bg-slate-100'}`}>
+                      <img src={cat.icon} className={`w-full h-full object-contain ${isActive ? 'brightness-200' : ''}`} alt={cat.name} />
+                    </div>
+                    <span className={`text-[13px] font-black ${isActive ? 'tracking-tight' : 'tracking-normal'}`}>{cat.name}</span>
                   </div>
-
-                  <span className="text-xs lg:text-sm text-left leading-tight font-medium truncate">
-                    {cat.name}
-                  </span>
+                  <ChevronRight size={16} className={`transition-transform ${isActive ? 'translate-x-0' : '-translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0'}`} />
                 </button>
               );
             })}
           </div>
         </aside>
 
-        {/* Right Content */}
-        <div className="flex-1 w-full px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 bg-gray-50/30">
-          {/* Mobile Categories */}
-          <div className="md:hidden flex overflow-x-auto gap-7 pb-4 scrollbar-hide snap-x snap-mandatory">
-            {SIDEBAR_CATEGORIES.map((cat) => {
-              const isActive = location.pathname === cat.path;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => navigate(cat.path)}
-                  className={`flex flex-col items-center gap-1.5 shrink-0 snap-start ${
-                    isActive ? "scale-105" : "opacity-100"
-                  }`}
-                >
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center p-2 ${
-                      isActive
-                        ? "bg-green-400 shadow-md"
-                        : "bg-white border border-gray-100"
-                    }`}
-                  >
-                    <img
-                      src={cat.icon}
-                      className={`w-full h-full object-contain ${
-                        isActive ? "brightness-0 invert" : ""
-                      }`}
-                      alt={cat.name}
-                    />
-                  </div>
+        {/* Main Content */}
+        <div className="flex-1 w-full px-4 sm:px-6 lg:px-10 py-6 sm:py-10">
+          {/* Page Header */}
+          <div className="flex flex-col gap-6 mb-8 sm:mb-12">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                   <div className="w-8 h-1 bg-emerald-500 rounded-full" />
+                   <p className="text-[10px] sm:text-xs font-black text-emerald-600 uppercase tracking-[0.2em]">Fresh Harvest</p>
+                </div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
+                  {title}
+                </h1>
+              </div>
 
-                  <span
-                    className={`text-[10px] font-bold whitespace-nowrap ${
-                      isActive ? "text-pink-600" : "text-gray-400"
-                    }`}
-                  >
-                    {cat.id === "all" ? "All" : cat.name.split(" ").pop()}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+              {/* View Toggles (Desktop Only) */}
+              <div className="hidden sm:flex items-center bg-white p-1 rounded-2xl border border-slate-100 shadow-sm">
+                 <button 
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-emerald-500 text-white shadow-md' : 'text-slate-400 hover:bg-slate-50'}`}
+                 >
+                    <LayoutGrid size={20} />
+                 </button>
+                 <button 
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded-xl transition-all ${viewMode === 'list' ? 'bg-emerald-500 text-white shadow-md' : 'text-slate-400 hover:bg-slate-50'}`}
+                 >
+                    <List size={20} />
+                 </button>
+              </div>
+            </div>
 
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
-            <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">
-              {title}
-            </h2>
-
-            <div className="flex items-center gap-2 bg-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-gray-100 shadow-sm w-fit">
-              <span className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase">
-                Sort:
-              </span>
-
-              <select className="text-[10px] sm:text-xs font-bold text-emerald-600 bg-transparent cursor-pointer outline-none">
-                <option>Relevance</option>
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
-              </select>
+            {/* Filter Bar */}
+            <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+               <button className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm text-xs font-black text-slate-700 hover:bg-slate-50 shrink-0">
+                  <Filter size={14} className="text-emerald-500" /> Filters
+               </button>
+               <div className="h-6 w-px bg-slate-200 shrink-0" />
+               <select className="bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm text-xs font-black text-slate-700 outline-none cursor-pointer shrink-0">
+                  <option>Relevance</option>
+                  <option>Price: Low to High</option>
+                  <option>Price: High to Low</option>
+                  <option>Newest First</option>
+               </select>
+               <div className="bg-emerald-50 text-emerald-700 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider shrink-0 border border-emerald-100">
+                  {productsData.length} Products Found
+               </div>
             </div>
           </div>
 
           {/* Product Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-5 md:gap-6">
-            {productsData.map((item) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3 }}
-                className="h-full"
-              >
-                <ProductCard product={item} />
-              </motion.div>
-            ))}
+          <div className={
+            viewMode === 'grid' 
+              ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
+              : "flex flex-col gap-4"
+          }>
+            <AnimatePresence>
+              {productsData.map((item, idx) => (
+                <motion.div
+                  key={item.id || idx}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4, delay: idx * 0.05 }}
+                  className="h-full"
+                >
+                  <ProductCard product={item} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
+
+          {/* Empty State */}
+          {productsData.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+               <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6">
+                  <LayoutGrid size={40} className="text-slate-300" />
+               </div>
+               <h3 className="text-xl font-black text-slate-900 mb-2">No Products Found</h3>
+               <p className="text-slate-500 font-medium">Try adjusting your filters or checking another category.</p>
+            </div>
+          )}
         </div>
       </div>
     </section>
