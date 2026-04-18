@@ -54,7 +54,10 @@ exports.googleLogin = async (req, res) => {
         googleId: sub,
         authProvider: "google",
         isVerified: true,
+        isProfileComplete: false
       });
+      isNewUser = true;
+    } else if (!user.isProfileComplete) {
       isNewUser = true;
     }
 
@@ -129,7 +132,9 @@ exports.verifyOTP = async (req, res) => {
     let isNewUser = false;
 
     if (!user) {
-      user = await User.create({ phone });
+      user = await User.create({ phone, isProfileComplete: false });
+      isNewUser = true;
+    } else if (!user.isProfileComplete) {
       isNewUser = true;
     }
 

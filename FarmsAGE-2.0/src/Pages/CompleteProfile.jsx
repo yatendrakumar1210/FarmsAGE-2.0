@@ -35,7 +35,11 @@ const CompleteProfile = () => {
       const data = await resp.json();
       if (resp.ok) {
         login(data.user, data.token); // Use new token with updated role
-        navigate("/");
+        if (role === "vendor") {
+          navigate("/vendor");
+        } else {
+          navigate("/");
+        }
       } else {
         setError(data.message || "Failed to update profile");
       }
