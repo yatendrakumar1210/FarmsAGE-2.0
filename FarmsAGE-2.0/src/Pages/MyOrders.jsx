@@ -16,7 +16,8 @@ import {
   RefreshCcw,
   Sparkles,
   Calendar,
-  Box
+  Box,
+  Store
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
@@ -212,6 +213,12 @@ const MyOrders = () => {
                               <CreditCard size={14} className="text-slate-300" />
                               {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid Online'}
                            </div>
+                           {order.vendorId && (
+                              <div className="flex items-center gap-2.5 text-emerald-600 font-bold text-[10px] mt-3 bg-emerald-50/50 p-2 rounded-lg border border-emerald-100/50">
+                                 <Store size={12} className="text-emerald-500" />
+                                 <span className="truncate">{order.vendorId.storeName || order.vendorId.name}</span>
+                              </div>
+                           )}
                         </div>
                       </div>
 

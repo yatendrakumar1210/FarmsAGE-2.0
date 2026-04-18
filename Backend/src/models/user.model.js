@@ -54,6 +54,11 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
+    storeAddress: {
+      type: String,
+      default: "",
+    },
+
     coordinates: {
       lat: { type: Number, default: null },
       lng: { type: Number, default: null },
@@ -62,6 +67,12 @@ const userSchema = new mongoose.Schema(
     isProfileComplete: {
       type: Boolean,
       default: false,
+    },
+
+    shopStatus: {
+      type: String,
+      enum: ["none", "pending", "approved", "rejected"],
+      default: "none",
     },
 
     isVerified: {

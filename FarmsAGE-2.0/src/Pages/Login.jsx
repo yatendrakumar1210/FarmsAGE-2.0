@@ -70,7 +70,14 @@ const Login = () => {
           if (data.isNewUser) {
             navigate("/complete-profile");
           } else {
-            navigate("/");
+            const role = data.user?.role?.toLowerCase();
+            if (role === "admin") {
+              navigate("/admin");
+            } else if (role === "vendor") {
+              navigate("/vendor");
+            } else {
+              navigate("/");
+            }
           }
         } else {
           setError(data.message || "Google Login failed");
@@ -133,7 +140,14 @@ const Login = () => {
         if (data.isNewUser) {
           navigate("/complete-profile");
         } else {
-          navigate("/");
+          const role = data.user?.role?.toLowerCase();
+          if (role === "admin") {
+            navigate("/admin");
+          } else if (role === "vendor") {
+            navigate("/vendor");
+          } else {
+            navigate("/");
+          }
         }
       } else {
         setError(data.message || "Invalid OTP");

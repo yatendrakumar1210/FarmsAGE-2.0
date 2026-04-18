@@ -9,6 +9,7 @@ const {
   deleteProduct,
   getUsers,
   updateUserRole,
+  updateShopStatus,
 } = require("../controller/admin.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
@@ -26,5 +27,6 @@ router.delete("/products/:id", deleteProduct);
 
 router.get("/users", getUsers);
 router.put("/users/:id/role", updateUserRole);
+router.put("/users/:id/shop-status", updateShopStatus);
 
 module.exports = router;

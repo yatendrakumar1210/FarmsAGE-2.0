@@ -33,7 +33,9 @@ exports.updateOrder = async (req, res) => {
 // 📋 Get all products (admin view)
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
+    const products = await Product.find()
+      .populate("vendorId", "name storeName")
+      .sort({ createdAt: -1 });
     res.json(products);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch products", error: err.message });
@@ -45,8 +47,17 @@ exports.getPublicProducts = async (req, res) => {
   try {
     const { category } = req.query;
     const filter = category ? { category } : {};
-    const products = await Product.find(filter).sort({ createdAt: -1 });
-    res.json(products);
+    
+    // Fetch products and populate vendor info to check status
+    const products = await Product.find(filter)
+      .populate("vendorId", "shopStatus")
+      .sort({ createdAt: -1 });
+
+    // 🌍 Only show Global (Admin) products in the main catalog
+    // Vendor products will only be seen in their respective Store Pages
+    const filteredProducts = products.filter(p => !p.vendorId);
+
+    res.json(filteredProducts);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch products", error: err.message });
   }
@@ -109,5 +120,21 @@ exports.updateUserRole = async (req, res) => {
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: "Failed to update user role", error: err.message });
+  }
+};
+
+// 🏠 Update vendor shop status (Approve/Reject)
+exports.updateShopStatus = async (req, res) => {
+  try {
+    const { shopStatus } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { shopStatus },
+      { new: true, runValidators: true }
+    ).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update shop status", error: err.message });
   }
 };

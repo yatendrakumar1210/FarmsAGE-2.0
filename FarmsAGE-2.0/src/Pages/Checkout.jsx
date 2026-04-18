@@ -73,7 +73,8 @@ const Checkout = () => {
           quantity: item.quantity,
           weight: item.weight,
           name: item.name,
-          image: item.image
+          image: item.image,
+          vendorId: item.vendorId || null
         }))
       };
 
@@ -106,8 +107,7 @@ const Checkout = () => {
               razorpay_signature: response.razorpay_signature,
               items: orderData.items,
               deliveryAddress: address,
-              totalAmount: total,
-              vendorId: cart[0]?.vendorId || null
+              totalAmount: total
             };
 
             const verifyRes = await fetch(`${API}/api/orders/verify-payment`, {
@@ -171,11 +171,11 @@ const Checkout = () => {
           quantity: item.quantity,
           weight: item.weight,
           name: item.name,
-          image: item.image
+          image: item.image,
+          vendorId: item.vendorId || null
         })),
         deliveryAddress: address,
-        totalAmount: total,
-        vendorId: cart[0]?.vendorId || null
+        totalAmount: total
       };
 
       const res = await fetch(`${API}/api/orders/cod`, {

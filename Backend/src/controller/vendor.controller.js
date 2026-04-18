@@ -1,6 +1,7 @@
 const Order = require("../models/order.model");
 const Product = require("../models/product.model");
 const User = require("../models/user.model");
+const jwt = require("jsonwebtoken");
 
 // ─── Vendor Product Management ───
 
@@ -121,6 +122,39 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
+// 🏠 Register vendor's shop
+exports.registerShop = async (req, res) => {
+  try {
+    const { storeName, specialty, storeImage, coordinates, storeAddress, phone, email } = req.body;
+    const vendor = await User.findByIdAndUpdate(
+      req.user.id,
+      { 
+        storeName, 
+        specialty, 
+        storeImage, 
+        coordinates,
+        storeAddress,
+        phone,
+        email,
+        role: "vendor",
+        shopStatus: "pending"
+      },
+      { new: true }
+    ).select("-password");
+
+    // 🔑 Generate NEW token with updated role
+    const token = jwt.sign(
+      { id: vendor._id, role: vendor.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({ user: vendor, token });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to register shop", error: err.message });
+  }
+};
+
 // ─── Public: Nearby Vendors ───
 
 // 🌍 Get nearby vendors (public endpoint, requires lat/lng query params)
@@ -135,9 +169,10 @@ exports.getNearbyVendors = async (req, res) => {
     const userLat = parseFloat(lat);
     const userLng = parseFloat(lng);
 
-    // Find all vendors who have set coordinates
+    // Find all vendors who have set coordinates and are approved
     const vendors = await User.find({
       role: "vendor",
+      shopStatus: "approved",
       "coordinates.lat": { $ne: null },
       "coordinates.lng": { $ne: null },
     }).select("name storeName specialty storeImage coordinates");

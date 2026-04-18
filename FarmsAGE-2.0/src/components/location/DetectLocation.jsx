@@ -40,7 +40,7 @@ const DetectLocation = ({ onLocationDetected }) => {
 
             // Update parent component
             if (onLocationDetected) {
-              onLocationDetected(addressData);
+              onLocationDetected({ ...addressData, latitude, longitude });
             }
           }
         } catch (err) {

@@ -166,8 +166,16 @@ exports.completeProfile = async (req, res) => {
 
     await user.save();
 
+    // 🔑 Generate NEW token with updated role (very important!)
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
     res.json({
       success: true,
+      token, // Send new token to frontend
       user,
     });
   } catch (error) {

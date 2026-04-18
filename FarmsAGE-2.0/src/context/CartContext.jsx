@@ -8,6 +8,22 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
   const addToCart = (product, selectedWeight) => {
+    const productVendorId = product.vendorId || "global";
+
+    // 🥡 Zomato Style: One shop at a time check
+    if (cart.length > 0) {
+      const cartVendorId = cart[0].vendorId || "global";
+      if (cartVendorId !== productVendorId) {
+        const wantsToReplace = window.confirm(
+          "Your cart contains items from another store. Clear cart and add this item instead?"
+        );
+        if (wantsToReplace) {
+          setCart([{ ...product, weight: selectedWeight, quantity: 1 }]);
+        }
+        return;
+      }
+    }
+
     setCart((prevCart) => {
       const pId = product._id || product.id;
       // Check if item already exists in cart with the same weight

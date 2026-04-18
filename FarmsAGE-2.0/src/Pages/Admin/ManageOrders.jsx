@@ -131,7 +131,7 @@ const ManageOrders = () => {
                 className="flex flex-col md:flex-row md:items-center gap-3 p-4 cursor-pointer hover:bg-gray-50"
               >
                 {/* Row Content Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 w-full">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-3 w-full">
                   <div>
                     <p className="text-[10px] text-gray-400 uppercase">Order</p>
                     <p className="font-bold text-sm">
@@ -150,6 +150,13 @@ const ManageOrders = () => {
                     </p>
                     <p className="text-sm font-medium">
                       {addr.name || order.userId?.name || "Unknown"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] text-gray-400 uppercase">Vendor</p>
+                    <p className="text-sm font-bold text-amber-600">
+                      {order.vendorId?.storeName || order.vendorId?.name || "Global"}
                     </p>
                   </div>
 

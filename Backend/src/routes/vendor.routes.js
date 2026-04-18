@@ -13,6 +13,7 @@ const {
   getNearbyVendors,
   getVendorProducts,
   getVendorInfo,
+  registerShop,
 } = require("../controller/vendor.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
@@ -23,8 +24,14 @@ router.get("/nearby", getNearbyVendors);
 router.get("/:vendorId/products", getVendorProducts);
 router.get("/:vendorId/info", getVendorInfo);
 
-// ─── Protected Vendor Routes ───
-router.use(authMiddleware, vendorMiddleware);
+// ─── Protected Private Routes ───
+router.use(authMiddleware);
+
+// Registration (Needs to be accessible to users to become vendors)
+router.post("/register-shop", registerShop);
+
+// 🔒 Restricted to Vendors/Admins only
+router.use(vendorMiddleware);
 
 // Products
 router.get("/products", getMyProducts);

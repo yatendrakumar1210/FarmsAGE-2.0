@@ -245,6 +245,7 @@ const ManageProducts = () => {
                                 <th>Stock</th>
                                 <th>Unit</th>
                                 <th>Organic</th>
+                                <th>Vendor</th>
                                 <th>Source</th>
                                 <th>Actions</th>
                             </tr>
@@ -276,6 +277,11 @@ const ManageProducts = () => {
                                     <td><StockBadge qty={p.quantity ?? 100} /></td>
                                     <td style={{ color: '#64748b', fontSize: '0.8rem' }}>{p.unit || '1 kg'}</td>
                                     <td style={{ textAlign: 'center' }}>{p.isOrganic ? '✅' : '❌'}</td>
+                                    <td>
+                                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: p.vendorId ? '#b45309' : '#64748b' }}>
+                                            {p.vendorId ? (p.vendorId.storeName || p.vendorId.name) : "Admin"}
+                                        </span>
+                                    </td>
                                     <td>
                                         {p._isStatic ? (
                                             <span style={{ background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '12px', fontSize: '0.68rem', fontWeight: 700 }}>

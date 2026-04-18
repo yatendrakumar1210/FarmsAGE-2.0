@@ -9,8 +9,11 @@ import {
   LogOut,
   Menu,
   X,
-  Store
+  Store,
+  Clock,
+  AlertCircle
 } from "lucide-react";
+import VendorRegistration from "./VendorRegistration";
 import "../Admin/admin.css";
 import "./vendor.css";
 
@@ -60,61 +63,75 @@ const VendorLayout = () => {
 
           {/* Nav */}
           <nav className="flex-1 p-4 space-y-2">
-            <NavLink
-              to="/vendor/dashboard"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-                }`
-              }
-            >
-              <LayoutDashboard size={18} />
-              Dashboard
-            </NavLink>
+            {user?.shopStatus === "approved" ? (
+              <>
+                <NavLink
+                  to="/vendor/dashboard"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                      isActive
+                        ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                    }`
+                  }
+                >
+                  <LayoutDashboard size={18} />
+                  Dashboard
+                </NavLink>
 
-            <NavLink
-              to="/vendor/products"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-                }`
-              }
-            >
-              <ShoppingBasket size={18} />
-              My Products
-            </NavLink>
+                <NavLink
+                  to="/vendor/products"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                      isActive
+                        ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                    }`
+                  }
+                >
+                  <ShoppingBasket size={18} />
+                  My Products
+                </NavLink>
 
-            <NavLink
-              to="/vendor/orders"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-                }`
-              }
-            >
-              <ShoppingCart size={18} />
-              Orders
-            </NavLink>
+                <NavLink
+                  to="/vendor/orders"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                      isActive
+                        ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                    }`
+                  }
+                >
+                  <ShoppingCart size={18} />
+                  Orders
+                </NavLink>
 
-            <NavLink
-              to="/vendor/profile"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-                }`
-              }
-            >
-              <User size={18} />
-              Store Profile
-            </NavLink>
+                <NavLink
+                  to="/vendor/profile"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                      isActive
+                        ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                    }`
+                  }
+                >
+                  <User size={18} />
+                  Store Profile
+                </NavLink>
+              </>
+            ) : (
+              <div className="px-3 py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">
+                  Registration Required
+                </p>
+                <div className="flex flex-col items-center gap-2 mt-4 opacity-40 grayscale">
+                   <div className="w-8 h-8 rounded-lg bg-slate-200" />
+                   <div className="w-16 h-2 rounded bg-slate-200" />
+                </div>
+              </div>
+            )}
           </nav>
 
           {/* Logout */}
@@ -178,8 +195,12 @@ const VendorLayout = () => {
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 bg-slate-50/50">
+          {user?.shopStatus === "approved" ? (
+            <Outlet />
+          ) : (
+            <VendorRegistration />
+          )}
         </main>
       </div>
     </div>
