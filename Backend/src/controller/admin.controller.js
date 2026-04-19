@@ -1,6 +1,9 @@
 const Order = require("../models/order.model");
 const Product = require("../models/product.model");
 const User = require("../models/user.model");
+const { sendEmail } = require("../utils/sendEmail");
+const orderStatusTemplate = require("../templates/orderStatusTemplate");
+const shopStatusTemplate = require("../templates/shopStatusTemplate");
 
 // 📦 Get all orders (with populated user info)
 exports.getOrders = async (req, res) => {
@@ -22,8 +25,19 @@ exports.updateOrder = async (req, res) => {
     const order = await Order.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true },
+      { returnDocument: "after" },
     );
+
+    // 📩 Notify User of Order Update
+    const customer = await User.findById(order.userId);
+    if (customer && customer.email) {
+      await sendEmail({
+        to: customer.email,
+        subject: `Order Update: #${order._id.toString().slice(-6)}`,
+        html: orderStatusTemplate(customer.name, order._id.toString().slice(-6), status)
+      });
+    }
+
     res.json(order);
   } catch (err) {
     res.status(500).json({ message: "Failed to update order", error: err.message });
@@ -77,7 +91,7 @@ exports.addProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     });
     if (!product) return res.status(404).json({ message: "Product not found" });
@@ -114,7 +128,7 @@ exports.updateUserRole = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { role },
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     ).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
@@ -130,9 +144,20 @@ exports.updateShopStatus = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { shopStatus },
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     ).select("-password");
+
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    // 📩 Notify Vendor of Shop Status Update
+    if (user.email) {
+      await sendEmail({
+        to: user.email,
+        subject: `Store Registration: ${shopStatus.toUpperCase()}`,
+        html: shopStatusTemplate(user.name, shopStatus)
+      });
+    }
+
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: "Failed to update shop status", error: err.message });

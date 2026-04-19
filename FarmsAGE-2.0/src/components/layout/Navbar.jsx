@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import logo from "../../assets/logo.jpg"
+import React, { useState, useEffect, useMemo } from "react";
+import logo from "../../assets/logo.jpg";
 
 import {
   ShoppingCart,
@@ -13,37 +13,40 @@ import {
   Package,
   ShieldCheck,
   Store,
-  Loader2
+  Loader2,
 } from "lucide-react";
+
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { getAddressFromCoords } from "../../utils/getAddress";
 import { saveAddress } from "../../services/locationServices";
 
-const Navbar = () => {
+const Navbar = React.memo(() => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [locationName, setLocationName] = useState(
-    () => localStorage.getItem("detectedLocation") || "Detect Location"
+    () => localStorage.getItem("detectedLocation") || "Detect Location",
   );
   const [loadingLocation, setLoadingLocation] = useState(false);
+
   const routerLocation = useLocation();
   const { cart } = useCart();
   const { user, logout } = useAuth();
-  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
-  // Change navbar style on scroll
+  const cartCount = useMemo(
+    () => cart.reduce((total, item) => total + item.quantity, 0),
+    [cart],
+  );
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => setOpen(false), [routerLocation]);
 
-  // Clear detected location if user logs out
   useEffect(() => {
     if (!user) {
       localStorage.removeItem("detectedLocation");
@@ -53,6 +56,7 @@ const Navbar = () => {
 
   const handleDetectLocation = () => {
     setLoadingLocation(true);
+
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser");
       setLoadingLocation(false);
@@ -69,13 +73,12 @@ const Navbar = () => {
             const locName = addressData.city || addressData.fullAddress;
             setLocationName(locName);
             localStorage.setItem("detectedLocation", locName);
-            
-            // Optional: Save to backend if user is logged in
+
             if (user) {
-              await saveAddress({ 
-                address: addressData.fullAddress, 
-                latitude, 
-                longitude 
+              await saveAddress({
+                address: addressData.fullAddress,
+                latitude,
+                longitude,
               });
             }
           }
@@ -87,9 +90,10 @@ const Navbar = () => {
       },
       (err) => {
         console.error(err);
+        alert("Unable to fetch location");
         setLoadingLocation(false);
       },
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
     );
   };
 
@@ -102,18 +106,22 @@ const Navbar = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between gap-4">
-        {/* 1. Logo Section */}
+        {/* Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0 group">
           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center overflow-hidden border border-slate-100 shadow-sm group-hover:scale-110 transition-transform duration-300">
-            <img className="w-full h-full object-cover" src={logo} alt="FarmsAge Logo" />
+            <img
+              className="w-full h-full object-cover"
+              src={logo}
+              alt="FarmsAge Logo"
+            />
           </div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tighter text-slate-800 font-['Outfit']">
             Farms<span className="text-emerald-600 font-extrabold">AGE</span>
           </h2>
         </Link>
 
-        {/* 2. Delivery Location (Desktop) */}
-        <div 
+        {/* Location */}
+        <div
           onClick={handleDetectLocation}
           className="hidden lg:flex flex-col border-l border-gray-200 pl-4 ml-2 cursor-pointer group hover:bg-emerald-50/50 py-1 transition-colors rounded-r-lg"
         >
@@ -129,47 +137,48 @@ const Navbar = () => {
             <span className="text-sm font-bold truncate max-w-[120px]">
               {locationName}
             </span>
-            <ChevronDown
-              size={14}
-              className="text-emerald-600 group-hover:translate-y-0.5 transition-transform"
-            />
+            <ChevronDown size={14} className="text-emerald-600" />
           </div>
         </div>
 
-        {/* 3. Central Search Bar (The "Hero" of the Navbar) */}
+        {/* Search */}
         <div className="flex-1 max-w-2xl relative group hidden md:block">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600 transition-colors">
-            <Search size={18} />
-          </div>
+          <Search
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            size={18}
+          />
           <input
             type="text"
             placeholder='Search "fresh mangoes" or "organic milk"'
-            className="w-full bg-gray-100 border-none rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all outline-none text-slate-700"
+            className="w-full bg-gray-100 border-none rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:bg-white outline-none text-slate-700"
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden lg:block">
-            <span className="text-[10px] font-bold bg-white px-2 py-1 rounded-md border border-gray-200 text-gray-400">
-              ⌘ K
-            </span>
-          </div>
         </div>
 
-        {/* 4. Action Icons */}
+        {/* Actions */}
         <div className="flex items-center gap-2 sm:gap-6">
+          {/* User */}
           {user ? (
             <div className="relative group flex items-center gap-2 font-bold text-slate-700 cursor-pointer">
-              <div className="w-8 h-8 sm:w-8 sm:h-8 w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+              {/* FIXED size */}
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
                 <User size={16} />
               </div>
-              <span className="text-sm truncate max-w-[100px]">{user.name || "User"}</span>
-              
-              
-              {/* Dropdown menu */}
+
+              <span className="text-sm truncate max-w-[100px]">
+                {user.name || "User"}
+              </span>
+
+              {/* Dropdown */}
               <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden z-50">
                 <div className="p-3 border-b border-slate-50">
-                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Logged in as</p>
-                   <p className="text-sm truncate mt-1 text-slate-800">{user.phone}</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                    Logged in as
+                  </p>
+                  <p className="text-sm truncate mt-1 text-slate-800">
+                    {user.email || user.phone}
+                  </p>
                 </div>
-                <button 
+                <button
                   onClick={logout}
                   className="w-full text-left px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
                 >
@@ -180,59 +189,60 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600"
             >
               <User size={20} />
               <span className="text-sm">Login</span>
             </Link>
           )}
-          
-          {user && !routerLocation.pathname.startsWith('/admin') && (
+
+          {/* Orders */}
+          {user && !routerLocation.pathname.startsWith("/admin") && (
             <Link
               to="/my-orders"
-              className="hidden lg:flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600 transition-colors"
+              className="hidden lg:flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600"
             >
               <Package size={20} />
               <span className="text-sm">My Orders</span>
             </Link>
           )}
 
-          {user && user.role?.toLowerCase() === 'admin' && (
+          {/* Admin */}
+          {user?.role?.toLowerCase() === "admin" && (
             <Link
               to="/admin"
-              className="hidden md:flex items-center gap-2 font-bold text-amber-600 hover:text-amber-700 transition-colors bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100"
+              className="hidden md:flex items-center gap-2 font-bold text-amber-600"
             >
               <ShieldCheck size={18} />
               <span className="text-sm">Admin Panel</span>
             </Link>
           )}
 
-          {user && user.role?.toLowerCase() === 'vendor' && (
+          {/* Vendor */}
+          {user?.role?.toLowerCase() === "vendor" && (
             <Link
               to="/vendor"
-              className="hidden md:flex items-center gap-2 font-bold text-emerald-700 hover:text-emerald-800 transition-colors bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100"
+              className="hidden md:flex items-center gap-2 font-bold text-emerald-700"
             >
               <Store size={18} />
               <span className="text-sm">Vendor Panel</span>
             </Link>
           )}
 
-          {!routerLocation.pathname.startsWith('/admin') && (
+          {/* Cart */}
+          {!routerLocation.pathname.startsWith("/admin") && (
             <Link
               to="/cart"
-              className="relative p-3 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 group"
+              className="relative p-3 bg-emerald-600 text-white rounded-2xl"
             >
-              <div className="flex items-center gap-2">
-                <ShoppingCart size={12} className="group-hover:shake" />
-                <span className="text-sm font-bold hidden md:block">My Cart</span>
-              </div>
-              <span className="absolute -top-1 -right-1 bg-amber-400 text-slate-900 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
+              <ShoppingCart size={12} className="group-hover:animate-bounce" />
+              <span className="absolute -top-1 -right-1 bg-amber-400 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
                 {cartCount}
               </span>
             </Link>
           )}
 
-          {/* Mobile Menu Toggle */}
+          {/* Mobile toggle */}
           <button
             className="md:hidden p-2 text-slate-800"
             onClick={() => setOpen(!open)}
@@ -242,76 +252,34 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* 5. Mobile Search (Visible only on mobile) */}
-      <div className="px-4 mt-2 md:hidden">
-        <div className="relative">
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-          <input
-            type="text"
-            placeholder="Search for groceries..."
-            className="w-full bg-gray-100 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none"
-          />
-        </div>
-      </div>
-
-      {/* 6. Mobile Drawer with Slide-in Animation */}
+      {/* Mobile Drawer FIXED */}
       <div
-        className={`fixed inset-0 top-[120px] bg-white z-[100] transition-transform duration-500 ease-in-out ${
+        className={`fixed inset-0 top-[120px] bg-white z-[100] transition-transform duration-500 ${
           open ? "translate-x-0" : "translate-x-full"
         } md:hidden overflow-y-auto pb-24`}
       >
         <div className="p-6 flex flex-col gap-6 font-bold text-xl text-slate-800">
-          {routerLocation.pathname.startsWith('/admin') ? (
-            <>
-              <Link to="/admin/dashboard">Dashboard</Link>
-              <Link to="/admin/products">Inventory</Link>
-              <Link to="/admin/orders">Order Management</Link>
-              <Link to="/admin/users">User Base</Link>
-              <Link to="/">Exit Admin</Link>
-            </>
-          ) : (
-            <>
-              <Link to="/home">Home</Link>
-              {user && user.role?.toLowerCase() === 'admin' && (
-                <Link to="/admin" className="text-amber-600">Admin Panel</Link>
-              )}
-              {user && user.role?.toLowerCase() === 'vendor' && (
-                <Link to="/vendor" className="text-emerald-600">Vendor Panel</Link>
-              )}
-              {!user && <Link to="/login" className="text-emerald-600">Login / Signup</Link>}
-              {user && <Link to="/my-orders">My Orders</Link>}
-              {/* <Link to="/category/fruits">Seasonal Fruits</Link> */}
-              <Link to="/category/vegetables">Fresh Vegetables</Link>
-              <Link to="/category/dairy">Dairy Products</Link>
-              <Link to="/category/organic">Organic Selection</Link>
-              <Link to="/offers">Daily Deals</Link>
-              <Link to="/contact">Help & Support</Link>
-              {user && <button onClick={logout} className="text-left text-red-500">Logout</button>}
-            </>
+          <Link to="/home">Home</Link>
+          {user && <Link to="/my-orders">My Orders</Link>}
+          {user?.role?.toLowerCase() === "admin" && (
+            <Link to="/admin">Admin</Link>
           )}
-          <hr />
-          <div 
+          {user?.role?.toLowerCase() === "vendor" && (
+            <Link to="/vendor">Vendor</Link>
+          )}
+          {!user && <Link to="/login">Login</Link>}
+
+          <button
             onClick={handleDetectLocation}
-            className="flex items-center gap-3 text-emerald-600 text-sm cursor-pointer hover:bg-emerald-50 p-2 rounded-xl transition-colors"
+            className="flex items-center gap-2 text-emerald-600"
           >
-            {loadingLocation ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <MapPin size={18} />
-            )}
-            <span className="font-bold">
-              {loadingLocation ? "Detecting location..." : `Deliver to: ${locationName}`}
-            </span>
-          </div>
+            <MapPin size={18} />
+            {locationName}
+          </button>
         </div>
       </div>
     </nav>
   );
-};
+});
 
 export default Navbar;
-
-

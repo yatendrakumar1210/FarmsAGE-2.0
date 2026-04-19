@@ -2,6 +2,8 @@ const Order = require("../models/order.model");
 const Product = require("../models/product.model");
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
+const { sendEmail } = require("../utils/sendEmail");
+const orderStatusTemplate = require("../templates/orderStatusTemplate");
 
 // ─── Vendor Product Management ───
 
@@ -42,7 +44,7 @@ exports.updateProduct = async (req, res) => {
     const product = await Product.findOneAndUpdate(
       { _id: req.params.id, vendorId: req.user.id },
       req.body,
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     );
     if (!product) return res.status(404).json({ message: "Product not found or access denied" });
     res.json(product);
@@ -89,6 +91,17 @@ exports.updateOrderStatus = async (req, res) => {
     }
     
     await order.save();
+
+    // 📩 Notify User of Status Update
+    const customer = await User.findById(order.userId);
+    if (customer && customer.email) {
+      await sendEmail({
+        to: customer.email,
+        subject: `Order Update: #${order._id.toString().slice(-6)}`,
+        html: orderStatusTemplate(customer.name, order._id.toString().slice(-6), status)
+      });
+    }
+
     res.json(order);
   } catch (err) {
     res.status(500).json({ message: "Failed to update order", error: err.message });
@@ -114,7 +127,7 @@ exports.updateProfile = async (req, res) => {
     const vendor = await User.findByIdAndUpdate(
       req.user.id,
       { storeName, specialty, storeImage, coordinates },
-      { new: true }
+      { returnDocument: "after" }
     ).select("-password");
     res.json(vendor);
   } catch (err) {
@@ -126,6 +139,22 @@ exports.updateProfile = async (req, res) => {
 exports.registerShop = async (req, res) => {
   try {
     const { storeName, specialty, storeImage, coordinates, storeAddress, phone, email } = req.body;
+
+    // 🔍 Check if email or phone is already taken by another user
+    if (email) {
+      const existingEmail = await User.findOne({ email, _id: { $ne: req.user.id } });
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+    }
+
+    if (phone) {
+      const existingPhone = await User.findOne({ phone, _id: { $ne: req.user.id } });
+      if (existingPhone) {
+        return res.status(400).json({ message: "Phone number already in use" });
+      }
+    }
+
     const vendor = await User.findByIdAndUpdate(
       req.user.id,
       { 
@@ -142,6 +171,10 @@ exports.registerShop = async (req, res) => {
       { new: true }
     ).select("-password");
 
+    if (!vendor) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     // 🔑 Generate NEW token with updated role
     const token = jwt.sign(
       { id: vendor._id, role: vendor.role },
@@ -151,7 +184,8 @@ exports.registerShop = async (req, res) => {
 
     res.json({ user: vendor, token });
   } catch (err) {
-    res.status(500).json({ message: "Failed to register shop", error: err.message });
+    console.error("REGISTER SHOP ERROR:", err);
+    res.status(500).json({ message: err.message || "Failed to register shop" });
   }
 };
 

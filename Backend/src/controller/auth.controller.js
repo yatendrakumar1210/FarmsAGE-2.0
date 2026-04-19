@@ -2,6 +2,8 @@ const OTP = require("../models/otp.model");
 const User = require("../models/user.model");
 const generateOTP = require("../utils/generateOtp");
 const jwt = require("jsonwebtoken");
+const { sendEmail } = require("../utils/sendEmail");
+const welcomeTemplate = require("../templates/welcomeTemplate");
 
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -161,15 +163,32 @@ exports.verifyOTP = async (req, res) => {
 // COMPLETE PROFILE 
 exports.completeProfile = async (req, res) => {
   try {
-    const { name, role } = req.body;
+    const { name, role, email } = req.body;
+
+    if (email) {
+      const existingUser = await User.findOne({ email, _id: { $ne: req.user.id } });
+      if (existingUser) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+    }
 
     const user = await User.findById(req.user.id);
 
     user.name = name;
     user.role = role; // user / vendor
+    if (email) user.email = email;
     user.isProfileComplete = true;
 
     await user.save();
+
+    // 📩 Send Welcome Email
+    if (user.email) {
+      await sendEmail({
+        to: user.email,
+        subject: "Welcome to FarmsAge!",
+        html: welcomeTemplate(user.name)
+      });
+    }
 
     // 🔑 Generate NEW token with updated role (very important!)
     const token = jwt.sign(

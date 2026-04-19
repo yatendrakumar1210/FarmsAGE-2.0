@@ -7,17 +7,27 @@ const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "
 
 
 const CompleteProfile = () => {
-  const [name, setName] = useState("");
+  const { user, login } = useAuth();
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [role, setRole] = useState("user");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) {
       setError("Please enter your name");
+      return;
+    }
+    if (!email.trim()) {
+      setError("Please enter your email");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
       return;
     }
     setLoading(true);
@@ -30,7 +40,7 @@ const CompleteProfile = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: name.trim(), role }),
+        body: JSON.stringify({ name: name.trim(), role, email: email.trim() }),
       });
       const data = await resp.json();
       if (resp.ok) {
@@ -83,6 +93,21 @@ const CompleteProfile = () => {
               placeholder="Enter your full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              disabled={loading}
+              className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-800 disabled:opacity-50"
+            />
+          </div>
+
+          {/* Email Input */}
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              placeholder="Enter your email for notifications"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
               className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-800 disabled:opacity-50"
             />
