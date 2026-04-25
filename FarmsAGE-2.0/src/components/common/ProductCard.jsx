@@ -78,7 +78,7 @@ const ProductCard = ({ product, priority = false }) => {
           decoding="async"
           width="150"
           height="150"
-          onError={(e) => (e.target.src = "/fallback.png")}
+          onError={(e) => (e.target.src = "https://via.placeholder.com/150?text=No+Image")}
           className={`w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700 ${
             isOutOfStock ? "opacity-40 grayscale" : ""
           }`}

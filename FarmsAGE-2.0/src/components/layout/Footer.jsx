@@ -6,11 +6,11 @@ import {
   Facebook,
   Instagram,
   Twitter,
-  Leaf,
   Send,
   Download,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from "../../assets/logo.jpg";
 
 const Footer = () => {
   return (
@@ -45,12 +45,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Column */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 group cursor-pointer font-['Outfit']">
-              <div className="p-1.5 bg-emerald-500/10 rounded-lg">
-                <Leaf className="text-emerald-500" size={20} />
+            <div className="flex items-center gap-2.5 group cursor-pointer font-['Outfit']">
+              <div className="w-9 h-9 rounded-xl overflow-hidden border border-white/10 flex-shrink-0">
+                <img src={logo} alt="FarmsAge Logo" className="w-full h-full object-cover" />
               </div>
               <h2 className="text-xl font-bold text-white tracking-tight">
-                farm<span className="text-emerald-500 uppercase">sage</span>
+                Farms<span className="text-emerald-500">AGE</span>
               </h2>
             </div>
             <p className="text-xs leading-relaxed text-gray-400 max-w-xs">

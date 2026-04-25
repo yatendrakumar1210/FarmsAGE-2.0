@@ -10,6 +10,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import logo from "../../assets/logo.jpg";
 import "./admin.css";
 
 const AdminLayout = () => {
@@ -38,35 +39,9 @@ const AdminLayout = () => {
               className="flex items-center gap-2.5 group"
               title="Go to Homepage"
             >
-              {/* Leaf icon SVG */}
-              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-emerald-600 rounded-xl flex items-center justify-center shadow-sm group-hover:bg-emerald-700 transition-colors">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-4.74L7.5 14.5 6 13l4-4 4 4-1.5 1.5-2.5-2.74V16.5h-1zm7-7l-4 4-4-4 1.5-1.5 2.5 2.74V7.5h1v4.74l2.5-2.74L18 9.5z"
-                    fill="white"
-                  />
-                  <path
-                    d="M17 8.5c0 2.76-1.79 5.1-4.28 5.78L17 8.5z"
-                    fill="white"
-                    opacity="0.6"
-                  />
-                  <ellipse
-                    cx="12"
-                    cy="12"
-                    rx="5"
-                    ry="7"
-                    stroke="white"
-                    strokeWidth="1.5"
-                    fill="none"
-                    transform="rotate(-20 12 12)"
-                  />
-                </svg>
+              {/* FarmsAge Official Logo */}
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl overflow-hidden flex-shrink-0 border border-slate-100 shadow-sm">
+                <img src={logo} alt="FarmsAge" className="w-full h-full object-cover" />
               </div>
               <div>
                 <span className="font-black text-lg text-slate-800 tracking-tight leading-none">

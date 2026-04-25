@@ -9,10 +9,10 @@ import {
   LogOut,
   Menu,
   X,
-  Store,
   Clock,
   AlertCircle
 } from "lucide-react";
+import logo from "../../assets/logo.jpg";
 import VendorRegistration from "./VendorRegistration";
 import "../Admin/admin.css";
 import "./vendor.css";
@@ -43,8 +43,9 @@ const VendorLayout = () => {
               className="flex items-center gap-2.5 group"
               title="Go to Homepage"
             >
-              <div className="w-8 h-8 bg-emerald-600 rounded-xl flex items-center justify-center shadow-sm group-hover:bg-emerald-700 transition-colors">
-                <Store size={16} color="white" />
+              {/* FarmsAge Official Logo */}
+              <div className="w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 border border-slate-100 shadow-sm">
+                <img src={logo} alt="FarmsAge" className="w-full h-full object-cover" />
               </div>
               <div>
                 <span className="font-black text-lg text-slate-800 tracking-tight leading-none">

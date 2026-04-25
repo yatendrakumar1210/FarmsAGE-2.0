@@ -9,7 +9,6 @@ import {
   User,
   Search,
   ChevronDown,
-  Leaf,
   Package,
   ShieldCheck,
   Store,
@@ -252,30 +251,143 @@ const Navbar = React.memo(() => {
         </div>
       </div>
 
-      {/* Mobile Drawer FIXED */}
+      {/* Mobile Drawer - Premium Full-screen Menu */}
       <div
-        className={`fixed inset-0 top-[120px] bg-white z-[100] transition-transform duration-500 ${
-          open ? "translate-x-0" : "translate-x-full"
-        } md:hidden overflow-y-auto pb-24`}
+        className={`fixed inset-0 bg-white z-[150] transition-all duration-500 ease-in-out ${
+          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none translate-x-12"
+        } md:hidden flex flex-col`}
       >
-        <div className="p-6 flex flex-col gap-6 font-bold text-xl text-slate-800">
-          <Link to="/home">Home</Link>
-          {user && <Link to="/my-orders">My Orders</Link>}
-          {user?.role?.toLowerCase() === "admin" && (
-            <Link to="/admin">Admin</Link>
-          )}
-          {user?.role?.toLowerCase() === "vendor" && (
-            <Link to="/vendor">Vendor</Link>
-          )}
-          {!user && <Link to="/login">Login</Link>}
-
-          <button
-            onClick={handleDetectLocation}
-            className="flex items-center gap-2 text-emerald-600"
+        {/* Header with Close Button */}
+        <div className="p-4 border-b flex items-center justify-between bg-white sticky top-0 z-[160]">
+          <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-slate-100 shadow-sm">
+              <img src={logo} alt="Logo" className="w-full h-full object-cover" />
+            </div>
+            <h2 className="text-xl font-bold tracking-tighter text-slate-800 font-['Outfit']">
+              Farms<span className="text-emerald-600">AGE</span>
+            </h2>
+          </Link>
+          <button 
+            onClick={() => setOpen(false)} 
+            className="p-2 bg-slate-50 text-slate-800 rounded-full hover:bg-slate-100 transition-colors"
           >
-            <MapPin size={18} />
-            {locationName}
+            <X size={24} />
           </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 pb-32">
+          {/* User Profile Section */}
+          {user ? (
+            <div className="flex items-center gap-4 p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
+              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0 shadow-inner">
+                <User size={24} />
+              </div>
+              <div className="min-w-0">
+                <p className="font-extrabold text-slate-900 truncate">{user.name || "User Account"}</p>
+                <p className="text-xs text-emerald-700 font-medium truncate">{user.email || user.phone}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+              <p className="text-sm text-slate-500 mb-3">Join our community for fresh harvests!</p>
+              <Link 
+                to="/login" 
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-600 text-white rounded-xl font-bold text-sm shadow-md"
+              >
+                <User size={16} /> Login / Sign Up
+              </Link>
+            </div>
+          )}
+
+          {/* Search in Drawer */}
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 transition-colors" size={18} />
+            <input
+              type="text"
+              placeholder="Search fresh products..."
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl py-4 pl-12 pr-4 text-sm outline-none focus:ring-2 focus:ring-emerald-500/10 focus:bg-white transition-all shadow-sm"
+            />
+          </div>
+
+          <div className="flex flex-col gap-6 font-bold text-lg text-slate-800">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black mb-[-12px]">Menu Navigation</span>
+            
+            <Link to="/home" onClick={() => setOpen(false)} className="flex items-center gap-3 hover:text-emerald-600 transition-colors">
+               Home
+            </Link>
+            
+            {/* Quick Categories */}
+            <div className="flex flex-col gap-4">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black">Daily Essentials</span>
+              <div className="grid grid-cols-2 gap-3">
+                <Link to="/category/fruits" onClick={() => setOpen(false)} className="px-4 py-3 bg-rose-50 text-rose-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-rose-100/50">🍎 Fruits</Link>
+                <Link to="/category/vegetables" onClick={() => setOpen(false)} className="px-4 py-3 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-emerald-100/50">🥬 Veggies</Link>
+                <Link to="/category/dairy" onClick={() => setOpen(false)} className="px-4 py-3 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-blue-100/50">🥛 Dairy</Link>
+                <Link to="/category/organic" onClick={() => setOpen(false)} className="px-4 py-3 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-amber-100/50">🍯 Organic</Link>
+              </div>
+            </div>
+
+            <div className="h-px bg-slate-100 w-full" />
+
+            {user && (
+              <Link to="/my-orders" onClick={() => setOpen(false)} className="flex items-center gap-3 hover:text-emerald-600">
+                <Package size={20} className="text-slate-400" /> My Orders
+              </Link>
+            )}
+
+            {user?.role?.toLowerCase() === "admin" && (
+              <Link to="/admin" onClick={() => setOpen(false)} className="flex items-center gap-3 text-amber-600 hover:text-amber-700">
+                <ShieldCheck size={20} /> Admin Panel
+              </Link>
+            )}
+            {user?.role?.toLowerCase() === "vendor" && (
+              <Link to="/vendor" onClick={() => setOpen(false)} className="flex items-center gap-3 text-emerald-700 hover:text-emerald-800">
+                <Store size={20} /> Vendor Panel
+              </Link>
+            )}
+
+            <Link to="/contact" onClick={() => setOpen(false)} className="flex items-center gap-3 hover:text-emerald-600">
+               Contact Us
+            </Link>
+
+            <button
+              onClick={() => {
+                handleDetectLocation();
+                setOpen(false);
+              }}
+              className="flex items-center gap-3 text-emerald-600 hover:text-emerald-700 text-left"
+            >
+              <MapPin size={20} />
+              <div className="flex flex-col">
+                <span className="text-xs text-slate-400 font-medium">Delivering to</span>
+                <span className="truncate max-w-[200px]">{locationName}</span>
+              </div>
+            </button>
+          </div>
+        </div>
+        
+        {/* Sticky Bottom Logout/Login Button */}
+        <div className="p-6 bg-white border-t border-slate-50 sticky bottom-0 z-[160] shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)]">
+          {user ? (
+            <button
+              onClick={() => {
+                logout();
+                setOpen(false);
+              }}
+              className="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-black text-sm flex items-center justify-center gap-2 hover:bg-red-100 transition-colors border border-red-100/50"
+            >
+              Logout Account
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              onClick={() => setOpen(false)}
+              className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-sm flex items-center justify-center shadow-lg shadow-emerald-200"
+            >
+              Login / Sign Up
+            </Link>
+          )}
         </div>
       </div>
     </nav>

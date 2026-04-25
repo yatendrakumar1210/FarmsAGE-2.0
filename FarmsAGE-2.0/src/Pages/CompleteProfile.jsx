@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { ArrowRight, UserCircle, Leaf } from "lucide-react";
+import { ArrowRight, UserCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logo from "../assets/logo.jpg";
 
 const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
 
@@ -164,7 +165,9 @@ const CompleteProfile = () => {
 
         {/* Branding */}
         <div className="mt-10 flex items-center justify-center gap-2 text-slate-400">
-          <Leaf size={14} />
+          <div className="w-5 h-5 rounded-md overflow-hidden flex-shrink-0">
+            <img src={logo} alt="FarmsAge" className="w-full h-full object-cover" />
+          </div>
           <span className="text-[10px] font-bold uppercase tracking-widest">
             FarmsAge — Fresh from farm to table
           </span>
