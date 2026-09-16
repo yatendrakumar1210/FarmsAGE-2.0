@@ -211,7 +211,7 @@ const MyOrders = () => {
                            </div>
                            <div className="flex items-center gap-2.5 text-slate-500 font-medium text-xs">
                               <CreditCard size={14} className="text-slate-300" />
-                              {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid Online'}
+                              {order.paymentMethod?.toLowerCase() === 'cod' ? 'Cash on Delivery' : 'Paid Online'}
                            </div>
                            {order.vendorId && (
                               <div className="flex items-center gap-2.5 text-emerald-600 font-bold text-[10px] mt-3 bg-emerald-50/50 p-2 rounded-lg border border-emerald-100/50">

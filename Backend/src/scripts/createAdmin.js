@@ -12,27 +12,29 @@ const createAdmin = async () => {
   try {
     await connectDB();
 
-    // 🔍 check if admin already exists
-    const existingAdmin = await User.findOne({ role: "admin" });
-
-    if (existingAdmin) {
-      console.log("❌ Admin already exists!");
-      process.exit();
-    }
-
     // 🔐 hash password
-    const hashedPassword = await bcrypt.hash("YT639588", 10);
+    const adminPhone = process.env.ADMIN_PHONE || "9359266118";
+    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
-    // ✅ create admin
-    await User.create({
-      name: "Admin",
-      email: "yatendrakumar01210@gmail.com",
-      password: hashedPassword,
-      phone: "9359266118",
-      role: "admin",
-    });
+    const admin = await User.findOneAndUpdate(
+      { phone: adminPhone },
+      {
+        name: "Admin",
+        email: "admin@farmsage.com",
+        password: hashedPassword,
+        phone: adminPhone,
+        role: "admin",
+        authProvider: "password",
+        isProfileComplete: true,
+        isVerified: true
+      },
+      { upsert: true, new: true }
+    );
 
-    console.log("✅ Admin created successfully!");
+    console.log("✅ Admin user created/updated successfully!");
+    console.log(`Phone: ${adminPhone}`);
+    console.log(`Password: ${adminPassword}`);
     process.exit();
   } catch (error) {
     console.log(error);

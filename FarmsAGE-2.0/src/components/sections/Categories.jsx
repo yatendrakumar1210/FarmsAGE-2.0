@@ -16,12 +16,6 @@ const categories = [
     bgColor: "bg-rose-50",
   },
   {
-    name: "Dairy & Milk",
-    image: "https://images.unsplash.com/photo-1622371684824-dc014541a4f5",
-    path: "dairy",
-    bgColor: "bg-blue-50",
-  },
-  {
     name: "Organic Store",
     image: "https://images.unsplash.com/photo-1506806732259-39c2d0268443",
     path: "organic",

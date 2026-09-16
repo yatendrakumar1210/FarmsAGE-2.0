@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "../common/ProductCard";
-import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronRight, Filter, LayoutGrid, List } from "lucide-react";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import { ChevronRight, Filter, LayoutGrid, List, Search, X } from "lucide-react";
 
 const SIDEBAR_CATEGORIES = [
   {
@@ -37,10 +37,59 @@ const SIDEBAR_CATEGORIES = [
   },
 ];
 
-const CategoryProducts = ({ title, productsData }) => {
+const CategoryProducts = ({ title, productsData = [] }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const querySearch = searchParams.get("search") || "";
+  const [searchTerm, setSearchTerm] = useState(querySearch);
+  const [sortBy, setSortBy] = useState("Relevance");
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
+
+  useEffect(() => {
+    setSearchTerm(querySearch);
+  }, [querySearch]);
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearchTerm(val);
+    if (val.trim()) {
+      setSearchParams({ search: val.trim() });
+    } else {
+      setSearchParams({});
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
+    setSearchParams({});
+  };
+
+  // Filter and Sort products
+  const filteredProducts = useMemo(() => {
+    let result = [...productsData];
+
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase().trim();
+      result = result.filter(
+        (p) =>
+          p.name?.toLowerCase().includes(q) ||
+          p.category?.toLowerCase().includes(q) ||
+          p.description?.toLowerCase().includes(q)
+      );
+    }
+
+    if (sortBy === "Price: Low to High") {
+      result.sort((a, b) => Number(a.price) - Number(b.price));
+    } else if (sortBy === "Price: High to Low") {
+      result.sort((a, b) => Number(b.price) - Number(a.price));
+    } else if (sortBy === "Newest First") {
+      result.reverse();
+    }
+
+    return result;
+  }, [productsData, searchTerm, sortBy]);
 
   return (
     <section className="bg-[#F8FAFC] min-h-screen">
@@ -106,7 +155,7 @@ const CategoryProducts = ({ title, productsData }) => {
                    <p className="text-[10px] sm:text-xs font-black text-emerald-600 uppercase tracking-[0.2em]">Fresh Harvest</p>
                 </div>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
-                  {title}
+                  {searchTerm ? `Search: "${searchTerm}"` : title}
                 </h1>
               </div>
 
@@ -127,20 +176,40 @@ const CategoryProducts = ({ title, productsData }) => {
               </div>
             </div>
 
-            {/* Filter Bar */}
-            <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-               <button className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm text-xs font-black text-slate-700 hover:bg-slate-50 shrink-0">
-                  <Filter size={14} className="text-emerald-500" /> Filters
-               </button>
-               <div className="h-6 w-px bg-slate-200 shrink-0" />
-               <select className="bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm text-xs font-black text-slate-700 outline-none cursor-pointer shrink-0">
-                  <option>Relevance</option>
-                  <option>Price: Low to High</option>
-                  <option>Price: High to Low</option>
-                  <option>Newest First</option>
+            {/* Filter & Live Search Bar */}
+            <div className="flex flex-wrap items-center gap-3">
+               {/* Live Search Input */}
+               <div className="relative flex-1 min-w-[220px]">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="Search products..."
+                    className="w-full bg-white border border-slate-200 rounded-2xl py-2.5 pl-11 pr-9 text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-sm"
+                  />
+                  {searchTerm && (
+                    <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                      <X size={14} />
+                    </button>
+                  )}
+               </div>
+
+               {/* Sort By Dropdown */}
+               <select 
+                 value={sortBy} 
+                 onChange={(e) => setSortBy(e.target.value)}
+                 className="bg-white px-4 py-2.5 rounded-2xl border border-slate-200 shadow-sm text-xs font-bold text-slate-700 outline-none cursor-pointer shrink-0"
+               >
+                  <option value="Relevance">Sort: Relevance</option>
+                  <option value="Price: Low to High">Price: Low to High</option>
+                  <option value="Price: High to Low">Price: High to Low</option>
+                  <option value="Newest First">Newest First</option>
                </select>
-               <div className="bg-emerald-50 text-emerald-700 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider shrink-0 border border-emerald-100">
-                  {productsData.length} Products Found
+
+               {/* Result Count Badge */}
+               <div className="bg-emerald-50 text-emerald-700 px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider shrink-0 border border-emerald-100">
+                  {filteredProducts.length} Products Found
                </div>
             </div>
           </div>
@@ -152,14 +221,14 @@ const CategoryProducts = ({ title, productsData }) => {
               : "flex flex-col gap-4"
           }>
             <AnimatePresence>
-              {productsData.map((item, idx) => (
+              {filteredProducts.map((item, idx) => (
                 <motion.div
-                  key={item.id || idx}
+                  key={item.id || item._id || idx}
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4, delay: idx * 0.05 }}
+                  transition={{ duration: 0.3, delay: idx * 0.03 }}
                   className="h-full"
                 >
                   <ProductCard product={item} />
@@ -169,13 +238,20 @@ const CategoryProducts = ({ title, productsData }) => {
           </div>
 
           {/* Empty State */}
-          {productsData.length === 0 && (
+          {filteredProducts.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20 text-center">
                <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6">
-                  <LayoutGrid size={40} className="text-slate-300" />
+                  <Search size={40} className="text-slate-300" />
                </div>
                <h3 className="text-xl font-black text-slate-900 mb-2">No Products Found</h3>
-               <p className="text-slate-500 font-medium">Try adjusting your filters or checking another category.</p>
+               <p className="text-slate-500 font-medium max-w-sm mb-4">
+                 {searchTerm ? `We couldn't find any products matching "${searchTerm}".` : "No products available in this category."}
+               </p>
+               {searchTerm && (
+                 <button onClick={clearSearch} className="px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-xs shadow-md">
+                   Clear Search & View All
+                 </button>
+               )}
             </div>
           )}
         </div>
@@ -185,5 +261,3 @@ const CategoryProducts = ({ title, productsData }) => {
 };
 
 export default CategoryProducts;
-
-

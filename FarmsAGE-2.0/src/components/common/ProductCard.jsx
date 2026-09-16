@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import { useState, memo } from "react";
 import { useCart } from "../../context/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,12 +18,12 @@ const ProductCard = ({ product, priority = false }) => {
       )
     : 0;
 
-  const [selectedWeight] = useState(
+  const [selectedWeight, setSelectedWeight] = useState(
     defaultWeightIndex >= 0 ? defaultWeightIndex : 0,
   );
   const [added, setAdded] = useState(false);
 
-  const { addToCart } = useCart();
+  const { cart, addToCart, updateQuantity, removeFromCart } = useCart();
 
   const isOutOfStock = product.quantity === 0;
 
@@ -32,6 +32,12 @@ const ProductCard = ({ product, priority = false }) => {
   const baseOldPrice = product.oldPrice || Math.round(product.price * 1.25);
   const originalPrice = Math.round(baseOldPrice * currentWeight.multiplier);
   const discountAmount = originalPrice - currentPrice;
+
+  const cartItemId = product._id || product.id;
+  const cartItem = cart.find(
+    (item) => String(item._id || item.id) === String(cartItemId) && item.weight === currentWeight.label
+  );
+  const cartQuantity = cartItem ? cartItem.quantity : 0;
 
   // 🔥 Optimized Image URL
   const optimizedImage = product.image.includes("?")
@@ -127,11 +133,21 @@ const ProductCard = ({ product, priority = false }) => {
           {product.name}
         </h3>
 
-        <p className="text-xs text-gray-400">
-          {product.unit || currentWeight.label}
-        </p>
+        <div className="mt-1">
+          <select
+            value={selectedWeight}
+            onChange={(e) => setSelectedWeight(Number(e.target.value))}
+            className="bg-slate-50 border border-slate-200 text-slate-700 text-[11px] font-bold rounded-md px-1.5 py-0.5 outline-none cursor-pointer hover:border-emerald-500 transition-colors"
+          >
+            {weightOptions.map((w, idx) => (
+              <option key={idx} value={idx}>
+                {w.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        {/* PRICE */}
+        {/* PRICE & QTY CONTROLS */}
         <div className="mt-auto flex justify-between items-end pt-2">
           <div>
             <span className="font-bold text-lg">₹{currentPrice}</span>
@@ -143,36 +159,64 @@ const ProductCard = ({ product, priority = false }) => {
           </div>
 
           {!isOutOfStock && (
-            <button
-              onClick={handleAddToCart}
-              className={`px-3 py-1 rounded-lg text-xs font-bold border ${
-                added
-                  ? "bg-green-500 text-white border-green-500"
-                  : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-              }`}
-            >
-              <AnimatePresence mode="wait">
-                {added ? (
-                  <motion.span
-                    key="added"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    ✓ Added
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="add"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    ADD
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </button>
+            cartQuantity > 0 ? (
+              <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (cartQuantity <= 1) {
+                      removeFromCart(cartItemId, currentWeight.label);
+                    } else {
+                      updateQuantity(cartItemId, currentWeight.label, -1);
+                    }
+                  }}
+                  className="text-emerald-700 hover:text-emerald-900 font-bold p-0.5"
+                >
+                  <Minus size={14} />
+                </button>
+                <span className="text-xs font-black text-emerald-800 min-w-[14px] text-center">{cartQuantity}</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    updateQuantity(cartItemId, currentWeight.label, 1);
+                  }}
+                  className="text-emerald-700 hover:text-emerald-900 font-bold p-0.5"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                className={`px-3 py-1 rounded-lg text-xs font-bold border ${
+                  added
+                    ? "bg-green-500 text-white border-green-500"
+                    : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                }`}
+              >
+                <AnimatePresence mode="wait">
+                  {added ? (
+                    <motion.span
+                      key="added"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      ✓ Added
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="add"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      ADD
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+            )
           )}
         </div>
       </div>

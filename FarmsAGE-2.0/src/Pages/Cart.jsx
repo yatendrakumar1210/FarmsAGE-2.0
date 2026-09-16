@@ -6,9 +6,10 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
+import { calculateNewUnitPrice } from "../utils/weightUtils";
 
 const Cart = () => {
-  const { cart, removeFromCart, updateQuantity } = useCart();
+  const { cart, removeFromCart, updateQuantity, updateItemWeight } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -86,90 +87,81 @@ const Cart = () => {
               </div>
 
               <AnimatePresence>
-                {cart.map((item) => (
-                  <motion.div 
-                    key={`${item.id}-${item.weight}`}
-                    layout
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="bg-white p-4 rounded-3xl border border-gray-100 flex items-center gap-3 sm:gap-6 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gray-50 rounded-2xl p-1 sm:p-2 shrink-0 overflow-hidden">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-xl" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-slate-800 text-sm sm:text-base leading-tight truncate">{item.name}</h3>
-                      <div className="mt-1 flex items-center">
-                        <select
-                          value={item.weight}
-                          onChange={(e) => {
-                            const newWeight = e.target.value;
-                            const weightOptions = [
-                              { label: "1 kg", multiplier: 1 },
-                              { label: "500 g", multiplier: 0.5 },
-                              { label: "250 g", multiplier: 0.25 },
-                            ];
-                            const opt = weightOptions.find(o => o.label === newWeight);
-                            const currentOpt = weightOptions.find(o => o.label === item.weight);
-                            
-                            if (opt && currentOpt && typeof updateItemWeight === 'function') {
-                              // If originalPricePerKg doesn't exist (added before recent change), calculate it
-                              const basePrice = item.originalPricePerKg || (item.price / currentOpt.multiplier);
-                              const newPrice = Math.round(basePrice * opt.multiplier);
-                              updateItemWeight(item.id, item.weight, newWeight, newPrice);
-                            }
-                          }}
-                          className="appearance-none bg-gray-50 border border-gray-200 text-emerald-600 text-[10px] font-black uppercase tracking-wider rounded border-emerald-100 hover:border-emerald-300 transition-colors focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 block px-2 py-1 cursor-pointer outline-none"
-                        >
-                          <option value="1 kg">1 kg</option>
-                          <option value="500 g">500 g</option>
-                          <option value="250 g">250 g</option>
-                        </select>
-                      </div>
-                      <div className="flex items-center justify-between mt-2 sm:mt-3 gap-2">
-                        <div>
-                          <p className="font-black text-emerald-600 text-base sm:text-lg">₹{item.price * item.quantity}</p>
-                          {item.quantity > 1 && (
-                            <p className="text-[10px] text-slate-400 font-medium">₹{item.price} × {item.quantity}</p>
-                          )}
-                        </div>
-                        
-                        {/* Qty Controls */}
-                        <div className="flex items-center gap-2 sm:gap-3 bg-gray-50 p-1 rounded-xl border border-gray-100">
-                          <button 
-                            onClick={() => {
-                              if (item.quantity <= 1) {
-                                removeFromCart(item.id, item.weight);
-                              } else {
-                                updateQuantity(item.id, item.weight, -1);
-                              }
-                            }}
-                            className="p-1 hover:bg-white rounded-lg transition-colors text-slate-500"
-                          >
-                            <Minus size={16} />
-                          </button>
-                          <span className="font-bold text-sm min-w-[20px] text-center">{item.quantity}</span>
-                          <button 
-                            onClick={() => updateQuantity(item.id, item.weight, 1)}
-                            className="p-1 hover:bg-white rounded-lg transition-colors text-emerald-600"
-                          >
-                            <Plus size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button 
-                      onClick={() => removeFromCart(item.id, item.weight)}
-                      className="p-2 sm:p-3 text-slate-300 hover:text-rose-500 transition-colors shrink-0"
+                {cart.map((item) => {
+                  const itemId = item._id || item.id;
+                  return (
+                    <motion.div 
+                      key={`${itemId}-${item.weight}`}
+                      layout
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="bg-white p-4 rounded-3xl border border-gray-100 flex items-center gap-3 sm:gap-6 shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <Trash2 size={18} />
-                    </button>
-                  </motion.div>
-                ))}
+                      <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gray-50 rounded-2xl p-1 sm:p-2 shrink-0 overflow-hidden">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-xl" />
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-slate-800 text-sm sm:text-base leading-tight truncate">{item.name}</h3>
+                        <div className="mt-1 flex items-center">
+                          <select
+                            value={item.weight}
+                            onChange={(e) => {
+                              const newWeight = e.target.value;
+                              const { newUnitPrice } = calculateNewUnitPrice(item, newWeight);
+                              updateItemWeight(itemId, item.weight, newWeight, newUnitPrice);
+                            }}
+                            className="appearance-none bg-gray-50 border border-gray-200 text-emerald-600 text-[10px] font-black uppercase tracking-wider rounded border-emerald-100 hover:border-emerald-300 transition-colors focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 block px-2 py-1 cursor-pointer outline-none"
+                          >
+                            <option value="1 kg">1 kg</option>
+                            <option value="500 g">500 g</option>
+                            <option value="250 g">250 g</option>
+                          </select>
+                        </div>
+                        <div className="flex items-center justify-between mt-2 sm:mt-3 gap-2">
+                          <div>
+                            <p className="font-black text-emerald-600 text-base sm:text-lg">₹{item.price * item.quantity}</p>
+                            {item.quantity > 1 && (
+                              <p className="text-[10px] text-slate-400 font-medium">₹{item.price} × {item.quantity}</p>
+                            )}
+                          </div>
+                          
+                          {/* Qty Controls */}
+                          <div className="flex items-center gap-2 sm:gap-3 bg-gray-50 p-1 rounded-xl border border-gray-100">
+                            <button 
+                              onClick={() => {
+                                if (item.quantity <= 1) {
+                                  removeFromCart(itemId, item.weight);
+                                } else {
+                                  updateQuantity(itemId, item.weight, -1);
+                                }
+                              }}
+                              className="p-1 hover:bg-white rounded-lg transition-colors text-slate-500"
+                            >
+                              <Minus size={16} />
+                            </button>
+                            <span className="font-bold text-sm min-w-[20px] text-center">{item.quantity}</span>
+                            <button 
+                              onClick={() => updateQuantity(itemId, item.weight, 1)}
+                              className="p-1 hover:bg-white rounded-lg transition-colors text-emerald-600"
+                            >
+                              <Plus size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button 
+                        onClick={() => removeFromCart(itemId, item.weight)}
+                        className="p-2 sm:p-3 text-slate-300 hover:text-rose-500 transition-colors shrink-0"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
             </div>
 

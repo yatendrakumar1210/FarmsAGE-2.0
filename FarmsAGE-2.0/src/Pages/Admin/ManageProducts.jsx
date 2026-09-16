@@ -212,7 +212,7 @@ const ManageProducts = () => {
                         fontSize: '0.85rem', outline: 'none', minWidth: '220px', flex: 1
                     }}
                 />
-                {['All', 'Vegetables', 'Fruits', 'Organic', 'Dairy'].map(cat => (
+                {['All', 'Vegetables', 'Fruits', 'Organic'].map(cat => (
                     <button
                         key={cat}
                         onClick={() => setCategoryFilter(cat)}
@@ -347,7 +347,6 @@ const ManageProducts = () => {
                                         <option value="Vegetables">Vegetables</option>
                                         <option value="Fruits">Fruits</option>
                                         <option value="Organic">Organic</option>
-                                        <option value="Dairy">Dairy</option>
                                     </select>
                                 </div>
                                 <div className="form-group">

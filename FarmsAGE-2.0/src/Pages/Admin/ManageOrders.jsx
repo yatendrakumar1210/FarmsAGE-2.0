@@ -22,7 +22,10 @@ const formatDateTime = (isoString) => {
 const StatusBadge = ({ value, type }) => {
   const colors = {
     // Order status
+    Placed: { bg: "#e0f2fe", color: "#0369a1" },
     Pending: { bg: "#fef3c7", color: "#92400e" },
+    Accepted: { bg: "#dcfce7", color: "#15803d" },
+    Packing: { bg: "#fef9c3", color: "#a16207" },
     Processing: { bg: "#dbeafe", color: "#1e40af" },
     OutForDelivery: { bg: "#ede9fe", color: "#5b21b6" },
     Delivered: { bg: "#d1fae5", color: "#065f46" },
@@ -172,8 +175,19 @@ const ManageOrders = () => {
                     </p>
                   </div>
 
-                  <div>
-                    <StatusBadge value={order.status} />
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <select
+                      value={order.status || "Pending"}
+                      onChange={(e) => updateStatus(order._id, e.target.value)}
+                      className="text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 outline-none cursor-pointer bg-slate-50 hover:bg-white transition-colors"
+                    >
+                      <option value="Placed">Placed</option>
+                      <option value="Accepted">Accepted</option>
+                      <option value="Packing">Packing</option>
+                      <option value="OutForDelivery">Out For Delivery</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
                   </div>
                 </div>
 

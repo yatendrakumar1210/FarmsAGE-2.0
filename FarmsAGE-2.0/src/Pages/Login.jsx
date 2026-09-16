@@ -120,40 +120,43 @@ const Login = () => {
     }
   };
 
-  const handleVerifyOtp = async (e) => {
+  const [password, setPassword] = useState("");
+
+  const handlePasswordLogin = async (e) => {
     e.preventDefault();
-    if (!otp) {
-      setError("Please enter a valid OTP");
+    if (!phone || phone.length !== 10) {
+      setError("Please enter a valid 10-digit phone number");
       return;
     }
+    if (!password) {
+      setError("Please enter your password");
+      return;
+    }
+
     setLoading(true);
     setError("");
+
     try {
-      const resp = await fetch(`${API}/api/auth/verify-otp`, {
+      const resp = await fetch(`${API}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp })
+        body: JSON.stringify({ phone, password })
       });
       const data = await resp.json();
+
       if (resp.ok) {
-        login(data.user || { phone }, data.token);
-        if (data.isNewUser) {
-          navigate("/complete-profile");
+        login(data.user, data.token);
+        const role = data.user?.role?.toLowerCase();
+        if (role === "admin") {
+          navigate("/admin");
         } else {
-          const role = data.user?.role?.toLowerCase();
-          if (role === "admin") {
-            navigate("/admin");
-          } else if (role === "vendor") {
-            navigate("/vendor");
-          } else {
-            navigate("/");
-          }
+          navigate("/");
         }
       } else {
-        setError(data.message || "Invalid OTP");
+        setError(data.message || "Login failed");
       }
     } catch (err) {
-      setError("Server error. Please try again later.");
+      setError("Server error. Please ensure backend is running.");
     } finally {
       setLoading(false);
     }
@@ -208,10 +211,10 @@ const Login = () => {
             </h2>
           </div>
 
-          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 w-full bg-white border-2 border-slate-100 rounded-2xl px-4 py-4 focus-within:border-emerald-500 transition-all">
-                <div className="flex items-center gap-1 border-r border-slate-200 pr-3 cursor-pointer hover:bg-slate-50 rounded-lg transition-colors p-1">
+          <form className="space-y-4" onSubmit={handlePasswordLogin}>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 w-full bg-white border-2 border-slate-100 rounded-2xl px-4 py-3.5 focus-within:border-emerald-500 transition-all">
+                <div className="flex items-center gap-1 border-r border-slate-200 pr-3">
                   <img
                     src="https://flagcdn.com/w20/in.png"
                     alt="India"
@@ -220,44 +223,30 @@ const Login = () => {
                   <span className="font-bold text-slate-700 text-sm ml-1">
                     +91
                   </span>
-                  <ChevronDown size={14} className="text-slate-400" />
                 </div>
                 <input
                   type="tel"
                   maxLength={10}
-                  placeholder="Enter Phone Number"
+                  placeholder="10-digit Phone Number"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  disabled={isOtpSent || loading}
-                  className="flex-1 bg-transparent border-none outline-none font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-medium tracking-widest disabled:opacity-50"
+                  disabled={loading}
+                  className="flex-1 bg-transparent border-none outline-none font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-medium tracking-wider"
+                  required
                 />
               </div>
 
-              <AnimatePresence>
-                {isOtpSent && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="space-y-2 pt-2">
-                      <input
-                        type="text"
-                        maxLength={6}
-                        placeholder="Enter 6-digit OTP"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        disabled={loading}
-                        className="w-full bg-emerald-50/30 border-2 border-emerald-100/50 rounded-2xl py-4 px-6 focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-800 tracking-[0.5em] text-center placeholder:tracking-normal placeholder:font-medium"
-                      />
-                      <p className="text-[10px] text-center text-slate-400 font-bold uppercase tracking-widest mt-2">
-                        OTP sent to +91 {phone}
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <div className="flex items-center gap-3 w-full bg-white border-2 border-slate-100 rounded-2xl px-4 py-3.5 focus-within:border-emerald-500 transition-all">
+                <input
+                  type="password"
+                  placeholder="Enter Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  className="flex-1 bg-transparent border-none outline-none font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-medium"
+                  required
+                />
+              </div>
             </div>
 
             {error && (
@@ -267,40 +256,20 @@ const Login = () => {
             )}
 
             <button
-              onClick={isOtpSent ? handleVerifyOtp : handleSendOtp}
+              type="submit"
               disabled={loading}
-              className="w-full bg-emerald-600 text-white py-4.5 rounded-2xl font-bold text-lg shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-[0.98] disabled:opacity-70"
+              className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-[0.98] disabled:opacity-70"
             >
-              {loading ? "Please wait..." : "Continue"}
+              {loading ? "Logging in..." : "Log In"}
             </button>
 
-            {/* Zomato Style Divider */}
-            <div className="relative flex items-center gap-4 py-4">
-              <div className="flex-1 border-t border-slate-100" />
-              <span className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em] bg-white px-2">
-                or
-              </span>
-              <div className="flex-1 border-t border-slate-100" />
-            </div>
-
-            <div className="flex justify-center gap-8">
-              <button
-                type="button"
-                onClick={() => handleGoogleLogin()}
-                className="w-12 h-12 rounded-full border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm"
-              >
-                <img
-                  src="https://www.svgrepo.com/show/475656/google-color.svg"
-                  className="w-6 h-6"
-                  alt="Google"
-                />
-              </button>
-              <button
-                type="button"
-                className="w-12 h-12 rounded-full border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm"
-              >
-                <Mail className="text-slate-400" size={20} />
-              </button>
+            <div className="mt-4 text-center">
+              <p className="text-xs text-slate-500 font-medium">
+                New to FarmsAge?{" "}
+                <Link to="/register" className="text-emerald-600 font-bold hover:underline">
+                  Create Account
+                </Link>
+              </p>
             </div>
           </form>
 

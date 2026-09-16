@@ -2,11 +2,100 @@ const OTP = require("../models/otp.model");
 const User = require("../models/user.model");
 const generateOTP = require("../utils/generateOtp");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const { sendEmail } = require("../utils/sendEmail");
 const welcomeTemplate = require("../templates/welcomeTemplate");
 
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// REGISTER USER (Phone + Password)
+exports.register = async (req, res) => {
+  try {
+    const { name, phone, email, password } = req.body;
+
+    if (!phone || !password) {
+      return res.status(400).json({ message: "Phone number and password are required" });
+    }
+
+    const existingUser = await User.findOne({ phone });
+    if (existingUser) {
+      return res.status(400).json({ message: "User with this phone number already exists" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = await User.create({
+      name: name || "",
+      phone,
+      email: email || "",
+      password: hashedPassword,
+      authProvider: "password",
+      isProfileComplete: true,
+      isVerified: true
+    });
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || "secret",
+      { expiresIn: "7d" }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Registration successful",
+      token,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// LOGIN USER (Phone + Password)
+exports.login = async (req, res) => {
+  try {
+    const { phone, password } = req.body;
+
+    if (!phone || !password) {
+      return res.status(400).json({ message: "Phone and password are required" });
+    }
+
+    const user = await User.findOne({ phone });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid phone number or password" });
+    }
+
+    if (!user.password) {
+      return res.status(400).json({ message: "Invalid phone number or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid phone number or password" });
+    }
+
+    user.lastLogin = new Date();
+    await user.save();
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || "secret",
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      success: true,
+      message: "Login successful",
+      token,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 exports.googleLogin = async (req, res) => {
   try {
@@ -201,6 +290,56 @@ exports.completeProfile = async (req, res) => {
       success: true,
       token, // Send new token to frontend
       user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// GET CURRENT USER PROFILE & ADDRESSES
+exports.getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// SAVE / UPDATE ADDRESS
+exports.saveAddress = async (req, res) => {
+  try {
+    const { name, phone, street, city, pincode } = req.body;
+    if (!name || !phone || !street || !city || !pincode) {
+      return res.status(400).json({ message: "All address fields are required" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const newAddress = { name, phone, street, city, pincode };
+
+    // Avoid duplicate address entries
+    const exists = user.addresses.some(
+      (a) =>
+        a.street?.toLowerCase() === street.toLowerCase() &&
+        a.pincode === pincode &&
+        a.phone === phone
+    );
+
+    if (!exists) {
+      user.addresses.push(newAddress);
+    }
+
+    user.defaultAddress = newAddress;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Address saved successfully",
+      addresses: user.addresses,
+      defaultAddress: user.defaultAddress,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

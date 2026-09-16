@@ -26,10 +26,15 @@ const userSchema = new mongoose.Schema(
 
     profilePic: String,
 
+    password: {
+      type: String,
+      default: "",
+    },
+
     authProvider: {
       type: String,
-      enum: ["otp", "google"],
-      default: "otp",
+      enum: ["password", "otp", "google"],
+      default: "password",
     },
 
     role: {

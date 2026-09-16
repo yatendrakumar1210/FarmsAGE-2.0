@@ -15,7 +15,7 @@ import {
   Loader2,
 } from "lucide-react";
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { getAddressFromCoords } from "../../utils/getAddress";
@@ -24,14 +24,25 @@ import { saveAddress } from "../../services/locationServices";
 const Navbar = React.memo(() => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [locationName, setLocationName] = useState(
     () => localStorage.getItem("detectedLocation") || "Detect Location",
   );
   const [loadingLocation, setLoadingLocation] = useState(false);
 
   const routerLocation = useLocation();
+  const navigate = useNavigate();
   const { cart } = useCart();
   const { user, logout } = useAuth();
+
+  const handleSearchSubmit = (e) => {
+    e?.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/category/all?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate(`/category/all`);
+    }
+  };
 
   const cartCount = useMemo(
     () => cart.reduce((total, item) => total + item.quantity, 0),
@@ -141,17 +152,20 @@ const Navbar = React.memo(() => {
         </div>
 
         {/* Search */}
-        <div className="flex-1 max-w-2xl relative group hidden md:block">
+        <form onSubmit={handleSearchSubmit} className="flex-1 max-w-2xl relative group hidden md:block">
           <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            onClick={handleSearchSubmit}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-emerald-600 transition-colors"
             size={18}
           />
           <input
             type="text"
-            placeholder='Search "fresh mangoes" or "organic milk"'
-            className="w-full bg-gray-100 border-none rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:bg-white outline-none text-slate-700"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder='Search "mangoes", "tomatoes", "apples"...'
+            className="w-full bg-gray-100 border-none rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:bg-white outline-none text-slate-700 font-medium"
           />
-        </div>
+        </form>
 
         {/* Actions */}
         <div className="flex items-center gap-2 sm:gap-6">
@@ -301,14 +315,20 @@ const Navbar = React.memo(() => {
           )}
 
           {/* Search in Drawer */}
-          <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 transition-colors" size={18} />
+          <form onSubmit={(e) => { handleSearchSubmit(e); setOpen(false); }} className="relative group">
+            <Search
+              onClick={(e) => { handleSearchSubmit(e); setOpen(false); }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 transition-colors cursor-pointer"
+              size={18}
+            />
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search fresh products..."
-              className="w-full bg-slate-50 border border-slate-100 rounded-xl py-4 pl-12 pr-4 text-sm outline-none focus:ring-2 focus:ring-emerald-500/10 focus:bg-white transition-all shadow-sm"
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl py-4 pl-12 pr-4 text-sm outline-none focus:ring-2 focus:ring-emerald-500/10 focus:bg-white transition-all shadow-sm font-medium"
             />
-          </div>
+          </form>
 
           <div className="flex flex-col gap-6 font-bold text-lg text-slate-800">
             <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black mb-[-12px]">Menu Navigation</span>

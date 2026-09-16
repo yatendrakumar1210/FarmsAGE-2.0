@@ -5,7 +5,7 @@ import ProductCard from "../common/ProductCard";
 import products from "../../data/products";
 import { useNavigate } from "react-router-dom";
 
-const filterOptions = ["All", "Vegetables", "Fruits", "Dairy", "Organic"];
+const filterOptions = ["All", "Vegetables", "Fruits", "Organic"];
 
 const Products = () => {
   const navigate = useNavigate();

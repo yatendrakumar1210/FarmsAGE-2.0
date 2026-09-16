@@ -1,5 +1,6 @@
 const razorpay = require("../config/razorpay");
 const Order = require("../models/order.model");
+const Product = require("../models/product.model");
 const crypto = require("crypto");
 const userTemplate = require("../templates/userTemplate");
 const vendorTemplate = require("../templates/vendorTemplate");
@@ -11,11 +12,13 @@ exports.createOrder = async (req, res) => {
   try {
     const { items } = req.body;
 
-    let totalAmount = 0;
-    items.forEach((i) => (totalAmount += i.price * i.quantity));
+    let subtotal = 0;
+    items.forEach((i) => (subtotal += i.price * i.quantity));
+    const deliveryCharge = subtotal > 500 || subtotal === 0 ? 0 : 40;
+    const totalAmount = subtotal + deliveryCharge;
 
     const order = await razorpay.orders.create({
-      amount: totalAmount *100 ,
+      amount: totalAmount * 100,
       currency: "INR",
     });
 
@@ -23,6 +26,21 @@ exports.createOrder = async (req, res) => {
   } catch (err) {
     console.error("RAZORPAY ORDER ERROR:", err);
     res.status(500).json({ message: err.message });
+  }
+};
+
+// Helper to decrement product inventory
+const updateProductInventory = async (items) => {
+  for (const item of items) {
+    if (item.productId) {
+      try {
+        await Product.findByIdAndUpdate(item.productId, {
+          $inc: { quantity: -item.quantity }
+        });
+      } catch (err) {
+        console.error(`Failed to decrement stock for product ${item.productId}:`, err);
+      }
+    }
   }
 };
 
@@ -62,7 +80,9 @@ exports.verifyPayment = async (req, res) => {
 
     // 🚀 Create sub-orders for each vendor
     for (const [vId, vItems] of Object.entries(vendorGroups)) {
-      const vTotal = vItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+      const subtotal = vItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+      const deliveryCharge = subtotal > 500 || subtotal === 0 ? 0 : 40;
+      const vTotal = subtotal + deliveryCharge;
 
       const order = await Order.create({
         userId: req.user.id,
@@ -77,6 +97,9 @@ exports.verifyPayment = async (req, res) => {
       });
       createdOrders.push(order);
       
+      // 📦 Decrement stock for ordered items
+      await updateProductInventory(vItems);
+
       // 📩 Send Vendor Email (if vendor exists)
       if (vId !== "global") {
         const vendor = await User.findById(vId);
@@ -126,7 +149,9 @@ exports.codOrder = async (req, res) => {
 
     // 🚀 Create sub-orders for each vendor
     for (const [vId, vItems] of Object.entries(vendorGroups)) {
-      const vTotal = vItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+      const subtotal = vItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+      const deliveryCharge = subtotal > 500 || subtotal === 0 ? 0 : 40;
+      const vTotal = subtotal + deliveryCharge;
 
       const order = await Order.create({
         userId: req.user.id,
@@ -139,6 +164,9 @@ exports.codOrder = async (req, res) => {
         status: "Pending",
       });
       createdOrders.push(order);
+
+      // 📦 Decrement stock for ordered items
+      await updateProductInventory(vItems);
 
       // 📩 Send Vendor Email (if vendor exists)
       if (vId !== "global") {

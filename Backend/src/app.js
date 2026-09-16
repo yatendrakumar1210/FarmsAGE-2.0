@@ -24,7 +24,7 @@ app.use('/api/admin', adminSystem);
 app.use('/api/address', addressSystem);
 app.use('/api/products', productsSystem);
 app.use('/api/vendor', vendorSystem);
-app.use('api/email', googleAuth);
+app.use('/api/email', googleAuth);
 
 
 app.get('/', (req, res) => {

@@ -19,6 +19,7 @@ const Home = lazy(() => import("../Pages/Home"));
 const Cart = lazy(() => import("../Pages/Cart"));
 const Contact = lazy(() => import("../Pages/Contact"));
 const Login = lazy(() => import("../Pages/Login"));
+const Register = lazy(() => import("../Pages/Register"));
 const Fruits = lazy(() => import("../Pages/Fruits"));
 const Vegetables = lazy(() => import("../Pages/Vegetables"));
 const Organic = lazy(() => import("../Pages/Organic"));
@@ -45,6 +46,8 @@ const VendorProfile = lazy(() => import("../Pages/Vendor/VendorProfile"));
 const VendorRoute = lazy(() => import("./VendorRoute"));
 const VendorStore = lazy(() => import("../Pages/VendorStore"));
 
+const ProtectedRoute = lazy(() => import("./ProtectedRoute"));
+
 const AppRoutes = () => {
   return (
     <Suspense fallback={<PageLoader />}>
@@ -54,14 +57,23 @@ const AppRoutes = () => {
         <Route path="/cart" element={<Cart />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/complete-profile" element={<CompleteProfile />} />
         <Route path="/category/fruits" element={<Fruits />} />
         <Route path="/category/vegetables" element={<Vegetables />} />
         <Route path="/category/organic" element={<Organic />} />
         <Route path="/category/all" element={<AllProducts />} />
-        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/checkout" element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        } />
         <Route path="/order-success" element={<OrderSuccess />} />
-        <Route path="/my-orders" element={<MyOrders />} />
+        <Route path="/my-orders" element={
+          <ProtectedRoute>
+            <MyOrders />
+          </ProtectedRoute>
+        } />
 
         {/* Public Vendor Store Page */}
         <Route path="/vendor/:vendorId/store" element={<VendorStore />} />
