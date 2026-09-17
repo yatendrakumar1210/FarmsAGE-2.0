@@ -7,6 +7,7 @@ import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import DetectLocation from "../components/location/DetectLocation";
 import { calculateNewUnitPrice } from "../utils/weightUtils";
+import { playOrderSuccessSound } from "../utils/playOrderSound";
 
 const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
 
@@ -189,6 +190,7 @@ const Checkout = () => {
 
             const verifyResult = await verifyRes.json();
             if (verifyResult.success) {
+              playOrderSuccessSound();
               clearCart();
               navigate("/order-success", { 
                 state: { 
@@ -261,6 +263,7 @@ const Checkout = () => {
 
       const result = await res.json();
       if (result.success) {
+        playOrderSuccessSound();
         clearCart();
         navigate("/order-success", { 
           state: { 

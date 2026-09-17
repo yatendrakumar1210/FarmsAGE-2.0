@@ -136,7 +136,7 @@ const Navbar = React.memo(() => {
           className="hidden lg:flex flex-col border-l border-gray-200 pl-4 ml-2 cursor-pointer group hover:bg-emerald-50/50 py-1 transition-colors rounded-r-lg"
         >
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter leading-none">
-            {loadingLocation ? "Detecting..." : "Direct from Local Vendors"}
+            {loadingLocation ? "Detecting..." : "Delivering To"}
           </span>
           <div className="flex items-center gap-1 text-slate-800">
             {loadingLocation ? (
@@ -265,145 +265,255 @@ const Navbar = React.memo(() => {
         </div>
       </div>
 
-      {/* Mobile Drawer - Premium Full-screen Menu */}
+      {/* Mobile Drawer - Ultra-Modern Customer Slide-Out Sidebar */}
+      {/* Backdrop */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[140] md:hidden transition-opacity duration-300"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      {/* Drawer */}
       <div
-        className={`fixed inset-0 bg-white z-[150] transition-all duration-500 ease-in-out ${
-          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none translate-x-12"
-        } md:hidden flex flex-col`}
+        className={`fixed top-0 left-0 bottom-0 w-[85%] max-w-[340px] bg-white z-[150] md:hidden flex flex-col shadow-2xl transform transition-transform duration-300 ease-out ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
-        {/* Header with Close Button */}
-        <div className="p-4 border-b flex items-center justify-between bg-white sticky top-0 z-[160]">
-          <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-            <div className="w-8 h-8 rounded-lg overflow-hidden border border-slate-100 shadow-sm">
-              <img src={logo} alt="Logo" className="w-full h-full object-cover" />
+        {/* Drawer Header */}
+        <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
+          <Link to="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
+            <div className="w-8 h-8 rounded-xl overflow-hidden border border-emerald-500/30 shadow-md">
+              <img src={logo} alt="FarmsAge" className="w-full h-full object-cover" />
             </div>
-            <h2 className="text-xl font-bold tracking-tighter text-slate-800 font-['Outfit']">
-              Farms<span className="text-emerald-600">AGE</span>
-            </h2>
+            <div>
+              <h2 className="text-lg font-black tracking-tight text-white font-['Outfit']">
+                Farms<span className="text-emerald-400">AGE</span>
+              </h2>
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                Fresh Marketplace
+              </p>
+            </div>
           </Link>
-          <button 
-            onClick={() => setOpen(false)} 
-            className="p-2 bg-slate-50 text-slate-800 rounded-full hover:bg-slate-100 transition-colors"
+          <button
+            onClick={() => setOpen(false)}
+            className="p-1.5 bg-slate-800 text-slate-300 hover:text-white rounded-xl transition-colors"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 pb-32">
-          {/* User Profile Section */}
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-5">
+          {/* User Profile Card */}
           {user ? (
-            <div className="flex items-center gap-4 p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
-              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0 shadow-inner">
-                <User size={24} />
-              </div>
-              <div className="min-w-0">
-                <p className="font-extrabold text-slate-900 truncate">{user.name || "User Account"}</p>
-                <p className="text-xs text-emerald-700 font-medium truncate">{user.email || user.phone}</p>
+            <div className="p-3.5 bg-gradient-to-r from-emerald-900 to-teal-900 text-white rounded-2xl shadow-md border border-emerald-700/40">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">
+                  {user.name?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-extrabold text-xs text-white truncate">{user.name || "Customer Account"}</p>
+                  <p className="text-[10px] text-emerald-200 truncate">{user.email || user.phone}</p>
+                  <span className="inline-block text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-400/20 px-1.5 py-0.5 rounded mt-1 border border-amber-400/30">
+                    {user.role || "Member"}
+                  </span>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
-              <p className="text-sm text-slate-500 mb-3">Join our community for fresh harvests!</p>
-              <Link 
-                to="/login" 
+            <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100/80 text-center">
+              <p className="text-xs font-bold text-slate-700 mb-1">Welcome to FarmsAGE 🌿</p>
+              <p className="text-[11px] text-slate-500 mb-3">Sign in for exclusive daily deals & fast 1-click order</p>
+              <Link
+                to="/login"
                 onClick={() => setOpen(false)}
-                className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-600 text-white rounded-xl font-bold text-sm shadow-md"
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 shadow-md transition"
               >
-                <User size={16} /> Login / Sign Up
+                <User size={15} /> Login / Register Account
               </Link>
             </div>
           )}
 
-          {/* Search in Drawer */}
-          <form onSubmit={(e) => { handleSearchSubmit(e); setOpen(false); }} className="relative group">
+          {/* Search Input */}
+          <form onSubmit={(e) => { handleSearchSubmit(e); setOpen(false); }} className="relative">
             <Search
               onClick={(e) => { handleSearchSubmit(e); setOpen(false); }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 transition-colors cursor-pointer"
-              size={18}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer hover:text-emerald-600 transition"
+              size={16}
             />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search fresh products..."
-              className="w-full bg-slate-50 border border-slate-100 rounded-xl py-4 pl-12 pr-4 text-sm outline-none focus:ring-2 focus:ring-emerald-500/10 focus:bg-white transition-all shadow-sm font-medium"
+              placeholder="Search mangoes, coconuts, tomatoes..."
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3 text-xs text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition font-medium"
             />
           </form>
 
-          <div className="flex flex-col gap-6 font-bold text-lg text-slate-800">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black mb-[-12px]">Menu Navigation</span>
-            
-            <Link to="/home" onClick={() => setOpen(false)} className="flex items-center gap-3 hover:text-emerald-600 transition-colors">
-               Home
-            </Link>
-            
-            {/* Quick Categories */}
-            <div className="flex flex-col gap-4">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black">Daily Essentials</span>
-              <div className="grid grid-cols-2 gap-3">
-                <Link to="/category/fruits" onClick={() => setOpen(false)} className="px-4 py-3 bg-rose-50 text-rose-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-rose-100/50">🍎 Fruits</Link>
-                <Link to="/category/vegetables" onClick={() => setOpen(false)} className="px-4 py-3 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-emerald-100/50">🥬 Veggies</Link>
-                <Link to="/category/dairy" onClick={() => setOpen(false)} className="px-4 py-3 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-blue-100/50">🥛 Dairy</Link>
-                <Link to="/category/organic" onClick={() => setOpen(false)} className="px-4 py-3 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-amber-100/50">🍯 Organic</Link>
+          {/* Location Bar */}
+          <button
+            onClick={() => {
+              handleDetectLocation();
+              setOpen(false);
+            }}
+            className="w-full p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-100 flex items-center justify-between text-left transition"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 bg-emerald-100 text-emerald-700 rounded-lg">
+                <MapPin size={16} />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Delivery Location</p>
+                <p className="text-xs font-bold text-slate-800 truncate max-w-[170px]">{locationName}</p>
               </div>
             </div>
+            <ChevronDown size={14} className="text-slate-400" />
+          </button>
 
-            <div className="h-px bg-slate-100 w-full" />
+          {/* Categories Grid */}
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2.5 px-1">
+              Shop Categories
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                to="/category/fruits"
+                onClick={() => setOpen(false)}
+                className="p-3 bg-rose-50/80 hover:bg-rose-100 border border-rose-100 rounded-xl flex items-center gap-2.5 transition group"
+              >
+                <span className="text-lg group-hover:scale-110 transition-transform">🍎</span>
+                <div>
+                  <p className="text-xs font-bold text-rose-900">Fresh Fruits</p>
+                  <p className="text-[9px] text-rose-600/80 font-medium">Sweet & Juicy</p>
+                </div>
+              </Link>
+
+              <Link
+                to="/category/vegetables"
+                onClick={() => setOpen(false)}
+                className="p-3 bg-emerald-50/80 hover:bg-emerald-100 border border-emerald-100 rounded-xl flex items-center gap-2.5 transition group"
+              >
+                <span className="text-lg group-hover:scale-110 transition-transform">🥬</span>
+                <div>
+                  <p className="text-xs font-bold text-emerald-900">Veggies</p>
+                  <p className="text-[9px] text-emerald-600/80 font-medium">Farm Direct</p>
+                </div>
+              </Link>
+
+              <Link
+                to="/category/organic"
+                onClick={() => setOpen(false)}
+                className="p-3 bg-amber-50/80 hover:bg-amber-100 border border-amber-100 rounded-xl flex items-center gap-2.5 transition group"
+              >
+                <span className="text-lg group-hover:scale-110 transition-transform">🍯</span>
+                <div>
+                  <p className="text-xs font-bold text-amber-900">Organic</p>
+                  <p className="text-[9px] text-amber-600/80 font-medium">100% Pure</p>
+                </div>
+              </Link>
+
+              <Link
+                to="/category/all"
+                onClick={() => setOpen(false)}
+                className="p-3 bg-blue-50/80 hover:bg-blue-100 border border-blue-100 rounded-xl flex items-center gap-2.5 transition group"
+              >
+                <span className="text-lg group-hover:scale-110 transition-transform">🛒</span>
+                <div>
+                  <p className="text-xs font-bold text-blue-900">All Items</p>
+                  <p className="text-[9px] text-blue-600/80 font-medium">Full Catalog</p>
+                </div>
+              </Link>
+            </div>
+          </div>
+
+          {/* Main Navigation Links */}
+          <div className="space-y-1 pt-2 border-t border-slate-100">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 px-1">
+              Menu Links
+            </p>
+
+            <Link
+              to="/home"
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-between p-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+            >
+              <span>Store Homepage</span>
+              <ChevronDown size={14} className="-rotate-90 text-slate-400" />
+            </Link>
 
             {user && (
-              <Link to="/my-orders" onClick={() => setOpen(false)} className="flex items-center gap-3 hover:text-emerald-600">
-                <Package size={20} className="text-slate-400" /> My Orders
+              <Link
+                to="/my-orders"
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-between p-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Package size={16} className="text-emerald-600" />
+                  <span>My Orders</span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">
+                  History
+                </span>
               </Link>
             )}
 
             {user?.role?.toLowerCase() === "admin" && (
-              <Link to="/admin" onClick={() => setOpen(false)} className="flex items-center gap-3 text-amber-600 hover:text-amber-700">
-                <ShieldCheck size={20} /> Admin Panel
+              <Link
+                to="/admin"
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-between p-2.5 rounded-xl text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <ShieldCheck size={16} />
+                  <span>Admin Panel Console</span>
+                </div>
+                <ChevronDown size={14} className="-rotate-90 text-amber-500" />
               </Link>
             )}
+
             {user?.role?.toLowerCase() === "vendor" && (
-              <Link to="/vendor" onClick={() => setOpen(false)} className="flex items-center gap-3 text-emerald-700 hover:text-emerald-800">
-                <Store size={20} /> Vendor Panel
+              <Link
+                to="/vendor"
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-between p-2.5 rounded-xl text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Store size={16} />
+                  <span>Vendor Dashboard</span>
+                </div>
+                <ChevronDown size={14} className="-rotate-90 text-emerald-600" />
               </Link>
             )}
 
-            <Link to="/contact" onClick={() => setOpen(false)} className="flex items-center gap-3 hover:text-emerald-600">
-               Contact Us
-            </Link>
-
-            <button
-              onClick={() => {
-                handleDetectLocation();
-                setOpen(false);
-              }}
-              className="flex items-center gap-3 text-emerald-600 hover:text-emerald-700 text-left"
+            <Link
+              to="/contact"
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-between p-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
             >
-              <MapPin size={20} />
-              <div className="flex flex-col">
-                <span className="text-xs text-slate-400 font-medium">Delivering to</span>
-                <span className="truncate max-w-[200px]">{locationName}</span>
-              </div>
-            </button>
+              <span>Contact & Support</span>
+              <ChevronDown size={14} className="-rotate-90 text-slate-400" />
+            </Link>
           </div>
         </div>
-        
-        {/* Sticky Bottom Logout/Login Button */}
-        <div className="p-6 bg-white border-t border-slate-50 sticky bottom-0 z-[160] shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)]">
+
+        {/* Footer Logout / Auth Button */}
+        <div className="p-4 border-t border-slate-100 bg-white">
           {user ? (
             <button
               onClick={() => {
                 logout();
                 setOpen(false);
               }}
-              className="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-black text-sm flex items-center justify-center gap-2 hover:bg-red-100 transition-colors border border-red-100/50"
+              className="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-rose-100 transition"
             >
-              Logout Account
+              Log Out Account
             </button>
           ) : (
             <Link
               to="/login"
               onClick={() => setOpen(false)}
-              className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-sm flex items-center justify-center shadow-lg shadow-emerald-200"
+              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center shadow-md transition"
             >
               Login / Sign Up
             </Link>

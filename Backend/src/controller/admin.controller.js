@@ -56,22 +56,72 @@ exports.getProducts = async (req, res) => {
   }
 };
 
-// 🌐 Get all products (public — no auth required)
+// 🌐 Get all products (public — no auth required, server-side paginated & filtered)
 exports.getPublicProducts = async (req, res) => {
   try {
-    const { category } = req.query;
-    const filter = category ? { category } : {};
-    
-    // Fetch products and populate vendor info to check status
-    const products = await Product.find(filter)
-      .populate("vendorId", "shopStatus")
-      .sort({ createdAt: -1 });
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 18);
+    const skip = (page - 1) * limit;
+
+    const { category, search, sortBy } = req.query;
 
     // 🌍 Only show Global (Admin) products in the main catalog
-    // Vendor products will only be seen in their respective Store Pages
-    const filteredProducts = products.filter(p => !p.vendorId);
+    const query = {
+      $or: [{ vendorId: null }, { vendorId: { $exists: false } }]
+    };
 
-    res.json(filteredProducts);
+    // Category filtering
+    if (category && category !== "All") {
+      if (category.toLowerCase() === "organic") {
+        query.$and = query.$and || [];
+        query.$and.push({
+          $or: [{ category: "Organic" }, { isOrganic: true }]
+        });
+      } else if (category.toLowerCase().includes("herb")) {
+        query.category = { $regex: /herb/i };
+      } else {
+        query.category = { $regex: new RegExp(`^${category}$`, "i") };
+      }
+    }
+
+    // Search filtering
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i");
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [
+          { name: searchRegex },
+          { category: searchRegex }
+        ]
+      });
+    }
+
+    // Sorting
+    let sortOptions = { createdAt: -1 };
+    if (sortBy === "Price: Low to High" || sortBy === "price_asc") {
+      sortOptions = { price: 1 };
+    } else if (sortBy === "Price: High to Low" || sortBy === "price_desc") {
+      sortOptions = { price: -1 };
+    } else if (sortBy === "Newest First" || sortBy === "newest") {
+      sortOptions = { createdAt: -1 };
+    }
+
+    const totalProducts = await Product.countDocuments(query);
+    const totalPages = Math.ceil(totalProducts / limit) || 1;
+
+    const products = await Product.find(query)
+      .select("_id name image category price oldPrice discount unit quantity isOrganic createdAt")
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    res.json({
+      products,
+      totalProducts,
+      currentPage: page,
+      totalPages
+    });
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch products", error: err.message });
   }

@@ -355,8 +355,11 @@ const ManageProducts = () => {
                                         <option value="1 kg">1 kg</option>
                                         <option value="500 g">500 g</option>
                                         <option value="250 g">250 g</option>
-                                        <option value="1 pack">1 pack</option>
                                         <option value="1 Piece">1 Piece</option>
+                                        <option value="1 Pack">1 Pack</option>
+                                        <option value="1 Box">1 Box</option>
+                                        <option value="12 pcs">12 pcs</option>
+                                        <option value="6 pcs">6 pcs</option>
                                     </select>
                                 </div>
                             </div>

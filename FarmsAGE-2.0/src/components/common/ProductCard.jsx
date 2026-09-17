@@ -2,16 +2,59 @@ import { Plus, Minus } from "lucide-react";
 import { useState, memo } from "react";
 import { useCart } from "../../context/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { optimizeImageUrl } from "../../utils/optimizeImage";
 
-const weightOptions = [
+const standardWeightOptions = [
   { label: "1 kg", multiplier: 1 },
   { label: "500 g", multiplier: 0.5 },
   { label: "250 g", multiplier: 0.25 },
-  { label: "1 pack", multiplier: 1 },
+];
+
+const bananaPieceOptions = [
+  { label: "12 pcs", multiplier: 1 },
+  { label: "6 pcs", multiplier: 0.5 },
+];
+
+const singlePieceOptions = [
   { label: "1 Piece", multiplier: 1 },
+  { label: "2 Pieces", multiplier: 2 },
+];
+
+const boxOptions = [
+  { label: "1 Box", multiplier: 1 },
+  { label: "2 Boxes", multiplier: 2 },
 ];
 
 const ProductCard = ({ product, priority = false }) => {
+  const normUnit = (product.unit || "").toLowerCase();
+  const normName = (product.name || "").toLowerCase();
+
+  const isBoxItem = normUnit.includes("box") || normName.includes("box");
+  const isPackItem = normUnit.includes("pack") || normName.includes("strawberry");
+  const isSinglePieceItem = 
+    normUnit.includes("piece") || 
+    normName.includes("coconut") || 
+    normName.includes("nariyal") || 
+    normName.includes("dragon fruit") ||
+    normName.includes("pineapple") ||
+    normName.includes("kiwi");
+
+  const isBananaItem = 
+    normUnit.includes("12 pcs") || 
+    normUnit.includes("6 pcs") || 
+    normName.includes("banana") || 
+    normUnit.includes("pcs");
+
+  const weightOptions = isBoxItem
+    ? boxOptions
+    : isPackItem
+    ? packOptions
+    : isSinglePieceItem
+    ? singlePieceOptions
+    : isBananaItem
+    ? bananaPieceOptions
+    : standardWeightOptions;
+
   const defaultWeightIndex = product.unit
     ? weightOptions.findIndex(
         (w) => w.label.toLowerCase() === product.unit?.toLowerCase(),
@@ -25,9 +68,14 @@ const ProductCard = ({ product, priority = false }) => {
 
   const { cart, addToCart, updateQuantity, removeFromCart } = useCart();
 
-  const isOutOfStock = product.quantity === 0;
+  const isOutOfStock = 
+    product.quantity === 0 || 
+    product.quantity === '0' || 
+    product.isOutOfStock === true || 
+    product.inStock === false ||
+    product.stockStatus === 'out_of_stock';
 
-  const currentWeight = weightOptions[selectedWeight];
+  const currentWeight = weightOptions[selectedWeight] || weightOptions[0];
   const currentPrice = Math.round(product.price * currentWeight.multiplier);
   const baseOldPrice = product.oldPrice || Math.round(product.price * 1.25);
   const originalPrice = Math.round(baseOldPrice * currentWeight.multiplier);
@@ -40,9 +88,7 @@ const ProductCard = ({ product, priority = false }) => {
   const cartQuantity = cartItem ? cartItem.quantity : 0;
 
   // 🔥 Optimized Image URL
-  const optimizedImage = product.image.includes("?")
-    ? `${product.image}&w=300&q=70&fm=webp`
-    : `${product.image}?w=300&q=70&fm=webp`;
+  const optimizedImage = optimizeImageUrl(product.image, 360);
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -76,7 +122,7 @@ const ProductCard = ({ product, priority = false }) => {
       className="group bg-white rounded-2xl h-full border border-gray-100/60 shadow-sm hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-500 overflow-hidden flex flex-col"
     >
       {/* IMAGE */}
-      <div className="relative bg-slate-50/80 p-4 aspect-square flex items-center justify-center overflow-hidden">
+      <div className="relative bg-slate-50/80 p-2 sm:p-4 aspect-square flex items-center justify-center overflow-hidden">
         <img
           src={optimizedImage}
           alt={product.name}
@@ -85,59 +131,47 @@ const ProductCard = ({ product, priority = false }) => {
           width="150"
           height="150"
           onError={(e) => (e.target.src = "https://via.placeholder.com/150?text=No+Image")}
-          className={`w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700 ${
-            isOutOfStock ? "opacity-40 grayscale" : ""
-          }`}
+          className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700"
         />
 
         {/* TAG */}
-        {!isOutOfStock && (
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
-            <span className="bg-emerald-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase">
-              {getTag()}
-            </span>
+        <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 flex flex-col gap-1">
+          <span className="bg-emerald-500 text-white text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.5 rounded-full uppercase">
+            {getTag()}
+          </span>
 
-            {discountAmount > 0 && (
-              <span className="bg-amber-400 text-black text-[9px] font-black px-2 py-0.5 rounded-full">
-                Save ₹{discountAmount}
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* OUT OF STOCK */}
-        {isOutOfStock && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-            <span className="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">
-              Sold Out
+          {discountAmount > 0 && (
+            <span className="bg-amber-400 text-black text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.5 rounded-full">
+              Save ₹{discountAmount}
             </span>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* QUICK ADD */}
         {!isOutOfStock && (
           <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
             <button
               onClick={handleAddToCart}
-              className="bg-white text-emerald-600 p-3 rounded-full shadow hover:bg-emerald-600 hover:text-white transition"
+              className="bg-white text-emerald-600 p-2.5 sm:p-3 rounded-full shadow hover:bg-emerald-600 hover:text-white transition"
             >
-              <Plus size={20} />
+              <Plus size={18} />
             </button>
           </div>
         )}
       </div>
 
       {/* CONTENT */}
-      <div className="p-3 flex flex-col flex-1">
-        <h3 className="font-bold text-sm text-slate-800 line-clamp-2 h-10">
+      <div className="p-2.5 sm:p-3 flex flex-col flex-1">
+        <h3 className="font-bold text-xs sm:text-sm text-slate-800 line-clamp-2 h-8 sm:h-10 leading-tight">
           {product.name}
         </h3>
 
         <div className="mt-1">
           <select
+            disabled={isOutOfStock}
             value={selectedWeight}
             onChange={(e) => setSelectedWeight(Number(e.target.value))}
-            className="bg-slate-50 border border-slate-200 text-slate-700 text-[11px] font-bold rounded-md px-1.5 py-0.5 outline-none cursor-pointer hover:border-emerald-500 transition-colors"
+            className="bg-slate-50 border border-slate-200 text-slate-700 text-[10px] sm:text-[11px] font-bold rounded-md px-1 sm:px-1.5 py-0.5 outline-none cursor-pointer hover:border-emerald-500 transition-colors w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {weightOptions.map((w, idx) => (
               <option key={idx} value={idx}>
@@ -148,75 +182,80 @@ const ProductCard = ({ product, priority = false }) => {
         </div>
 
         {/* PRICE & QTY CONTROLS */}
-        <div className="mt-auto flex justify-between items-end pt-2">
+        <div className="mt-auto flex justify-between items-end pt-2 gap-1">
           <div>
-            <span className="font-bold text-lg">₹{currentPrice}</span>
+            <span className="font-black text-sm sm:text-lg text-slate-900">₹{currentPrice}</span>
             {originalPrice > currentPrice && (
-              <span className="text-xs line-through text-gray-400 ml-2">
+              <span className="text-[10px] sm:text-xs line-through text-gray-400 ml-1">
                 ₹{originalPrice}
               </span>
             )}
           </div>
 
-          {!isOutOfStock && (
-            cartQuantity > 0 ? (
-              <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (cartQuantity <= 1) {
-                      removeFromCart(cartItemId, currentWeight.label);
-                    } else {
-                      updateQuantity(cartItemId, currentWeight.label, -1);
-                    }
-                  }}
-                  className="text-emerald-700 hover:text-emerald-900 font-bold p-0.5"
-                >
-                  <Minus size={14} />
-                </button>
-                <span className="text-xs font-black text-emerald-800 min-w-[14px] text-center">{cartQuantity}</span>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    updateQuantity(cartItemId, currentWeight.label, 1);
-                  }}
-                  className="text-emerald-700 hover:text-emerald-900 font-bold p-0.5"
-                >
-                  <Plus size={14} />
-                </button>
-              </div>
-            ) : (
+          {isOutOfStock ? (
+            <button
+              disabled
+              className="px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-extrabold bg-slate-100 text-rose-600 border border-slate-200 cursor-not-allowed shrink-0"
+            >
+              Out of Stock
+            </button>
+          ) : cartQuantity > 0 ? (
+            <div className="flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-lg">
               <button
-                onClick={handleAddToCart}
-                className={`px-3 py-1 rounded-lg text-xs font-bold border ${
-                  added
-                    ? "bg-green-500 text-white border-green-500"
-                    : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (cartQuantity <= 1) {
+                    removeFromCart(cartItemId, currentWeight.label);
+                  } else {
+                    updateQuantity(cartItemId, currentWeight.label, -1);
+                  }
+                }}
+                className="text-emerald-700 hover:text-emerald-900 font-bold p-0.5"
               >
-                <AnimatePresence mode="wait">
-                  {added ? (
-                    <motion.span
-                      key="added"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      ✓ Added
-                    </motion.span>
-                  ) : (
-                    <motion.span
-                      key="add"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      ADD
-                    </motion.span>
-                  )}
-                </AnimatePresence>
+                <Minus size={12} />
               </button>
-            )
+              <span className="text-[11px] sm:text-xs font-black text-emerald-800 min-w-[12px] text-center">{cartQuantity}</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateQuantity(cartItemId, currentWeight.label, 1);
+                }}
+                className="text-emerald-700 hover:text-emerald-900 font-bold p-0.5"
+              >
+                <Plus size={12} />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              className={`px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold border transition-colors shrink-0 ${
+                added
+                  ? "bg-green-500 text-white border-green-500"
+                  : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+              }`}
+            >
+              <AnimatePresence mode="wait">
+                {added ? (
+                  <motion.span
+                    key="added"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    ✓ Added
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="add"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    ADD
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
           )}
         </div>
       </div>

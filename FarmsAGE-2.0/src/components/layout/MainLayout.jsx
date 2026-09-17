@@ -6,6 +6,9 @@ import Footer from "./Footer";
 
 const MainLayout = ({ children }) => {
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [announcement, setAnnouncement] = useState(() => {
+    return localStorage.getItem("farmsage_announcement") || "";
+  });
 
   // Handle "Scroll to Top" visibility
   useEffect(() => {
@@ -13,7 +16,16 @@ const MainLayout = ({ children }) => {
       setShowScrollTop(window.scrollY > 400);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    const handleStorage = () => {
+      setAnnouncement(localStorage.getItem("farmsage_announcement") || "");
+    };
+    window.addEventListener("storage", handleStorage);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("storage", handleStorage);
+    };
   }, []);
 
   const scrollToTop = () => {
@@ -27,10 +39,14 @@ const MainLayout = ({ children }) => {
         <div className="max-w-7xl mx-auto flex flex-wrap justify-center items-center gap-1 sm:gap-2 text-[9px] xs:text-[10px] sm:text-xs font-bold uppercase tracking-wide text-center">
           <Zap size={14} className="fill-current animate-pulse" />
           <span>
-            Flash Sale: Get 30% Off on Organic Fruits. Use Code:{" "}
-            <span className="underline decoration-wavy underline-offset-4">
-              FARM30
-            </span>
+            {announcement || (
+              <>
+                Flash Sale: Get 30% Off on Organic Fruits. Use Code:{" "}
+                <span className="underline decoration-wavy underline-offset-4">
+                  FARM30
+                </span>
+              </>
+            )}
           </span>
         </div>
       </div>

@@ -14,6 +14,7 @@ const fruits = [
     price: 50,
     oldPrice: 65,
     discount: "23% OFF",
+    unit: "12 pcs",
     image:
       "https://media.istockphoto.com/id/2258763200/photo/banana-bunch-1.jpg?s=612x612&w=0&k=20&c=xmHBV-5xhyasGOhBjq5Y_oXK8yzdOQyLwy1rUdenYGs=",
   },
@@ -41,6 +42,7 @@ const fruits = [
     price: 90,
     oldPrice: 120,
     discount: "25% OFF",
+    unit: "1 Piece",
     image:
       "https://media.istockphoto.com/id/146055059/photo/pineapple-isolated.jpg?s=612x612&w=0&k=20&c=l3pL1b_vErlC0foL2JCGwRr_FeOYi-uh42mccmeThPM=",
   },
@@ -50,6 +52,7 @@ const fruits = [
     price: 160,
     oldPrice: 200,
     discount: "20% OFF",
+    unit: "1 Pack",
     image:
       "https://media.istockphoto.com/id/978985258/photo/fresh-red-strawberries.jpg?s=612x612&w=0&k=20&c=9zfe7I4na4joOuCmWe71FMC0tk0nFV1xFIGErZmbhHA=",
   },
@@ -95,6 +98,7 @@ const fruits = [
     price: 180,
     oldPrice: 220,
     discount: "18% OFF",
+    unit: "1 Piece",
     image:
       "https://media.istockphoto.com/id/176767255/photo/iwi-fruits-isolated-on-white-background-macro-photo.jpg?s=612x612&w=0&k=20&c=Q1Za_Q2c0zPRBZsNuiIYc3u4MFOvXO27QvBYbZ-XQvo=",
   },
@@ -158,6 +162,7 @@ const fruits = [
     price: 200,
     oldPrice: 250,
     discount: "20% OFF",
+    unit: "1 Piece",
     image:
       "https://media.istockphoto.com/id/887706658/photo/pitahaya-isolated.jpg?s=612x612&w=0&k=20&c=DQD4UJBhiQUFiuwtFVPS1iXV9wMjdhbYVwPZSJE1fuU=",
   },
@@ -167,6 +172,7 @@ const fruits = [
     price: 40,
     oldPrice: 50,
     discount: "20% OFF",
+    unit: "1 Piece",
     image:
       "https://media.istockphoto.com/id/953704340/photo/green-coconut-fruit-isolated-on-white-background.jpg?s=612x612&w=0&k=20&c=Swxqn4YDcJ6FhDrfAcl2yO4vVfAqQcrf1-5RRjcUCGQ=",
   },

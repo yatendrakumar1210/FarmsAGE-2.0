@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
   LayoutDashboard,
@@ -9,6 +9,10 @@ import {
   LogOut,
   Menu,
   X,
+  Store,
+  Sparkles,
+  ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 import logo from "../../assets/logo.jpg";
 import "./admin.css";
@@ -16,184 +20,217 @@ import "./admin.css";
 const AdminLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Auto-close sidebar on mobile route change
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
+  const navItems = [
+    {
+      to: "/admin/dashboard",
+      label: "Dashboard",
+      icon: <LayoutDashboard size={19} />,
+      badge: null,
+    },
+    {
+      to: "/admin/products",
+      label: "Products Catalog",
+      icon: <ShoppingBasket size={19} />,
+      badge: "Manage",
+    },
+    {
+      to: "/admin/orders",
+      label: "Customer Orders",
+      icon: <ShoppingCart size={19} />,
+      badge: "Live",
+    },
+    {
+      to: "/admin/users",
+      label: "User Accounts",
+      icon: <Users size={19} />,
+      badge: null,
+    },
+  ];
+
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-slate-50/70 overflow-hidden font-sans">
+      {/* Sidebar Overlay (Mobile) */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[110] md:hidden transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className={`fixed md:static top-0 left-0 z-[120] h-full w-56 lg:w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-out will-change-transform ${
+        className={`fixed md:static top-0 left-0 z-[120] h-full w-64 bg-slate-900 text-slate-100 flex flex-col justify-between shadow-2xl md:shadow-none transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
-        <div className="flex flex-col h-full overflow-y-auto">
-          {/* Logo — clicks to homepage */}
-          <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex flex-col h-full">
+          {/* Header & Logo */}
+          <div className="p-5 border-b border-slate-800 flex items-center justify-between">
             <button
               onClick={() => navigate("/")}
-              className="flex items-center gap-2.5 group"
-              title="Go to Homepage"
+              className="flex items-center gap-3 text-left group"
+              title="Go to Marketplace"
             >
-              {/* FarmsAge Official Logo */}
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl overflow-hidden flex-shrink-0 border border-slate-100 shadow-sm">
+              <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 border border-emerald-500/30 shadow-md group-hover:scale-105 transition-transform">
                 <img src={logo} alt="FarmsAge" className="w-full h-full object-cover" />
               </div>
               <div>
-                <span className="font-black text-lg text-slate-800 tracking-tight leading-none">
-                  Farms<span className="text-emerald-600">AGE</span>
+                <span className="font-black text-lg text-white tracking-tight flex items-center gap-1">
+                  Farms<span className="text-emerald-400">AGE</span>
+                  <span className="text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                    2.0
+                  </span>
                 </span>
-                <div className="text-[10px] font-semibold text-slate-400 tracking-widest uppercase leading-none mt-0.5">
-                  Admin Panel
+                <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1 mt-0.5">
+                  <ShieldCheck size={11} className="text-emerald-400" /> Admin Console
                 </div>
               </div>
             </button>
+
             <button
-              className="md:hidden text-gray-500 hover:text-emerald-600"
-              onClick={() => setSidebarOpen(false)}
+              className="md:hidden text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"
+              onClick={() => setIsSidebarOpen(false)}
             >
               <X size={20} />
             </button>
           </div>
 
-          {/* Nav */}
-          <nav className="flex-1 p-4 space-y-2">
-            <NavLink
-              to="/admin/dashboard"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-                }`
-              }
-            >
-              <LayoutDashboard size={18} />
-              Dashboard
-            </NavLink>
+          {/* Navigation Links */}
+          <nav className="flex-1 px-3 py-5 space-y-1.5 overflow-y-auto">
+            <div className="px-3 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
+              Core Management
+            </div>
 
-            <NavLink
-              to="/admin/products"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-                }`
-              }
-            >
-              <ShoppingBasket size={18} />
-              Products
-            </NavLink>
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all duration-200 group ${
+                    isActive
+                      ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/30"
+                      : "text-slate-400 hover:bg-slate-800/80 hover:text-slate-200"
+                  }`
+                }
+              >
+                <div className="flex items-center gap-3">
+                  <span className="transition-transform group-hover:scale-110">
+                    {item.icon}
+                  </span>
+                  <span>{item.label}</span>
+                </div>
+                {item.badge && (
+                  <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 group-hover:bg-slate-700">
+                    {item.badge}
+                  </span>
+                )}
+              </NavLink>
+            ))}
 
-            <NavLink
-              to="/admin/orders"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-                }`
-              }
-            >
-              <ShoppingCart size={18} />
-              Orders
-            </NavLink>
+            <div className="pt-4 px-3 pb-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
+              Quick Shortcuts
+            </div>
 
-            <NavLink
-              to="/admin/users"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-                }`
-              }
+            <button
+              onClick={() => navigate("/")}
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-emerald-400 transition-all duration-200"
             >
-              <Users size={18} />
-              Users
-            </NavLink>
+              <div className="flex items-center gap-3">
+                <Store size={18} />
+                <span>Visit Storefront</span>
+              </div>
+              <ChevronRight size={14} className="text-slate-500" />
+            </button>
           </nav>
 
-          {/* Logout */}
-          <div className="p-4 border-t">
+          {/* User Profile & Logout */}
+          <div className="p-4 border-t border-slate-800/80 bg-slate-950/40">
+            <div className="flex items-center justify-between gap-3 mb-3 px-1">
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 font-black flex items-center justify-center text-xs shadow-md shrink-0">
+                  {user?.name?.charAt(0).toUpperCase() || "A"}
+                </div>
+                <div className="overflow-hidden">
+                  <p className="text-xs font-bold text-white truncate">
+                    {user?.name || "Super Admin"}
+                  </p>
+                  <p className="text-[10px] text-slate-400 font-medium truncate">
+                    {user?.email || "admin@farmsage.com"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-rose-400 hover:text-white bg-rose-500/10 hover:bg-rose-600 rounded-xl transition-all duration-200"
             >
-              <LogOut size={18} />
-              Logout
+              <LogOut size={16} />
+              <span>Log Out</span>
             </button>
           </div>
         </div>
       </aside>
 
-      {/* Overlay (Mobile) */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
-
-      {/* Main Content */}
+      {/* Main Content Workspace */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Topbar */}
-        <header className="flex items-center justify-between bg-white border-b px-4 sm:px-6 py-3">
-          {/* Left */}
+        {/* Top Header */}
+        <header className="flex items-center justify-between bg-white border-b border-slate-200/80 px-4 sm:px-6 py-3.5 shadow-2xs z-10">
           <div className="flex items-center gap-3">
-            {/* Hamburger */}
             <button
-              className="md:hidden"
+              className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             >
-              <Menu size={24} />
+              <Menu size={22} />
             </button>
 
-            <h2 className="text-xs sm:text-sm md:text-lg font-semibold truncate max-w-35 sm:max-w-50 md:max-w-none">
-              Welcome Back, {user?.name || "Admin"}
-            </h2>
+            <div>
+              <h1 className="text-sm sm:text-base font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                <span>Welcome back, <span className="text-emerald-700">{user?.name || "Admin"}</span></span>
+                <Sparkles size={16} className="text-amber-400 hidden sm:inline" />
+              </h1>
+              <p className="text-[11px] text-slate-400 hidden sm:block">Manage your FarmsAGE 2.0 marketplace catalog & orders</p>
+            </div>
           </div>
 
-          {/* Right */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/")}
-              title="Go to Main Website"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 rounded-xl transition-all shadow-2xs"
             >
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
-              Visit Website
+              <Store size={15} />
+              <span className="hidden sm:inline">Storefront</span>
             </button>
 
-            <div className="hidden sm:block text-xs text-gray-500">
-              Administrator
-            </div>
+            <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block" />
 
-            <div className="w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-              {user?.name?.charAt(0).toUpperCase() || "A"}
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-black flex items-center justify-center text-xs shadow-sm">
+                {user?.name?.charAt(0).toUpperCase() || "A"}
+              </div>
+              <div className="hidden lg:block text-left">
+                <p className="text-xs font-bold text-slate-800 leading-none">{user?.name || "Administrator"}</p>
+                <p className="text-[10px] text-slate-400 font-medium leading-none mt-1">Super Admin</p>
+              </div>
             </div>
           </div>
         </header>
 
-        {/* Content */}
-        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6">
+        {/* Dynamic Page Outlet */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50/60">
           <div className="w-full max-w-7xl mx-auto">
             <Outlet />
           </div>

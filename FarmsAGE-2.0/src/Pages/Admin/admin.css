@@ -487,45 +487,6 @@
 }
 
 @media (max-width: 768px) {
-  .admin-topbar {
-    padding: 0 1rem;
-  }
-  
-  .admin-content {
-    padding: 1rem;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1rem;
-  }
-  
-  .stat-card {
-    padding: 1rem;
-    gap: 1rem;
-  }
-  
-  .stat-icon {
-    width: 48px;
-    height: 48px;
-    font-size: 1.25rem;
-  }
-  
-  .stat-info p {
-    font-size: 1.25rem;
-  }
-
-  .admin-sidebar {
-    position: fixed;
-    left: -260px;
-    height: 100%;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .admin-sidebar.open {
-    left: 0;
-  }
-
   .table-header {
     flex-direction: column;
     align-items: flex-start;
