@@ -18,7 +18,7 @@ const FloatingCartBar = () => {
 
   return (
     <AnimatePresence>
-      <div className="fixed bottom-4 left-0 right-0 z-[120] px-4 pointer-events-none flex justify-center">
+      <div className="fixed bottom-[68px] md:bottom-4 left-0 right-0 z-[120] px-3 sm:px-4 pointer-events-none flex justify-center">
         <motion.div
           initial={{ y: 50, opacity: 0, scale: 0.95 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}

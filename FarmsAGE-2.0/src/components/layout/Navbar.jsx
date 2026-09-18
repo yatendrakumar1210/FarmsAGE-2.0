@@ -139,20 +139,38 @@ const Navbar = React.memo(() => {
     >
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between gap-4">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 shrink-0 group">
-          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center overflow-hidden border border-slate-100 shadow-sm group-hover:scale-110 transition-transform duration-300">
-            <img
-              className="w-full h-full object-cover"
-              src={logo}
-              alt="FarmsAge Logo"
-            />
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tighter text-slate-800 font-['Outfit']">
-            Farms<span className="text-emerald-600 font-extrabold">AGE</span>
-          </h2>
-        </Link>
+        <div className="flex items-center gap-2 min-w-0">
+          <Link to="/" className="flex items-center gap-1.5 shrink-0 group">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-xl flex items-center justify-center overflow-hidden border border-slate-100 shadow-sm group-hover:scale-110 transition-transform duration-300">
+              <img
+                className="w-full h-full object-cover"
+                src={logo}
+                alt="FarmsAge Logo"
+              />
+            </div>
+            <h2 className="text-lg sm:text-2xl font-bold tracking-tighter text-slate-800 font-['Outfit'] hidden min-[380px]:block">
+              Farms<span className="text-emerald-600 font-extrabold">AGE</span>
+            </h2>
+          </Link>
 
-        {/* Blinkit Quick-Commerce Delivery Location Badge */}
+          {/* Mobile Blinkit Location Selector Badge */}
+          <div
+            onClick={() => setIsLocationModalOpen(true)}
+            className="flex md:hidden flex-col cursor-pointer px-1 py-0.5 max-w-[135px] min-[390px]:max-w-[170px] min-w-0"
+          >
+            <span className="text-[9px] font-black uppercase tracking-wider text-emerald-600 flex items-center gap-0.5 leading-none">
+              <span>⚡ 10-15 MINS</span>
+            </span>
+            <div className="flex items-center gap-0.5 text-slate-800 leading-tight mt-0.5">
+              <span className="text-[11px] font-black truncate text-slate-900">
+                {locationName}
+              </span>
+              <ChevronDown size={11} className="text-slate-400 shrink-0" />
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Blinkit Delivery Location Badge */}
         <div
           onClick={() => setIsLocationModalOpen(true)}
           className="hidden md:flex flex-col border-l border-slate-200/80 pl-3.5 ml-1 cursor-pointer group hover:bg-emerald-50/70 px-2 py-1 transition-all rounded-xl border border-transparent hover:border-emerald-100/60 shrink-0"
@@ -171,7 +189,7 @@ const Navbar = React.memo(() => {
           </div>
         </div>
 
-        {/* Search Bar with Cycling Placeholder */}
+        {/* Desktop Search Bar with Cycling Placeholder */}
         <form onSubmit={handleSearchSubmit} className="flex-1 max-w-xl relative group hidden md:block mx-2">
           <Search
             onClick={handleSearchSubmit}
@@ -298,9 +316,36 @@ const Navbar = React.memo(() => {
             className="md:hidden p-1.5 text-slate-800 rounded-xl hover:bg-slate-100 transition"
             onClick={() => setOpen(!open)}
           >
-            {open ? <X size={26} /> : <Menu size={26} />}
+            {open ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
+      </div>
+
+      {/* Mobile Sticky Search Bar (Always visible on mobile viewports) */}
+      <div className="md:hidden px-3 pt-2 pb-1 bg-white border-t border-slate-100/60">
+        <form onSubmit={handleSearchSubmit} className="relative w-full">
+          <Search
+            onClick={handleSearchSubmit}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer hover:text-emerald-600"
+            size={16}
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={SEARCH_PLACEHOLDERS[placeholderIndex]}
+            className="w-full bg-slate-100/90 border border-slate-200/80 rounded-xl py-2 pl-9 pr-8 text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white focus:border-emerald-500 transition-all placeholder:text-slate-400 shadow-inner"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </form>
       </div>
 
       {/* Mobile Drawer - Ultra-Modern Customer Slide-Out Sidebar */}

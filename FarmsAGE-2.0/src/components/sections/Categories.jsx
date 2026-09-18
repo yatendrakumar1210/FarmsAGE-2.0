@@ -57,41 +57,42 @@ const Categories = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-10 md:py-14 font-sans">
+    <section className="max-w-7xl mx-auto px-2.5 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8 md:py-14 font-sans">
       {/* Header */}
-      <div className="flex items-center justify-between gap-4 mb-6 sm:mb-8 md:mb-10">
+      <div className="flex items-center justify-between gap-2 mb-3.5 sm:mb-8 md:mb-10 px-1">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-1 block">
+          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-0.5 block">
             ⚡ 10-15 Min Delivery
           </span>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-['Outfit']">
+          <h2 className="text-lg sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-['Outfit']">
             Explore <span className="text-emerald-600">Fresh Categories</span>
           </h2>
         </div>
 
         <button
           onClick={() => navigate("/category/all")}
-          className="text-emerald-600 hover:text-emerald-700 font-extrabold text-xs sm:text-sm flex items-center gap-1 hover:gap-2 transition-all px-3 py-2 rounded-xl hover:bg-emerald-50 shrink-0"
+          className="text-emerald-600 hover:text-emerald-700 font-black text-[11px] sm:text-sm flex items-center gap-0.5 hover:gap-1.5 transition-all px-2.5 py-1.5 rounded-xl hover:bg-emerald-50 shrink-0"
         >
-          See All <ChevronRight size={16} />
+          <span>See All</span>
+          <ChevronRight size={14} />
         </button>
       </div>
 
       {/* Categories Grid - 4 on mobile, 8 on desktop */}
-      <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-3 sm:gap-4 md:gap-6">
+      <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-2 sm:gap-4 md:gap-6">
         {categories.map((cat, index) => (
           <motion.div
             key={cat.name}
             initial={{ opacity: 0, scale: 0.85 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: index * 0.05 }}
+            transition={{ delay: index * 0.04 }}
             onClick={() => navigate(`/category/${cat.path}`)}
             className="flex flex-col items-center group cursor-pointer"
           >
             {/* Image */}
             <div
-              className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full ${cat.bgColor} flex items-center justify-center mb-2 sm:mb-3 md:mb-4 transition-all duration-300 group-hover:shadow-[0_15px_30px_-10px_rgba(16,185,129,0.3)] border border-white group-hover:border-emerald-100 overflow-hidden`}
+              className={`relative w-14 h-14 min-[380px]:w-16 min-[380px]:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full ${cat.bgColor} flex items-center justify-center mb-1.5 sm:mb-3 transition-all duration-300 group-hover:shadow-[0_15px_30px_-10px_rgba(16,185,129,0.3)] border border-white group-hover:border-emerald-100 overflow-hidden shadow-xs`}
             >
               <motion.img
                 whileHover={{ scale: 1.15 }}
@@ -104,7 +105,7 @@ const Categories = () => {
             </div>
 
             {/* Title */}
-            <h3 className="text-[11px] sm:text-xs md:text-sm lg:text-base font-bold text-slate-700 text-center tracking-tight group-hover:text-emerald-600 transition-colors">
+            <h3 className="text-[10px] min-[380px]:text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 text-center tracking-tight group-hover:text-emerald-600 transition-colors line-clamp-1 w-full px-0.5">
               {cat.name}
             </h3>
           </motion.div>

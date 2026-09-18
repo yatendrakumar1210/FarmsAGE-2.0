@@ -165,18 +165,18 @@ const ProductCard = ({ product, priority = false }) => {
       </div>
 
       {/* CONTENT */}
-      <div className="p-3 flex flex-col flex-1 justify-between">
+      <div className="p-2.5 sm:p-3 flex flex-col flex-1 justify-between">
         <div>
-          <h3 className="font-extrabold text-xs sm:text-sm text-slate-800 line-clamp-2 h-9 leading-snug">
+          <h3 className="font-extrabold text-xs sm:text-sm text-slate-800 line-clamp-2 h-8 sm:h-9 leading-snug">
             {product.name}
           </h3>
 
-          <div className="mt-1.5">
+          <div className="mt-1">
             <select
               disabled={isOutOfStock}
               value={selectedWeight}
               onChange={(e) => setSelectedWeight(Number(e.target.value))}
-              className="bg-slate-50 border border-slate-200 text-slate-700 text-[10px] sm:text-[11px] font-bold rounded-lg px-2 py-1 outline-none cursor-pointer hover:border-emerald-500 transition-colors w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-slate-50 border border-slate-200 text-slate-700 text-[10px] sm:text-[11px] font-bold rounded-lg px-1.5 sm:px-2 py-0.5 sm:py-1 outline-none cursor-pointer hover:border-emerald-500 transition-colors w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {weightOptions.map((w, idx) => (
                 <option key={idx} value={idx}>
@@ -188,11 +188,11 @@ const ProductCard = ({ product, priority = false }) => {
         </div>
 
         {/* PRICE & QTY CONTROLS */}
-        <div className="mt-auto flex justify-between items-end pt-2 gap-1">
-          <div>
-            <span className="font-black text-sm sm:text-lg text-slate-900">₹{currentPrice}</span>
+        <div className="mt-auto flex justify-between items-center pt-2 gap-1">
+          <div className="flex flex-col sm:flex-row sm:items-baseline leading-none">
+            <span className="font-black text-xs sm:text-base text-slate-900">₹{currentPrice}</span>
             {originalPrice > currentPrice && (
-              <span className="text-[10px] sm:text-xs line-through text-gray-400 ml-1">
+              <span className="text-[9px] sm:text-xs line-through text-gray-400 sm:ml-1 mt-0.5 sm:mt-0">
                 ₹{originalPrice}
               </span>
             )}
@@ -201,12 +201,12 @@ const ProductCard = ({ product, priority = false }) => {
           {isOutOfStock ? (
             <button
               disabled
-              className="px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-extrabold bg-slate-100 text-rose-600 border border-slate-200 cursor-not-allowed shrink-0"
+              className="px-1.5 py-1 rounded-lg text-[9px] sm:text-[11px] font-extrabold bg-slate-100 text-rose-600 border border-slate-200 cursor-not-allowed shrink-0"
             >
               Out of Stock
             </button>
           ) : cartQuantity > 0 ? (
-            <div className="flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-lg">
+            <div className="flex items-center gap-1 bg-emerald-50 border border-emerald-300 px-1 sm:px-2 py-0.5 sm:py-1 rounded-lg shadow-xs">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -218,7 +218,7 @@ const ProductCard = ({ product, priority = false }) => {
                 }}
                 className="text-emerald-700 hover:text-emerald-900 font-bold p-0.5"
               >
-                <Minus size={12} />
+                <Minus size={11} className="sm:w-3 sm:h-3" />
               </button>
               <span className="text-[11px] sm:text-xs font-black text-emerald-800 min-w-[12px] text-center">{cartQuantity}</span>
               <button
@@ -228,16 +228,16 @@ const ProductCard = ({ product, priority = false }) => {
                 }}
                 className="text-emerald-700 hover:text-emerald-900 font-bold p-0.5"
               >
-                <Plus size={12} />
+                <Plus size={11} className="sm:w-3 sm:h-3" />
               </button>
             </div>
           ) : (
             <button
               onClick={handleAddToCart}
-              className={`px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold border transition-colors shrink-0 ${
+              className={`px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-xs font-black border transition-all active:scale-95 shrink-0 ${
                 added
-                  ? "bg-green-500 text-white border-green-500"
-                  : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                  ? "bg-emerald-600 text-white border-emerald-600"
+                  : "border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white"
               }`}
             >
               <AnimatePresence mode="wait">

@@ -20,6 +20,7 @@ const Checkout = () => {
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("online");
 
   const [address, setAddress] = useState({
     name: "",
@@ -330,7 +331,7 @@ const Checkout = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-[#F8FAFC] min-h-screen pt-8 pb-20 font-sans">
+      <div className="bg-[#F8FAFC] min-h-screen pt-4 sm:pt-8 pb-32 sm:pb-20 font-sans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-4 mb-8">
             <Link to="/cart" className="p-2 hover:bg-white rounded-xl transition-colors border border-transparent hover:border-slate-200">
@@ -560,36 +561,50 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-3 sm:gap-6">
                   <motion.button 
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={handleOnlinePayment}
+                    onClick={() => {
+                      setPaymentMethod("online");
+                      handleOnlinePayment();
+                    }}
                     disabled={loading}
-                    className="p-6 rounded-3xl border-2 border-emerald-500 bg-emerald-50 flex flex-col items-center gap-4 group hover:bg-emerald-100 transition-colors"
+                    className={`p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center gap-2 sm:gap-4 transition-all text-center ${
+                      paymentMethod === "online"
+                        ? "border-emerald-500 bg-emerald-50/80 shadow-md shadow-emerald-50"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}
                   >
-                    <div className="bg-white p-3 rounded-2xl shadow-sm text-emerald-600">
-                      <CreditCard size={32} />
+                    <div className="bg-white p-2.5 sm:p-3 rounded-xl sm:rounded-2xl shadow-sm text-emerald-600">
+                      <CreditCard size={24} className="sm:w-8 sm:h-8" />
                     </div>
-                    <div className="text-center">
-                      <p className="font-black text-emerald-600">Pay Online</p>
-                      <p className="text-xs text-emerald-500 font-bold">Debit, Credit, UPI, NetBanking</p>
+                    <div>
+                      <p className="font-black text-xs sm:text-base text-slate-900">Pay Online</p>
+                      <p className="text-[10px] sm:text-xs text-emerald-700 font-bold mt-0.5">UPI, Cards, Banking</p>
                     </div>
                   </motion.button>
 
                   <motion.button 
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={handleCOD}
+                    onClick={() => {
+                      setPaymentMethod("cod");
+                      handleCOD();
+                    }}
                     disabled={loading}
-                    className="p-6 rounded-3xl border-2 border-slate-200 bg-white flex flex-col items-center gap-4 group hover:border-emerald-200 transition-colors"
+                    className={`p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center gap-2 sm:gap-4 transition-all text-center ${
+                      paymentMethod === "cod"
+                        ? "border-emerald-500 bg-emerald-50/80 shadow-md shadow-emerald-50"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}
                   >
-                    <div className="bg-slate-50 p-3 rounded-2xl shadow-sm text-slate-400 group-hover:text-emerald-500">
-                      <Box size={32} />
+                    <div className="bg-slate-50 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl shadow-sm text-slate-700">
+                      <Box size={24} className="sm:w-8 sm:h-8" />
                     </div>
-                    <div className="text-center">
-                      <p className="font-black text-slate-700 group-hover:text-emerald-600">Cash On Delivery</p>
-                      <p className="text-xs text-slate-400 font-bold">Pay when you receive</p>
+                    <div>
+                      <p className="font-black text-xs sm:text-base text-slate-900">Cash On Delivery</p>
+                      <p className="text-[10px] sm:text-xs text-slate-500 font-bold mt-0.5">Pay when delivered</p>
                     </div>
                   </motion.button>
                 </div>
@@ -696,6 +711,21 @@ const Checkout = () => {
         initialCoords={address.latitude ? { lat: address.latitude, lng: address.longitude } : null}
         initialAddress={address}
       />
+      {/* Mobile Sticky Payment Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] p-3 pb-safe flex items-center justify-between gap-3">
+        <div className="pl-1 leading-tight">
+          <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Total to Pay</p>
+          <p className="text-lg font-black text-slate-950">₹{total}</p>
+        </div>
+        <button
+          onClick={paymentMethod === "online" ? handleOnlinePayment : handleCOD}
+          disabled={loading}
+          className="flex-1 max-w-[240px] py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+        >
+          {loading ? "Processing..." : paymentMethod === "online" ? `Pay ₹${total} Online` : `Place COD (₹${total})`}
+        </button>
+      </div>
+
       <Footer />
     </>
   );

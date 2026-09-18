@@ -56,7 +56,7 @@ const Cart = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-[#F8FAFC] min-h-screen pt-8 pb-20">
+      <div className="bg-[#F8FAFC] min-h-screen pt-4 sm:pt-8 pb-32 sm:pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-4 mb-8 sm:mb-10">
             <Link to="/home" className="p-2 hover:bg-white rounded-xl transition-colors border border-transparent hover:border-slate-200">
@@ -229,6 +229,21 @@ const Cart = () => {
           </div>
         </div>
       </div>
+      {/* Mobile Sticky Checkout Bar (Blinkit Style) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] p-3 pb-safe flex items-center justify-between gap-3">
+        <div className="pl-1 leading-tight">
+          <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Grand Total</p>
+          <p className="text-lg font-black text-slate-950">₹{total}</p>
+        </div>
+        <button
+          onClick={handleCheckout}
+          className="flex-1 max-w-[240px] py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+        >
+          <span>Proceed to Checkout</span>
+          <ArrowLeft size={16} className="rotate-180" />
+        </button>
+      </div>
+
       <Footer />
     </>
   );

@@ -156,18 +156,22 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation, currentLocationName 
       {/* Background Overlay */}
       {isOpen && !showMapPicker && (
         <div
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[200] flex items-center justify-center p-3 sm:p-4"
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4"
           onClick={onClose}
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+            initial={{ opacity: 0, y: 50, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.98 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-3xl sm:rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl border border-slate-100 p-5 sm:p-7"
+            className="bg-white rounded-t-[2.2rem] sm:rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl border border-slate-100 p-5 sm:p-7 max-h-[88vh] overflow-y-auto pb-8 sm:pb-7"
           >
+            {/* Mobile Sheet Drag Handle */}
+            <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-3.5 sm:hidden" />
+
             {/* Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
                 <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
                   <MapPin size={20} />
