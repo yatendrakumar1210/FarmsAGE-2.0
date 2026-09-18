@@ -25,6 +25,11 @@ const boxOptions = [
   { label: "2 Boxes", multiplier: 2 },
 ];
 
+const packOptions = [
+  { label: "1 pack", multiplier: 1 },
+  { label: "2 packs", multiplier: 2 },
+];
+
 const ProductCard = ({ product, priority = false }) => {
   const normUnit = (product.unit || "").toLowerCase();
   const normName = (product.name || "").toLowerCase();
@@ -134,15 +139,14 @@ const ProductCard = ({ product, priority = false }) => {
           className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700"
         />
 
-        {/* TAG */}
-        <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 flex flex-col gap-1">
-          <span className="bg-emerald-500 text-white text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.5 rounded-full uppercase">
-            {getTag()}
+        {/* BLINKIT DELIVERY TIME & DISCOUNT BADGES */}
+        <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+          <span className="bg-slate-900/90 backdrop-blur-xs text-white text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1 shadow-sm">
+            <span className="text-emerald-400">⚡</span> 10 MINS
           </span>
-
           {discountAmount > 0 && (
-            <span className="bg-amber-400 text-black text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.5 rounded-full">
-              Save ₹{discountAmount}
+            <span className="bg-emerald-600 text-white text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.5 rounded-md shadow-sm">
+              ₹{discountAmount} OFF
             </span>
           )}
         </div>
@@ -161,24 +165,26 @@ const ProductCard = ({ product, priority = false }) => {
       </div>
 
       {/* CONTENT */}
-      <div className="p-2.5 sm:p-3 flex flex-col flex-1">
-        <h3 className="font-bold text-xs sm:text-sm text-slate-800 line-clamp-2 h-8 sm:h-10 leading-tight">
-          {product.name}
-        </h3>
+      <div className="p-3 flex flex-col flex-1 justify-between">
+        <div>
+          <h3 className="font-extrabold text-xs sm:text-sm text-slate-800 line-clamp-2 h-9 leading-snug">
+            {product.name}
+          </h3>
 
-        <div className="mt-1">
-          <select
-            disabled={isOutOfStock}
-            value={selectedWeight}
-            onChange={(e) => setSelectedWeight(Number(e.target.value))}
-            className="bg-slate-50 border border-slate-200 text-slate-700 text-[10px] sm:text-[11px] font-bold rounded-md px-1 sm:px-1.5 py-0.5 outline-none cursor-pointer hover:border-emerald-500 transition-colors w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {weightOptions.map((w, idx) => (
-              <option key={idx} value={idx}>
-                {w.label}
-              </option>
-            ))}
-          </select>
+          <div className="mt-1.5">
+            <select
+              disabled={isOutOfStock}
+              value={selectedWeight}
+              onChange={(e) => setSelectedWeight(Number(e.target.value))}
+              className="bg-slate-50 border border-slate-200 text-slate-700 text-[10px] sm:text-[11px] font-bold rounded-lg px-2 py-1 outline-none cursor-pointer hover:border-emerald-500 transition-colors w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {weightOptions.map((w, idx) => (
+                <option key={idx} value={idx}>
+                  {w.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* PRICE & QTY CONTROLS */}

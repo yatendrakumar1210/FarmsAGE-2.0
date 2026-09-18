@@ -112,9 +112,23 @@ const VendorOrders = () => {
                 </div>
               )}
               {order.deliveryAddress && (
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.8rem", color: "#64748b", fontWeight: 500 }}>
-                  <MapPin size={14} style={{ color: "#94a3b8" }} />
-                  {order.deliveryAddress.street}, {order.deliveryAddress.city} - {order.deliveryAddress.pincode}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.8rem", color: "#64748b", fontWeight: 500, flexWrap: "wrap" }}>
+                  <MapPin size={14} style={{ color: "#10b981" }} />
+                  <span>
+                    {order.deliveryAddress.houseNumber ? `${order.deliveryAddress.houseNumber}, ` : ""}
+                    {order.deliveryAddress.street}, {order.deliveryAddress.city} - {order.deliveryAddress.pincode}
+                    {order.deliveryAddress.landmark ? ` (Near ${order.deliveryAddress.landmark})` : ""}
+                  </span>
+                  {order.deliveryAddress.latitude && order.deliveryAddress.longitude && (
+                    <a
+                      href={`https://www.google.com/maps?q=${order.deliveryAddress.latitude},${order.deliveryAddress.longitude}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: "#059669", fontWeight: 700, marginLeft: 6, textDecoration: "underline" }}
+                    >
+                      [View on Map]
+                    </a>
+                  )}
                 </div>
               )}
             </div>

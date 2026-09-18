@@ -310,15 +310,26 @@ exports.getMe = async (req, res) => {
 // SAVE / UPDATE ADDRESS
 exports.saveAddress = async (req, res) => {
   try {
-    const { name, phone, street, city, pincode } = req.body;
+    const { name, phone, street, city, pincode, houseNumber, landmark, latitude, longitude, label } = req.body;
     if (!name || !phone || !street || !city || !pincode) {
-      return res.status(400).json({ message: "All address fields are required" });
+      return res.status(400).json({ message: "Name, phone, street, city, and pincode are required" });
     }
 
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const newAddress = { name, phone, street, city, pincode };
+    const newAddress = {
+      name,
+      phone,
+      street,
+      city,
+      pincode,
+      houseNumber: houseNumber || "",
+      landmark: landmark || "",
+      latitude: latitude ? Number(latitude) : null,
+      longitude: longitude ? Number(longitude) : null,
+      label: label || "Home",
+    };
 
     // Avoid duplicate address entries
     const exists = user.addresses.some(

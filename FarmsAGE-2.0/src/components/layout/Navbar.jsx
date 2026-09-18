@@ -20,20 +20,37 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { getAddressFromCoords } from "../../utils/getAddress";
 import { saveAddress } from "../../services/locationServices";
+import LocationModal from "../location/LocationModal";
+
+const SEARCH_PLACEHOLDERS = [
+  'Search "fresh mangoes"...',
+  'Search "farm tomatoes"...',
+  'Search "organic honey"...',
+  'Search "shimla apples"...',
+  'Search "fresh milk"...',
+];
 
 const Navbar = React.memo(() => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [locationName, setLocationName] = useState(
-    () => localStorage.getItem("detectedLocation") || "Detect Location",
+    () => localStorage.getItem("detectedLocation") || "Select Location",
   );
-  const [loadingLocation, setLoadingLocation] = useState(false);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
 
   const routerLocation = useLocation();
   const navigate = useNavigate();
   const { cart } = useCart();
   const { user, logout } = useAuth();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPlaceholderIndex((prev) => (prev + 1) % SEARCH_PLACEHOLDERS.length);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSearchSubmit = (e) => {
     e?.preventDefault();
@@ -46,6 +63,11 @@ const Navbar = React.memo(() => {
 
   const cartCount = useMemo(
     () => cart.reduce((total, item) => total + item.quantity, 0),
+    [cart],
+  );
+
+  const cartSubtotal = useMemo(
+    () => cart.reduce((total, item) => total + item.price * item.quantity, 0),
     [cart],
   );
 
@@ -130,82 +152,86 @@ const Navbar = React.memo(() => {
           </h2>
         </Link>
 
-        {/* Location */}
+        {/* Blinkit Quick-Commerce Delivery Location Badge */}
         <div
-          onClick={handleDetectLocation}
-          className="hidden lg:flex flex-col border-l border-gray-200 pl-4 ml-2 cursor-pointer group hover:bg-emerald-50/50 py-1 transition-colors rounded-r-lg"
+          onClick={() => setIsLocationModalOpen(true)}
+          className="hidden md:flex flex-col border-l border-slate-200/80 pl-3.5 ml-1 cursor-pointer group hover:bg-emerald-50/70 px-2 py-1 transition-all rounded-xl border border-transparent hover:border-emerald-100/60 shrink-0"
         >
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter leading-none">
-            {loadingLocation ? "Detecting..." : "Delivering To"}
-          </span>
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] font-black text-slate-900 uppercase tracking-wider flex items-center gap-0.5">
+              <span className="text-emerald-600 font-extrabold">⚡ 10-15 MINS</span>
+            </span>
+          </div>
           <div className="flex items-center gap-1 text-slate-800">
-            {loadingLocation ? (
-              <Loader2 size={14} className="animate-spin text-emerald-600" />
-            ) : (
-              <MapPin size={14} className="text-emerald-600" />
-            )}
-            <span className="text-sm font-bold truncate max-w-[120px]">
+            <MapPin size={13} className="text-emerald-600 shrink-0" />
+            <span className="text-xs font-black truncate max-w-[120px] lg:max-w-[150px]">
               {locationName}
             </span>
-            <ChevronDown size={14} className="text-emerald-600" />
+            <ChevronDown size={13} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
           </div>
         </div>
 
-        {/* Search */}
-        <form onSubmit={handleSearchSubmit} className="flex-1 max-w-2xl relative group hidden md:block">
+        {/* Search Bar with Cycling Placeholder */}
+        <form onSubmit={handleSearchSubmit} className="flex-1 max-w-xl relative group hidden md:block mx-2">
           <Search
             onClick={handleSearchSubmit}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-emerald-600 transition-colors"
-            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer hover:text-emerald-600 transition-colors"
+            size={17}
           />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder='Search "mangoes", "tomatoes", "apples"...'
-            className="w-full bg-gray-100 border-none rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:bg-white outline-none text-slate-700 font-medium"
+            placeholder={SEARCH_PLACEHOLDERS[placeholderIndex]}
+            className="w-full bg-slate-100/90 border border-slate-200/60 rounded-2xl py-2.5 sm:py-3 pl-11 pr-4 text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500/20 focus:bg-white focus:border-emerald-500 outline-none text-slate-800 font-bold transition-all placeholder:text-slate-400 shadow-inner"
           />
         </form>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 sm:gap-6">
-          {/* User */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* User Profile */}
           {user ? (
-            <div className="relative group flex items-center gap-2 font-bold text-slate-700 cursor-pointer">
-              {/* FIXED size */}
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                <User size={16} />
+            <div className="relative group flex items-center gap-2 font-bold text-slate-700 cursor-pointer py-1">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-extrabold text-xs shadow-sm shrink-0">
+                {user.name?.charAt(0).toUpperCase() || <User size={16} />}
               </div>
 
-              <span className="text-sm truncate max-w-[100px]">
-                {user.name || "User"}
+              <span className="text-xs sm:text-sm font-extrabold truncate max-w-[90px] hidden sm:inline-block">
+                {user.name?.split(" ")[0] || "Account"}
               </span>
 
               {/* Dropdown */}
-              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden z-50">
-                <div className="p-3 border-b border-slate-50">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden z-50">
+                <div className="p-3 border-b border-slate-50 bg-slate-50/50">
+                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">
                     Logged in as
                   </p>
-                  <p className="text-sm truncate mt-1 text-slate-800">
+                  <p className="text-xs font-bold truncate mt-0.5 text-slate-800">
                     {user.email || user.phone}
                   </p>
                 </div>
+                <Link
+                  to="/my-orders"
+                  className="px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                >
+                  <Package size={14} className="text-emerald-600" />
+                  <span>My Orders</span>
+                </Link>
                 <button
                   onClick={logout}
-                  className="w-full text-left px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
+                  className="w-full text-left px-4 py-2.5 text-xs font-black text-rose-500 hover:bg-rose-50 transition-colors border-t border-slate-50"
                 >
-                  Logout
+                  Logout Account
                 </button>
               </div>
             </div>
           ) : (
             <Link
               to="/login"
-              className="flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600"
+              className="flex items-center gap-1.5 font-extrabold text-slate-700 hover:text-emerald-600 px-2 py-1.5 rounded-xl hover:bg-slate-50 transition"
             >
-              <User size={20} />
-              <span className="text-sm">Login</span>
+              <User size={18} />
+              <span className="text-xs sm:text-sm">Login</span>
             </Link>
           )}
 
@@ -213,10 +239,10 @@ const Navbar = React.memo(() => {
           {user && !routerLocation.pathname.startsWith("/admin") && (
             <Link
               to="/my-orders"
-              className="hidden lg:flex items-center gap-2 font-bold text-slate-700 hover:text-emerald-600"
+              className="hidden lg:flex items-center gap-1.5 font-extrabold text-slate-700 hover:text-emerald-600 px-2 py-1.5 rounded-xl hover:bg-slate-50 transition"
             >
-              <Package size={20} />
-              <span className="text-sm">My Orders</span>
+              <Package size={18} />
+              <span className="text-xs sm:text-sm">Orders</span>
             </Link>
           )}
 
@@ -224,10 +250,10 @@ const Navbar = React.memo(() => {
           {user?.role?.toLowerCase() === "admin" && (
             <Link
               to="/admin"
-              className="hidden md:flex items-center gap-2 font-bold text-amber-600"
+              className="hidden md:flex items-center gap-1.5 font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200/60 text-xs"
             >
-              <ShieldCheck size={18} />
-              <span className="text-sm">Admin Panel</span>
+              <ShieldCheck size={16} />
+              <span>Admin</span>
             </Link>
           )}
 
@@ -235,32 +261,44 @@ const Navbar = React.memo(() => {
           {user?.role?.toLowerCase() === "vendor" && (
             <Link
               to="/vendor"
-              className="hidden md:flex items-center gap-2 font-bold text-emerald-700"
+              className="hidden md:flex items-center gap-1.5 font-black text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200/60 text-xs"
             >
-              <Store size={18} />
-              <span className="text-sm">Vendor Panel</span>
+              <Store size={16} />
+              <span>Vendor</span>
             </Link>
           )}
 
-          {/* Cart */}
+          {/* Blinkit-Style Cart Button */}
           {!routerLocation.pathname.startsWith("/admin") && (
             <Link
               to="/cart"
-              className="relative p-3 bg-emerald-600 text-white rounded-2xl"
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-md shadow-emerald-600/20 active:scale-95 transition-all group"
             >
-              <ShoppingCart size={12} className="group-hover:animate-bounce" />
-              <span className="absolute -top-1 -right-1 bg-amber-400 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
-                {cartCount}
-              </span>
+              <div className="relative">
+                <ShoppingCart size={18} className="group-hover:scale-110 transition-transform" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-amber-400 text-slate-950 text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-col text-left leading-none">
+                <span className="text-[10px] font-extrabold text-emerald-100 uppercase tracking-wider">
+                  {cartCount > 0 ? `${cartCount} items` : "My Cart"}
+                </span>
+                <span className="text-xs font-black text-white mt-0.5">
+                  {cartCount > 0 ? `₹${cartSubtotal}` : "₹0"}
+                </span>
+              </div>
             </Link>
           )}
 
           {/* Mobile toggle */}
           <button
-            className="md:hidden p-2 text-slate-800"
+            className="md:hidden p-1.5 text-slate-800 rounded-xl hover:bg-slate-100 transition"
             onClick={() => setOpen(!open)}
           >
-            {open ? <X size={28} /> : <Menu size={28} />}
+            {open ? <X size={26} /> : <Menu size={26} />}
           </button>
         </div>
       </div>
@@ -354,7 +392,7 @@ const Navbar = React.memo(() => {
           {/* Location Bar */}
           <button
             onClick={() => {
-              handleDetectLocation();
+              setIsLocationModalOpen(true);
               setOpen(false);
             }}
             className="w-full p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-100 flex items-center justify-between text-left transition"
@@ -520,6 +558,16 @@ const Navbar = React.memo(() => {
           )}
         </div>
       </div>
+
+      {/* Blinkit Location Selector Modal */}
+      <LocationModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        onSelectLocation={(data) => {
+          setLocationName(data.street || data.city);
+        }}
+        currentLocationName={locationName}
+      />
     </nav>
   );
 });

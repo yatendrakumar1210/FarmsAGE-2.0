@@ -113,11 +113,24 @@ const Cart = () => {
                               const { newUnitPrice } = calculateNewUnitPrice(item, newWeight);
                               updateItemWeight(itemId, item.weight, newWeight, newUnitPrice);
                             }}
-                            className="appearance-none bg-gray-50 border border-gray-200 text-emerald-600 text-[10px] font-black uppercase tracking-wider rounded border-emerald-100 hover:border-emerald-300 transition-colors focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 block px-2 py-1 cursor-pointer outline-none"
+                            className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-black uppercase tracking-wider rounded-lg hover:border-emerald-400 transition-colors block px-2 py-1 cursor-pointer outline-none"
                           >
-                            <option value="1 kg">1 kg</option>
-                            <option value="500 g">500 g</option>
-                            <option value="250 g">250 g</option>
+                            {["1 kg", "500 g", "250 g", "1 pack", "2 packs", "1 Piece", "2 Pieces", "1 Box", "12 pcs", "6 pcs"]
+                              .filter((opt) => {
+                                if (item.weight === opt) return true;
+                                const w = (item.weight || "").toLowerCase();
+                                if (w.includes("kg") || w.includes("g")) return opt.includes("kg") || opt.includes("g");
+                                if (w.includes("pack")) return opt.includes("pack");
+                                if (w.includes("piece")) return opt.includes("Piece");
+                                if (w.includes("box")) return opt.includes("Box");
+                                if (w.includes("pcs")) return opt.includes("pcs");
+                                return true;
+                              })
+                              .map((opt) => (
+                                <option key={opt} value={opt}>
+                                  {opt}
+                                </option>
+                              ))}
                           </select>
                         </div>
                         <div className="flex items-center justify-between mt-2 sm:mt-3 gap-2">

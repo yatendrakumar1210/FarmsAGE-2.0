@@ -92,6 +92,14 @@ const userSchema = new mongoose.Schema(
         street: String,
         city: String,
         pincode: String,
+        houseNumber: String,
+        landmark: String,
+        latitude: Number,
+        longitude: Number,
+        label: {
+          type: String,
+          default: "Home",
+        },
       },
     ],
 

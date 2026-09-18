@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, ArrowLeft, Truck, CreditCard, Box, CheckCircle2, User, Phone, MapPin, Plus, Minus, Trash2, Check, Edit3 } from "lucide-react";
+import { ShoppingBag, ArrowLeft, Truck, CreditCard, Box, CheckCircle2, User, Phone, MapPin, Plus, Minus, Trash2, Check, Edit3, Navigation, Crosshair } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
-import DetectLocation from "../components/location/DetectLocation";
+import MapLocationPicker from "../components/location/MapLocationPicker";
 import { calculateNewUnitPrice } from "../utils/weightUtils";
 import { playOrderSuccessSound } from "../utils/playOrderSound";
 
@@ -19,6 +19,7 @@ const Checkout = () => {
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
+  const [showMapPicker, setShowMapPicker] = useState(false);
 
   const [address, setAddress] = useState({
     name: "",
@@ -26,7 +27,30 @@ const Checkout = () => {
     street: "",
     city: "",
     pincode: "",
+    houseNumber: "",
+    landmark: "",
+    latitude: null,
+    longitude: null,
+    label: "Home",
   });
+
+  const handleMapLocationSelected = (data) => {
+    setAddress((prev) => ({
+      ...prev,
+      street: data.street,
+      city: data.city,
+      pincode: data.pincode,
+      houseNumber: data.houseNumber || prev.houseNumber,
+      landmark: data.landmark || prev.landmark,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      label: data.label || "Home",
+      name: prev.name || data.name,
+      phone: prev.phone || data.phone,
+    }));
+    setShowNewAddressForm(true);
+    setSelectedAddressIndex(null);
+  };
 
   useEffect(() => {
     fetchProfile();
@@ -47,7 +71,18 @@ const Checkout = () => {
         setSavedAddresses(userAddrs);
 
         if (defaultAddr && defaultAddr.street) {
-          setAddress(defaultAddr);
+          setAddress({
+            name: defaultAddr.name || data.user.name || "",
+            phone: defaultAddr.phone || data.user.phone || "",
+            street: defaultAddr.street || "",
+            city: defaultAddr.city || "",
+            pincode: defaultAddr.pincode || "",
+            houseNumber: defaultAddr.houseNumber || "",
+            landmark: defaultAddr.landmark || "",
+            latitude: defaultAddr.latitude || null,
+            longitude: defaultAddr.longitude || null,
+            label: defaultAddr.label || "Home",
+          });
           const foundIdx = userAddrs.findIndex(a => a.street === defaultAddr.street);
           setSelectedAddressIndex(foundIdx >= 0 ? foundIdx : 0);
         } else if (userAddrs.length > 0) {
@@ -195,7 +230,8 @@ const Checkout = () => {
               navigate("/order-success", { 
                 state: { 
                   orderId: verifyResult.order._id,
-                  paymentMethod: 'online'
+                  paymentMethod: 'online',
+                  order: verifyResult.order
                 } 
               });
             } else {
@@ -268,7 +304,8 @@ const Checkout = () => {
         navigate("/order-success", { 
           state: { 
             orderId: result.order._id,
-            paymentMethod: 'cod'
+            paymentMethod: 'cod',
+            order: result.order
           } 
         });
       } else {
@@ -305,33 +342,61 @@ const Checkout = () => {
           <div className="grid lg:grid-cols-3 gap-8 items-start">
             <div className="lg:col-span-2 space-y-6">
               <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <div className="flex items-center gap-3">
-                    <div className="bg-emerald-50 p-3 rounded-2xl">
-                      <Truck size={24} className="text-emerald-600" />
+                    <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100/80 text-emerald-600">
+                      <Truck size={24} />
                     </div>
                     <div>
-                      <h2 className="text-xl font-black text-slate-800">Delivery Location</h2>
-                      <p className="text-slate-500 text-sm">Select a saved address or enter a new one</p>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-xl font-black text-slate-800">Delivery Address</h2>
+                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+                          ⚡ 10-15 Mins
+                        </span>
+                      </div>
+                      <p className="text-slate-500 text-xs font-semibold">Select saved address or pinpoint on interactive map</p>
                     </div>
                   </div>
 
-                  <DetectLocation onLocationDetected={(data) => {
-                    setShowNewAddressForm(true);
-                    setSelectedAddressIndex(null);
-                    setAddress(prev => ({
-                      ...prev,
-                      street: data.street || data.fullAddress,
-                      city: data.city,
-                      pincode: data.pincode
-                    }));
-                  }}/>
+                  {/* Pick on Map Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => setShowMapPicker(true)}
+                    className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-black text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-95 shrink-0"
+                  >
+                    <Navigation size={15} />
+                    <span>Pick on Map</span>
+                  </button>
                 </div>
+
+                {/* GPS Pin Confirmation Banner */}
+                {address.latitude && address.longitude && (
+                  <div className="mb-6 p-3.5 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200/80 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                        📍
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-emerald-950">GPS Location Pin Confirmed</p>
+                        <p className="text-[11px] font-semibold text-emerald-700 truncate">
+                          {address.street || "Pin Dropped"}, {address.city} (Lat: {Number(address.latitude).toFixed(4)}, Lng: {Number(address.longitude).toFixed(4)})
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowMapPicker(true)}
+                      className="text-xs font-black text-emerald-700 hover:text-emerald-900 bg-white px-3 py-1.5 rounded-lg border border-emerald-200 shadow-sm shrink-0 ml-2"
+                    >
+                      Adjust Pin
+                    </button>
+                  </div>
+                )}
 
                 {/* 1-Click Saved Addresses List */}
                 {savedAddresses.length > 0 && (
                   <div className="mb-6 space-y-3">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Saved Addresses</p>
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-wider">Saved Addresses</p>
                     <div className="grid sm:grid-cols-2 gap-3">
                       {savedAddresses.map((addr, idx) => {
                         const isSelected = selectedAddressIndex === idx && !showNewAddressForm;
@@ -347,8 +412,15 @@ const Checkout = () => {
                           >
                             <div className="flex items-start justify-between">
                               <div className="space-y-1">
-                                <p className="font-bold text-sm text-slate-800">{addr.name}</p>
-                                <p className="text-xs text-slate-500 font-medium">{addr.street}, {addr.city} - {addr.pincode}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="font-extrabold text-sm text-slate-800">{addr.name}</p>
+                                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">
+                                    {addr.label || "Address"}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-slate-500 font-medium">
+                                  {addr.houseNumber ? `${addr.houseNumber}, ` : ""}{addr.street}, {addr.city} - {addr.pincode}
+                                </p>
                                 <p className="text-xs text-slate-400 font-semibold">📞 {addr.phone}</p>
                               </div>
                               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? "border-emerald-500 bg-emerald-500" : "border-slate-300"}`}>
@@ -363,20 +435,29 @@ const Checkout = () => {
                 )}
 
                 {/* Toggle to Add New Address */}
-                <div className="mb-6">
+                <div className="mb-6 flex flex-wrap items-center gap-3">
                   <button
                     type="button"
                     onClick={() => {
                       setShowNewAddressForm(!showNewAddressForm);
                       if (!showNewAddressForm) {
                         setSelectedAddressIndex(null);
-                        setAddress({ name: "", phone: "", street: "", city: "", pincode: "" });
+                        setAddress({ name: "", phone: "", street: "", city: "", pincode: "", houseNumber: "", landmark: "", latitude: null, longitude: null, label: "Home" });
                       }
                     }}
-                    className="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-4 py-2.5 rounded-xl border border-emerald-100 transition-colors"
+                    className="inline-flex items-center gap-2 text-xs font-black text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-4 py-2.5 rounded-xl border border-emerald-200 transition-colors"
                   >
-                    {showNewAddressForm ? <Edit3 size={16} /> : <Plus size={16} />}
-                    {showNewAddressForm ? "Use Saved Address" : "+ Add New Address / Location"}
+                    {showNewAddressForm ? <Edit3 size={15} /> : <Plus size={15} />}
+                    {showNewAddressForm ? "Use Saved Address" : "+ Enter Different Address Form"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowMapPicker(true)}
+                    className="inline-flex items-center gap-2 text-xs font-black text-slate-700 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200 px-4 py-2.5 rounded-xl transition-colors"
+                  >
+                    <Navigation size={14} className="text-emerald-600" />
+                    <span>Drop Pin on Map</span>
                   </button>
                 </div>
 
@@ -396,7 +477,7 @@ const Checkout = () => {
                         value={address.name}
                         onChange={handleInputChange}
                         placeholder="Enter full name"
-                        className="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-sm focus:bg-white focus:border-emerald-500 outline-none font-medium transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
                     <div className="space-y-1">
@@ -408,19 +489,39 @@ const Checkout = () => {
                         value={address.phone}
                         onChange={handleInputChange}
                         placeholder="10-digit mobile number"
-                        className="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-sm focus:bg-white focus:border-emerald-500 outline-none font-medium transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-700">Flat / House / Floor No.</label>
+                      <input 
+                        name="houseNumber"
+                        value={address.houseNumber || ""}
+                        onChange={handleInputChange}
+                        placeholder="e.g. Flat 301, 3rd Floor"
+                        className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-700">Landmark</label>
+                      <input 
+                        name="landmark"
+                        value={address.landmark || ""}
+                        onChange={handleInputChange}
+                        placeholder="e.g. Near Community Center"
+                        className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
                     <div className="sm:col-span-2 space-y-1">
                       <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                        <MapPin size={13} className="text-emerald-500" /> Street Address
+                        <MapPin size={13} className="text-emerald-500" /> Street / Society / Area
                       </label>
                       <input 
                         name="street"
                         value={address.street}
                         onChange={handleInputChange}
-                        placeholder="Flat/House No., Building, Street Name"
-                        className="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-sm focus:bg-white focus:border-emerald-500 outline-none font-medium transition-all"
+                        placeholder="Street Name, Locality"
+                        className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
                     <div className="space-y-1">
@@ -430,7 +531,7 @@ const Checkout = () => {
                         value={address.city}
                         onChange={handleInputChange}
                         placeholder="City"
-                        className="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-sm focus:bg-white focus:border-emerald-500 outline-none font-medium transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
                     <div className="space-y-1">
@@ -440,7 +541,7 @@ const Checkout = () => {
                         value={address.pincode}
                         onChange={handleInputChange}
                         placeholder="Pincode"
-                        className="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-sm focus:bg-white focus:border-emerald-500 outline-none font-medium transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
                   </motion.div>
@@ -587,6 +688,14 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+      {/* Map Location Picker Modal */}
+      <MapLocationPicker
+        isOpen={showMapPicker}
+        onClose={() => setShowMapPicker(false)}
+        onLocationSelect={handleMapLocationSelected}
+        initialCoords={address.latitude ? { lat: address.latitude, lng: address.longitude } : null}
+        initialAddress={address}
+      />
       <Footer />
     </>
   );

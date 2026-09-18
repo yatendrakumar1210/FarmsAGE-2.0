@@ -242,13 +242,36 @@ const ManageOrders = () => {
                         Delivery Address
                       </h4>
 
-                      <div className="bg-white p-3 rounded-lg border text-sm">
-                        <p className="font-semibold">{addr.name}</p>
-                        <p>{addr.phone}</p>
-                        <p>{addr.street}</p>
-                        <p>
+                      <div className="bg-white p-3 rounded-lg border text-sm space-y-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold">{addr.name}</p>
+                          {addr.label && (
+                            <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded font-bold uppercase text-slate-600">
+                              {addr.label}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-500">📞 {addr.phone}</p>
+                        <p className="text-xs text-slate-700">
+                          {addr.houseNumber ? `${addr.houseNumber}, ` : ""}
+                          {addr.street}
+                          {addr.landmark ? ` (Near ${addr.landmark})` : ""}
+                        </p>
+                        <p className="text-xs text-slate-700">
                           {addr.city} - {addr.pincode}
                         </p>
+                        {addr.latitude && addr.longitude && (
+                          <div className="pt-2">
+                            <a
+                              href={`https://www.google.com/maps?q=${addr.latitude},${addr.longitude}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md transition-colors"
+                            >
+                              📍 View Pin on Map ({Number(addr.latitude).toFixed(4)}, {Number(addr.longitude).toFixed(4)})
+                            </a>
+                          </div>
+                        )}
                       </div>
                     </div>
 

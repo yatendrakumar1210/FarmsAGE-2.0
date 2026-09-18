@@ -19,12 +19,14 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
+import OrderTrackingMap from "../components/location/OrderTrackingMap";
 import { playOrderSuccessSound } from "../utils/playOrderSound";
 
 const OrderSuccess = () => {
   const location = useLocation();
-  const orderId = location.state?.orderId || "FARMS-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-  const paymentMethod = location.state?.paymentMethod || 'online';
+  const order = location.state?.order || null;
+  const orderId = location.state?.orderId || order?._id || "FARMS-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+  const paymentMethod = location.state?.paymentMethod || order?.paymentMethod || 'online';
   const [showConfetti, setShowConfetti] = useState(true);
 
   // 🔔 Play Swiggy/Zomato signature order success chime
@@ -195,6 +197,11 @@ const OrderSuccess = () => {
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Express Dispatch</span>
               </div>
+            </motion.div>
+
+            {/* Live Interactive Map Tracking */}
+            <motion.div variants={itemVariants} className="mt-8 text-left">
+              <OrderTrackingMap order={order || { _id: orderId, status: "Placed" }} />
             </motion.div>
 
             {/* Detailed Info Cards Grid */}

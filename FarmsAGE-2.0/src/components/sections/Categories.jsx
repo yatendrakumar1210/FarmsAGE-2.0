@@ -5,34 +5,51 @@ import { ChevronRight } from "lucide-react";
 const categories = [
   {
     name: "Vegetables",
-    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999",
+    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=60&w=250",
     path: "vegetables",
-    bgColor: "bg-emerald-50",
+    bgColor: "bg-emerald-50 border-emerald-100",
   },
   {
     name: "Fresh Fruits",
-    image: "https://images.unsplash.com/photo-1610832958506-aa56368176cf",
+    image: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&q=60&w=250",
     path: "fruits",
-    bgColor: "bg-rose-50",
+    bgColor: "bg-rose-50 border-rose-100",
   },
   {
     name: "Organic Store",
-    image: "https://images.unsplash.com/photo-1506806732259-39c2d0268443",
+    image: "https://images.unsplash.com/photo-1506806732259-39c2d0268443?auto=format&fit=crop&q=60&w=250",
     path: "organic",
-    bgColor: "bg-amber-50",
+    bgColor: "bg-amber-50 border-amber-100",
   },
-  // {
-  //   name: "Atta & Dal",
-  //   image:
-  //     "https://media.istockphoto.com/id/686747322/photo/food-in-a-market-in-fes-morocco-the-market-is-one-of-the-most-important-attractions-of-the-city.jpg",
-  //   path: "grains",
-  //   bgColor: "bg-orange-50",
-  // },
+  {
+    name: "Leafy Herbs",
+    image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&q=60&w=250",
+    path: "all?search=leaf",
+    bgColor: "bg-teal-50 border-teal-100",
+  },
+  {
+    name: "Dairy & Milk",
+    image: "https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?auto=format&fit=crop&q=60&w=250",
+    path: "all?search=milk",
+    bgColor: "bg-blue-50 border-blue-100",
+  },
+  {
+    name: "Farm Oils",
+    image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&q=60&w=250",
+    path: "all?search=oil",
+    bgColor: "bg-yellow-50 border-yellow-100",
+  },
+  {
+    name: "Dry Fruits",
+    image: "https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=60&w=250",
+    path: "all?search=dry",
+    bgColor: "bg-orange-50 border-orange-100",
+  },
   {
     name: "Daily Deals",
-    image: "https://images.unsplash.com/photo-1542838132-92c53300491e",
+    image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=60&w=250",
     path: "all",
-    bgColor: "bg-indigo-50",
+    bgColor: "bg-indigo-50 border-indigo-100",
   },
 ];
 
@@ -40,23 +57,28 @@ const Categories = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-10 sm:py-12 md:py-16 font-sans">
+    <section className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-10 md:py-14 font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 sm:mb-10 md:mb-12">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight font-['Outfit']">
-          What are you <span className="text-emerald-600">looking for?</span>
-        </h2>
+      <div className="flex items-center justify-between gap-4 mb-6 sm:mb-8 md:mb-10">
+        <div>
+          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-1 block">
+            ⚡ 10-15 Min Delivery
+          </span>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-['Outfit']">
+            Explore <span className="text-emerald-600">Fresh Categories</span>
+          </h2>
+        </div>
 
         <button
           onClick={() => navigate("/category/all")}
-          className="self-start sm:self-auto text-emerald-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all px-3 py-2 rounded-lg hover:bg-emerald-50"
+          className="text-emerald-600 hover:text-emerald-700 font-extrabold text-xs sm:text-sm flex items-center gap-1 hover:gap-2 transition-all px-3 py-2 rounded-xl hover:bg-emerald-50 shrink-0"
         >
-          View All <ChevronRight size={18} />
+          See All <ChevronRight size={16} />
         </button>
       </div>
 
-      {/* Categories Grid */}
-      <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-6 sm:gap-8 md:gap-10">
+      {/* Categories Grid - 4 on mobile, 8 on desktop */}
+      <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-3 sm:gap-4 md:gap-6">
         {categories.map((cat, index) => (
           <motion.div
             key={cat.name}

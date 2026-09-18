@@ -25,6 +25,7 @@ import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import products from "../data/products";
 import { useCart } from "../context/CartContext";
+import OrderTrackingMap from "../components/location/OrderTrackingMap";
 
 const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
 
@@ -37,6 +38,7 @@ const MyOrders = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [trackingOrder, setTrackingOrder] = useState(null);
 
   const getProductDetails = (id) => {
     return products.find(p => p.id == id) || { name: "Organic Produce", image: "" };
@@ -336,8 +338,16 @@ const MyOrders = () => {
 
                         <div className="flex items-center gap-2">
                           <button
+                            onClick={() => setTrackingOrder(order)}
+                            className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95"
+                          >
+                            <Truck size={14} className="text-emerald-400" />
+                            <span>Track on Map</span>
+                          </button>
+
+                          <button
                             onClick={() => setSelectedInvoice(order)}
-                            className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 transition-colors"
+                            className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 transition-colors"
                           >
                             <FileText size={14} className="text-slate-500" />
                             <span>Invoice</span>
@@ -345,7 +355,7 @@ const MyOrders = () => {
 
                           <button
                             onClick={() => handleReorder(order.items)}
-                            className="flex-1 sm:flex-none px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-md shadow-emerald-200 transition-all flex items-center justify-center gap-1.5"
+                            className="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-md shadow-emerald-200 transition-all flex items-center justify-center gap-1.5"
                           >
                             <span>Reorder</span>
                             <ChevronRight size={14} />
@@ -424,6 +434,45 @@ const MyOrders = () => {
               >
                 <Printer size={16} /> Print Receipt
               </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Live Order Tracking Modal */}
+      <AnimatePresence>
+        {trackingOrder && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-3 sm:p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="bg-white rounded-3xl sm:rounded-[2.5rem] max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-100 relative max-h-[92vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                    <Truck size={18} />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base text-slate-900 font-['Outfit']">
+                      Live Delivery Tracking
+                    </h3>
+                    <p className="text-[11px] font-bold text-slate-400">
+                      Order #{trackingOrder._id.slice(-8).toUpperCase()}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setTrackingOrder(null)}
+                  className="p-1.5 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full transition"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <OrderTrackingMap order={trackingOrder} />
             </motion.div>
           </div>
         )}
