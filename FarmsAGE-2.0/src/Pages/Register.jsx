@@ -102,7 +102,7 @@ const Register = () => {
               <Mail size={18} className="text-slate-400" />
               <input
                 type="email"
-                placeholder="Email Address (Optional)"
+                placeholder="Email Address "
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-transparent outline-none text-sm font-semibold text-slate-800 placeholder:text-slate-400"

@@ -10,9 +10,9 @@ const Home = () => {
     <MainLayout>
       <Hero />
       <Categories />
-      <Offers />
-      <Products />
-      <Trust />
+      {/* <Offers /> */}
+      {/* <Products /> */}
+      {/* <Trust /> */}
     </MainLayout>
   );
 };

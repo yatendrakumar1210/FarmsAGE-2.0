@@ -14,7 +14,7 @@ const Products = () => {
   // Filter logic
   const filteredProducts =
     activeFilter === "All"
-      ? products.slice(20,30)
+      ? products.slice(30,40)
       : products.filter((p) => p.category === activeFilter).slice(0, 8);
 
   return (

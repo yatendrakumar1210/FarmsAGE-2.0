@@ -158,8 +158,8 @@ const Navbar = React.memo(() => {
             onClick={() => setIsLocationModalOpen(true)}
             className="flex md:hidden flex-col cursor-pointer px-1 py-0.5 max-w-[135px] min-[390px]:max-w-[170px] min-w-0"
           >
-            <span className="text-[9px] font-black uppercase tracking-wider text-emerald-600 flex items-center gap-0.5 leading-none">
-              <span>⚡ 10-15 MINS</span>
+            <span className="text-[8px] font-black uppercase tracking-wider text-emerald-600 flex items-center gap-0.9 leading-none">
+              <span>⚡ 30-40 MINS</span>
             </span>
             <div className="flex items-center gap-0.5 text-slate-800 leading-tight mt-0.5">
               <span className="text-[11px] font-black truncate text-slate-900">
@@ -177,7 +177,7 @@ const Navbar = React.memo(() => {
         >
           <div className="flex items-center gap-1">
             <span className="text-[10px] font-black text-slate-900 uppercase tracking-wider flex items-center gap-0.5">
-              <span className="text-emerald-600 font-extrabold">⚡ 10-15 MINS</span>
+              <span className="text-emerald-600 font-extrabold">⚡ 30-40 MINS</span>
             </span>
           </div>
           <div className="flex items-center gap-1 text-slate-800">
@@ -287,7 +287,7 @@ const Navbar = React.memo(() => {
           )}
 
           {/* Blinkit-Style Cart Button */}
-          {!routerLocation.pathname.startsWith("/admin") && (
+          {/* {!routerLocation.pathname.startsWith("/admin") && (
             <Link
               to="/cart"
               className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-md shadow-emerald-600/20 active:scale-95 transition-all group"
@@ -309,7 +309,7 @@ const Navbar = React.memo(() => {
                 </span>
               </div>
             </Link>
-          )}
+          )} */}
 
           {/* Mobile toggle */}
           <button
