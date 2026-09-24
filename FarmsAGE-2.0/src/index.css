@@ -4,11 +4,27 @@
   html, body {
     font-family: 'Inter', sans-serif;
     @apply antialiased text-slate-900;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
   }
 
   h1, h2, h3, h4, h5, h6, .heading-font {
     font-family: 'Outfit', sans-serif;
   }
+}
+
+/* Safe-area padding for notched devices (iPhone X+) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Hide scrollbar on horizontal scroll containers */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -22,4 +38,17 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #e2e8f0;
   border-radius: 10px;
+}
+
+/* Prevent image/element overflow on small screens */
+img, video, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Touch targets minimum size */
+@media (max-width: 768px) {
+  button, a, select, input[type="checkbox"], input[type="radio"] {
+    min-height: 36px;
+  }
 }

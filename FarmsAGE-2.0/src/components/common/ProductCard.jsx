@@ -73,7 +73,14 @@ const ProductCard = ({ product, priority = false }) => {
 
   const { cart, addToCart, updateQuantity, removeFromCart } = useCart();
 
+  const catName = (product.category || "").toLowerCase();
+  const prodName = (product.name || "").toLowerCase();
+  const isOrganic = product.isOrganic || catName.includes("organic") || prodName.includes("organic");
+  const isFruitsOrVegetables = 
+    (catName === "vegetables" || catName === "fruits" || catName === "fresh vegetables" || catName === "fresh fruits") && !isOrganic;
+
   const isOutOfStock = 
+    !isFruitsOrVegetables ||
     product.quantity === 0 || 
     product.quantity === '0' || 
     product.isOutOfStock === true || 
@@ -142,7 +149,7 @@ const ProductCard = ({ product, priority = false }) => {
         {/* BLINKIT DELIVERY TIME & DISCOUNT BADGES */}
         <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
           <span className="bg-slate-900/90 backdrop-blur-xs text-white text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1 shadow-sm">
-            <span className="text-emerald-400">⚡</span> 10 MINS
+            <span className="text-emerald-400">⚡</span> 30 MINS
           </span>
           {discountAmount > 0 && (
             <span className="bg-emerald-600 text-white text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.5 rounded-md shadow-sm">

@@ -69,7 +69,7 @@ const CompleteProfile = () => {
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-amber-200 blur-[120px] rounded-full" />
       </div>
 
-      <div className="max-w-lg w-full mx-6 bg-white rounded-[3rem] shadow-2xl shadow-emerald-100/50 overflow-hidden relative z-10 border border-gray-100 p-8 md:p-16">
+      <div className="max-w-lg w-full mx-4 sm:mx-6 bg-white rounded-2xl sm:rounded-[3rem] shadow-2xl shadow-emerald-100/50 overflow-hidden relative z-10 border border-gray-100 p-5 sm:p-8 md:p-16">
         {/* Header */}
         <div className="flex items-center gap-4 mb-10">
           <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center">

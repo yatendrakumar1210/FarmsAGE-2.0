@@ -11,11 +11,23 @@ const Products = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
 
-  // Filter logic
+  // Filter & sort logic (in-stock items first)
+  const isOutOfStock = (p) => {
+    const cat = (p.category || "").toLowerCase();
+    const name = (p.name || "").toLowerCase();
+    const isOrganic = p.isOrganic || cat.includes("organic") || name.includes("organic");
+    const isFruitOrVeg = (cat === "vegetables" || cat === "fruits" || cat === "fresh vegetables" || cat === "fresh fruits") && !isOrganic;
+    return !isFruitOrVeg || p.quantity === 0 || p.quantity === '0' || p.isOutOfStock === true;
+  };
+
+  const sortInStockFirst = (list) => {
+    return [...list].sort((a, b) => (isOutOfStock(a) ? 1 : 0) - (isOutOfStock(b) ? 1 : 0));
+  };
+
   const filteredProducts =
     activeFilter === "All"
-      ? products.slice(30,40)
-      : products.filter((p) => p.category === activeFilter).slice(0, 8);
+      ? sortInStockFirst(products).slice(0, 10)
+      : sortInStockFirst(products.filter((p) => p.category === activeFilter)).slice(0, 8);
 
   return (
     <section className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-10 md:py-12 font-sans overflow-hidden">

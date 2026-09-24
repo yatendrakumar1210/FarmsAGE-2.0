@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { MapPin, Save, Loader } from "lucide-react";
+import { MapPin, Save, Loader, Navigation } from "lucide-react";
+import MapLocationPicker from "../../components/location/MapLocationPicker";
 import "./vendor.css";
 
 const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
@@ -14,6 +15,7 @@ const VendorProfile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [showMapPicker, setShowMapPicker] = useState(false);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -141,20 +143,53 @@ const VendorProfile = () => {
           </div>
 
           <div className="form-group">
-            <label>Store Image URL</label>
-            <input
-              type="text"
-              placeholder="https://images.unsplash.com/..."
-              value={profile.storeImage}
-              onChange={(e) => setProfile({ ...profile, storeImage: e.target.value })}
-            />
-            {profile.storeImage && (
-              <img
-                src={profile.storeImage}
-                alt="Store preview"
-                style={{ width: 120, height: 80, objectFit: "cover", borderRadius: 10, marginTop: 8, border: "1px solid #e2e8f0" }}
-              />
-            )}
+            <label>Store Image / Banner</label>
+            <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", marginTop: "0.4rem" }}>
+              {profile.storeImage ? (
+                <div style={{ position: "relative" }}>
+                  <img
+                    src={profile.storeImage}
+                    alt="Store preview"
+                    style={{ width: 140, height: 90, objectFit: "cover", borderRadius: 12, border: "2px solid #10b981" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setProfile({ ...profile, storeImage: "" })}
+                    style={{
+                      position: "absolute", top: -8, right: -8, background: "#ef4444", color: "white",
+                      border: "none", borderRadius: "50%", width: 22, height: 22, fontSize: 12,
+                      cursor: "pointer", fontWeight: "bold"
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : null}
+              <label
+                style={{
+                  padding: "0.6rem 1.2rem", borderRadius: 10, border: "1.5px dashed #10b981",
+                  background: "#ecfdf5", color: "#059669", fontSize: "0.8rem", fontWeight: 700,
+                  cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6
+                }}
+              >
+                📷 {profile.storeImage ? "Change Image" : "Upload Store Image"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setProfile((prev) => ({ ...prev, storeImage: reader.result }));
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </label>
+            </div>
           </div>
 
           {/* Coordinates */}
@@ -163,19 +198,34 @@ const VendorProfile = () => {
               <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 0 }}>
                 Store Location
               </label>
-              <button
-                type="button"
-                onClick={detectLocation}
-                style={{
-                  display: "flex", alignItems: "center", gap: 4,
-                  padding: "4px 12px", borderRadius: 8,
-                  background: "#ecfdf5", border: "1px solid #a7f3d0",
-                  color: "#059669", fontSize: "0.75rem", fontWeight: 700,
-                  cursor: "pointer", transition: "all 0.2s",
-                }}
-              >
-                <MapPin size={12} /> Detect My Location
-              </button>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowMapPicker(true)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 4,
+                    padding: "4px 12px", borderRadius: 8,
+                    background: "#10b981", border: "none",
+                    color: "#ffffff", fontSize: "0.75rem", fontWeight: 700,
+                    cursor: "pointer", transition: "all 0.2s",
+                  }}
+                >
+                  <Navigation size={12} /> Select on Map
+                </button>
+                <button
+                  type="button"
+                  onClick={detectLocation}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 4,
+                    padding: "4px 12px", borderRadius: 8,
+                    background: "#ecfdf5", border: "1px solid #a7f3d0",
+                    color: "#059669", fontSize: "0.75rem", fontWeight: 700,
+                    cursor: "pointer", transition: "all 0.2s",
+                  }}
+                >
+                  <MapPin size={12} /> Detect GPS
+                </button>
+              </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
               <input
@@ -218,6 +268,27 @@ const VendorProfile = () => {
           </button>
         </form>
       </div>
+
+      <MapLocationPicker
+        isOpen={showMapPicker}
+        onClose={() => setShowMapPicker(false)}
+        onLocationSelect={(data) => {
+          setProfile((prev) => ({
+            ...prev,
+            coordinates: {
+              lat: data.latitude.toFixed(6),
+              lng: data.longitude.toFixed(6),
+            },
+          }));
+          setMessage("Location selected from map! Don't forget to save.");
+          setShowMapPicker(false);
+        }}
+        initialCoords={
+          profile.coordinates.lat && profile.coordinates.lng
+            ? { lat: parseFloat(profile.coordinates.lat), lng: parseFloat(profile.coordinates.lng) }
+            : null
+        }
+      />
     </div>
   );
 };

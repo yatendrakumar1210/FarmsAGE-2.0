@@ -2,6 +2,8 @@ const products = [
   {
     id: 1,
     name: "Beetroot",
+    category: "Vegetables",
+    quantity: 100,
     price: 47.12,
     oldPrice: 62,
     discount: "24% OFF",
@@ -10,6 +12,8 @@ const products = [
   {
     id: 2,
     name: "Capsicum - Green",
+    category: "Vegetables",
+    quantity: 100,
     price: 96,
     oldPrice: 234,
     discount: "59% OFF",
@@ -19,6 +23,8 @@ const products = [
   {
     id: 3,
     name: "Coriander Leaves",
+    category: "Vegetables",
+    quantity: 100,
     price: 96.52,
     oldPrice: 127,
     discount: "24% OFF",
@@ -27,6 +33,8 @@ const products = [
   {
     id: 4,
     name: "Tomato",
+    category: "Vegetables",
+    quantity: 100,
     price: 35,
     oldPrice: 50,
     discount: "30% OFF",
@@ -35,6 +43,8 @@ const products = [
   {
     id: 5,
     name: "Potato",
+    category: "Vegetables",
+    quantity: 100,
     price: 28,
     oldPrice: 40,
     discount: "30% OFF",
@@ -43,6 +53,8 @@ const products = [
   {
     id: 6,
     name: "Onion",
+    category: "Vegetables",
+    quantity: 100,
     price: 42,
     oldPrice: 60,
     discount: "30% OFF",
@@ -51,6 +63,8 @@ const products = [
   {
     id: 7,
     name: "Carrot",
+    category: "Vegetables",
+    quantity: 100,
     price: 55,
     oldPrice: 70,
     discount: "21% OFF",
@@ -59,6 +73,8 @@ const products = [
   {
     id: 8,
     name: "Cabbage",
+    category: "Vegetables",
+    quantity: 100,
     price: 30,
     oldPrice: 45,
     discount: "33% OFF",
@@ -67,6 +83,8 @@ const products = [
   {
     id: 9,
     name: "Cauliflower",
+    category: "Vegetables",
+    quantity: 100,
     price: 48,
     oldPrice: 65,
     discount: "26% OFF",
@@ -76,6 +94,8 @@ const products = [
   {
     id: 10,
     name: "Spinach",
+    category: "Vegetables",
+    quantity: 100,
     price: 25,
     oldPrice: 35,
     discount: "28% OFF",
@@ -84,6 +104,8 @@ const products = [
   {
     id: 11,
     name: "Brinjal",
+    category: "Vegetables",
+    quantity: 100,
     price: 52,
     oldPrice: 70,
     discount: "25% OFF",
@@ -93,6 +115,8 @@ const products = [
   {
     id: 12,
     name: "Green Chilli",
+    category: "Vegetables",
+    quantity: 100,
     price: 60,
     oldPrice: 85,
     discount: "29% OFF",
@@ -101,6 +125,8 @@ const products = [
   {
     id: 13,
     name: "Bottle Gourd",
+    category: "Vegetables",
+    quantity: 100,
     price: 38,
     oldPrice: 55,
     discount: "31% OFF",
@@ -109,6 +135,8 @@ const products = [
   {
     id: 14,
     name: "Pumpkin",
+    category: "Vegetables",
+    quantity: 100,
     price: 45,
     oldPrice: 65,
     discount: "30% OFF",
@@ -117,6 +145,8 @@ const products = [
   {
     id: 15,
     name: "Radish",
+    category: "Vegetables",
+    quantity: 100,
     price: 27,
     oldPrice: 40,
     discount: "32% OFF",
@@ -125,6 +155,8 @@ const products = [
   {
     id: 16,
     name: "Lady Finger (Okra)",
+    category: "Vegetables",
+    quantity: 100,
     price: 58,
     oldPrice: 75,
     discount: "22% OFF",
@@ -133,6 +165,8 @@ const products = [
   {
     id: 17,
     name: "Sweet Corn",
+    category: "Vegetables",
+    quantity: 100,
     price: 40,
     oldPrice: 55,
     discount: "27% OFF",
@@ -141,6 +175,8 @@ const products = [
   {
     id: 18,
     name: "Broccoli",
+    category: "Vegetables",
+    quantity: 100,
     price: 120,
     oldPrice: 150,
     discount: "20% OFF",
@@ -149,6 +185,8 @@ const products = [
   {
     id: 19,
     name: "Mushroom",
+    category: "Vegetables",
+    quantity: 100,
     price: 110,
     oldPrice: 140,
     discount: "21% OFF",
@@ -157,6 +195,8 @@ const products = [
   {
     id: 20,
     name: "Ginger",
+    category: "Vegetables",
+    quantity: 100,
     price: 90,
     oldPrice: 120,
     discount: "25% OFF",
@@ -165,6 +205,8 @@ const products = [
   {
     id: 21,
     name: "Garlic",
+    category: "Vegetables",
+    quantity: 100,
     price: 95,
     oldPrice: 130,
     discount: "27% OFF",
@@ -173,6 +215,8 @@ const products = [
   {
     id: 22,
     name: "Lemon",
+    category: "Vegetables",
+    quantity: 100,
     price: 30,
     oldPrice: 45,
     discount: "33% OFF",
@@ -181,6 +225,8 @@ const products = [
   {
     id: 23,
     name: "Cucumber",
+    category: "Vegetables",
+    quantity: 100,
     price: 35,
     oldPrice: 50,
     discount: "30% OFF",
@@ -189,6 +235,8 @@ const products = [
   {
     id: 24,
     name: "Green Peas",
+    category: "Vegetables",
+    quantity: 100,
     price: 65,
     oldPrice: 90,
     discount: "28% OFF",
@@ -197,6 +245,8 @@ const products = [
   {
     id: 25,
     name: "Mint Leaves",
+    category: "Vegetables",
+    quantity: 100,
     price: 20,
     oldPrice: 30,
     discount: "33% OFF",
@@ -205,6 +255,8 @@ const products = [
   {
     id: 26,
     name: "Spring Onion",
+    category: "Vegetables",
+    quantity: 100,
     price: 32,
     oldPrice: 45,
     discount: "29% OFF",
@@ -213,6 +265,8 @@ const products = [
   {
     id: 27,
     name: "Red Capsicum",
+    category: "Vegetables",
+    quantity: 100,
     price: 110,
     oldPrice: 150,
     discount: "27% OFF",
@@ -221,6 +275,8 @@ const products = [
   {
     id: 28,
     name: "Yellow Capsicum",
+    category: "Vegetables",
+    quantity: 100,
     price: 115,
     oldPrice: 150,
     discount: "23% OFF",
@@ -229,6 +285,8 @@ const products = [
   {
     id: 29,
     name: "Apple",
+    category: "Fruits",
+    quantity: 100,
     price: 140,
     oldPrice: 180,
     discount: "22% OFF",
@@ -237,6 +295,8 @@ const products = [
   {
     id: 30,
     name: "Banana",
+    category: "Fruits",
+    quantity: 100,
     price: 50,
     oldPrice: 65,
     discount: "23% OFF",
@@ -245,5 +305,3 @@ const products = [
 ];
 
 export default products;
-
-

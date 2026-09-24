@@ -60,7 +60,7 @@ exports.getProducts = async (req, res) => {
 exports.getPublicProducts = async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.max(1, parseInt(req.query.limit) || 18);
+    const limit = Math.max(1, parseInt(req.query.limit) || 12);
     const skip = (page - 1) * limit;
 
     const { category, search, sortBy } = req.query;
@@ -96,14 +96,14 @@ exports.getPublicProducts = async (req, res) => {
       });
     }
 
-    // Sorting
-    let sortOptions = { createdAt: -1 };
+    // Sorting (In-stock quantity > 0 first, Out-of-stock quantity: 0 last)
+    let sortOptions = { quantity: -1, createdAt: -1 };
     if (sortBy === "Price: Low to High" || sortBy === "price_asc") {
-      sortOptions = { price: 1 };
+      sortOptions = { quantity: -1, price: 1 };
     } else if (sortBy === "Price: High to Low" || sortBy === "price_desc") {
-      sortOptions = { price: -1 };
+      sortOptions = { quantity: -1, price: -1 };
     } else if (sortBy === "Newest First" || sortBy === "newest") {
-      sortOptions = { createdAt: -1 };
+      sortOptions = { quantity: -1, createdAt: -1 };
     }
 
     const totalProducts = await Product.countDocuments(query);

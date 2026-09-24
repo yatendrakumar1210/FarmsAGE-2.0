@@ -145,7 +145,7 @@ const Footer = () => {
               <MapPin className="text-emerald-500 shrink-0" size={12} /> Bulandshahr 203001 , UP
             </span>
             <span className="flex items-center gap-1">
-              <Phone className="text-emerald-500 shrink-0" size={12} /> +91 98765 43210
+              <Phone className="text-emerald-500 shrink-0" size={12} /> +91 9876543210
             </span>
             <span className="flex items-center gap-1">
               <Mail className="text-emerald-500 shrink-0" size={12} /> support@farmsage.com

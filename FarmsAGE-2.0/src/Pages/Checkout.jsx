@@ -398,33 +398,33 @@ const Checkout = () => {
                 {savedAddresses.length > 0 && (
                   <div className="mb-6 space-y-3">
                     <p className="text-xs font-black text-slate-400 uppercase tracking-wider">Saved Addresses</p>
-                    <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
                       {savedAddresses.map((addr, idx) => {
                         const isSelected = selectedAddressIndex === idx && !showNewAddressForm;
                         return (
                           <div
                             key={idx}
                             onClick={() => selectSavedAddress(addr, idx)}
-                            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                            className={`p-3.5 sm:p-4 rounded-2xl border-2 cursor-pointer transition-all min-w-0 ${
                               isSelected
                                 ? "border-emerald-500 bg-emerald-50/50 shadow-md shadow-emerald-50"
                                 : "border-slate-100 bg-slate-50/50 hover:border-slate-200"
                             }`}
                           >
-                            <div className="flex items-start justify-between">
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-2">
-                                  <p className="font-extrabold text-sm text-slate-800">{addr.name}</p>
-                                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="space-y-1 min-w-0 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="font-extrabold text-xs sm:text-sm text-slate-800 truncate">{addr.name}</p>
+                                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 shrink-0">
                                     {addr.label || "Address"}
                                   </span>
                                 </div>
-                                <p className="text-xs text-slate-500 font-medium">
+                                <p className="text-xs text-slate-500 font-medium leading-snug break-words">
                                   {addr.houseNumber ? `${addr.houseNumber}, ` : ""}{addr.street}, {addr.city} - {addr.pincode}
                                 </p>
-                                <p className="text-xs text-slate-400 font-semibold">📞 {addr.phone}</p>
+                                <p className="text-xs text-slate-400 font-semibold truncate">📞 {addr.phone}</p>
                               </div>
-                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? "border-emerald-500 bg-emerald-500" : "border-slate-300"}`}>
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? "border-emerald-500 bg-emerald-500" : "border-slate-300"}`}>
                                 {isSelected && <Check size={12} className="text-white" />}
                               </div>
                             </div>

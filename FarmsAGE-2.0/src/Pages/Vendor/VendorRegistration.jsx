@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Store, MapPin, Tag, Image as ImageIcon, CheckCircle, AlertCircle, Clock, Mail, Phone } from "lucide-react";
+import { Store, MapPin, Tag, Image as ImageIcon, CheckCircle, AlertCircle, Clock, Mail, Phone, Navigation, Upload, Trash2, Camera } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import DetectLocation from "../../components/location/DetectLocation";
+import MapLocationPicker from "../../components/location/MapLocationPicker";
 
 const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
 
@@ -11,6 +12,7 @@ const VendorRegistration = ({ onStatusChange }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [showMapPicker, setShowMapPicker] = useState(false);
   
   const [formData, setFormData] = useState({
     storeName: user?.storeName || "",
@@ -25,6 +27,22 @@ const VendorRegistration = ({ onStatusChange }) => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image file size must be less than 5MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev) => ({ ...prev, storeImage: reader.result }));
+        setError("");
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -163,34 +181,112 @@ const VendorRegistration = ({ onStatusChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-2">
-                <ImageIcon size={16} className="text-emerald-600" />
-                Store Image URL
+              <label className="block text-sm font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <ImageIcon size={16} className="text-emerald-600" />
+                  Store Banner / Photo
+                </span>
+                <span className="text-[11px] font-semibold text-slate-400">
+                  PNG, JPG or WEBP (Max 5MB)
+                </span>
               </label>
-              <input
-                type="url"
-                name="storeImage"
-                required
-                value={formData.storeImage}
-                onChange={handleChange}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl py-3 px-4 focus:border-emerald-500 outline-none transition-all font-medium text-slate-800"
-              />
+
+              {formData.storeImage ? (
+                <div className="relative group rounded-2xl overflow-hidden border-2 border-emerald-200 bg-slate-900 shadow-md">
+                  <img
+                    src={formData.storeImage}
+                    alt="Store Preview"
+                    className="w-full h-44 object-cover group-hover:opacity-90 transition-opacity"
+                  />
+                  <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                    <label className="px-3.5 py-2 bg-white/90 hover:bg-white text-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-lg transition-transform active:scale-95">
+                      <Upload size={14} className="text-emerald-600" />
+                      <span>Change Photo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, storeImage: "" }))}
+                      className="px-3.5 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg transition-transform active:scale-95 cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                      <span>Remove</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <label className="border-2 border-dashed border-slate-200 hover:border-emerald-500 bg-slate-50 hover:bg-emerald-50/50 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all group text-center">
+                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 group-hover:border-emerald-200 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 shadow-sm mb-2 transition-colors">
+                    <Camera size={22} />
+                  </div>
+                  <p className="text-xs font-extrabold text-slate-700 group-hover:text-emerald-800">
+                    Click to upload Store Photo
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Upload your shop logo or storefront photo
+                  </p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    required={!formData.storeImage}
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label className="block text-sm font-bold text-slate-700 flex items-center gap-2">
-                <MapPin size={16} className="text-emerald-600" />
-                Store Location
+            <div className="flex flex-col gap-3">
+              <label className="block text-sm font-bold text-slate-700 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <MapPin size={16} className="text-emerald-600" />
+                  Store Location on Map
+                </span>
+                <span className="text-xs font-semibold text-emerald-600">
+                  Interactive Map Pinning
+                </span>
               </label>
-              <DetectLocation onLocationDetected={(data) => {
-                setFormData(prev => ({
-                  ...prev,
-                  lat: data.latitude,
-                  lng: data.longitude,
-                  storeAddress: data.fullAddress || prev.storeAddress
-                }));
-              }} />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowMapPicker(true)}
+                  className="p-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-200 cursor-pointer"
+                >
+                  <Navigation size={16} />
+                  <span>Select Location on Map</span>
+                </button>
+
+                <DetectLocation onLocationDetected={(data) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    lat: data.latitude,
+                    lng: data.longitude,
+                    storeAddress: data.fullAddress || prev.storeAddress
+                  }));
+                }} />
+              </div>
+
+              {formData.lat && formData.lng && (
+                <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl text-xs text-emerald-900 font-semibold flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 truncate pr-2">
+                    <MapPin size={14} className="text-emerald-600 shrink-0" />
+                    Pinned Pin: <strong className="text-slate-900">{Number(formData.lat).toFixed(4)}, {Number(formData.lng).toFixed(4)}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowMapPicker(true)}
+                    className="text-emerald-700 font-black underline hover:text-emerald-900 shrink-0"
+                  >
+                    Adjust Map Pin
+                  </button>
+                </div>
+              )}
             </div>
 
             <div>
@@ -301,6 +397,26 @@ const VendorRegistration = ({ onStatusChange }) => {
           </button>
         </form>
       </div>
+
+      {/* Full Leaflet Interactive Map Picker Modal */}
+      <MapLocationPicker
+        isOpen={showMapPicker}
+        onClose={() => setShowMapPicker(false)}
+        onLocationSelect={(data) => {
+          setFormData((prev) => ({
+            ...prev,
+            lat: data.latitude,
+            lng: data.longitude,
+            storeAddress: data.fullAddress || (data.street ? `${data.street}, ${data.city}` : prev.storeAddress),
+          }));
+          setShowMapPicker(false);
+        }}
+        initialCoords={
+          formData.lat && formData.lng
+            ? { lat: parseFloat(formData.lat), lng: parseFloat(formData.lng) }
+            : null
+        }
+      />
     </div>
   );
 };

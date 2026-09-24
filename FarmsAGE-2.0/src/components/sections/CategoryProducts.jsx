@@ -49,6 +49,40 @@ const SIDEBAR_CATEGORIES = [
   },
 ];
 
+const checkIsOutOfStock = (p) => {
+  if (!p) return true;
+  const catName = (p.category || "").toLowerCase();
+  const prodName = (p.name || "").toLowerCase();
+  const isOrganic = p.isOrganic || catName.includes("organic") || prodName.includes("organic");
+  const isFruitsOrVegetables = 
+    (catName === "vegetables" || catName === "fruits" || catName === "fresh vegetables" || catName === "fresh fruits") && !isOrganic;
+
+  return (
+    !isFruitsOrVegetables ||
+    p.quantity === 0 || 
+    p.quantity === '0' || 
+    p.isOutOfStock === true || 
+    p.inStock === false ||
+    p.stockStatus === 'out_of_stock'
+  );
+};
+
+const sortInStockFirst = (list, sortBy = "Relevance") => {
+  return [...list].sort((a, b) => {
+    const aOut = checkIsOutOfStock(a) ? 1 : 0;
+    const bOut = checkIsOutOfStock(b) ? 1 : 0;
+    if (aOut !== bOut) {
+      return aOut - bOut; // In-stock (0) first, Out-of-stock (1) last
+    }
+    if (sortBy === "Price: Low to High") {
+      return Number(a.price) - Number(b.price);
+    } else if (sortBy === "Price: High to Low") {
+      return Number(b.price) - Number(a.price);
+    }
+    return 0;
+  });
+};
+
 const CategoryProducts = ({ title = "All Products", category = "All", productsData: propProducts = null }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -94,10 +128,32 @@ const CategoryProducts = ({ title = "All Products", category = "All", productsDa
   // Fetch paginated products from API with static fallback
   const fetchProducts = useCallback(async () => {
     setLoading(true);
+    const limit = 12;
+
+    // If propProducts is explicitly supplied (e.g. VendorStore), paginate locally
+    if (propProducts && Array.isArray(propProducts)) {
+      let filtered = [...propProducts];
+      if (debouncedSearch.trim()) {
+        const q = debouncedSearch.toLowerCase().trim();
+        filtered = filtered.filter(p => p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q));
+      }
+      const sorted = sortInStockFirst(filtered, sortBy);
+      const total = sorted.length;
+      const pages = Math.ceil(total / limit) || 1;
+      const startIndex = (currentPage - 1) * limit;
+      const paginated = sorted.slice(startIndex, startIndex + limit);
+
+      setProducts(paginated);
+      setTotalProducts(total);
+      setTotalPages(pages);
+      setLoading(false);
+      return;
+    }
+
     try {
       const params = new URLSearchParams({
         page: String(currentPage),
-        limit: "18",
+        limit: String(limit),
         sortBy,
       });
 
@@ -112,7 +168,8 @@ const CategoryProducts = ({ title = "All Products", category = "All", productsDa
       const data = await res.json();
 
       if (data && Array.isArray(data.products)) {
-        setProducts(data.products);
+        const sorted = sortInStockFirst(data.products, sortBy);
+        setProducts(sorted);
         setTotalProducts(data.totalProducts || data.products.length);
         setTotalPages(data.totalPages || 1);
         setLoading(false);
@@ -122,8 +179,8 @@ const CategoryProducts = ({ title = "All Products", category = "All", productsDa
       console.warn("API pagination fetch warning, using static fallback:", err.message);
     }
 
-    // Static Fallback
-    let staticList = propProducts || [...productsData, ...fruitsData, ...organicData, ...dairyData];
+    // Static Fallback - STRICTLY 12 ITEMS PER PAGE
+    let staticList = [...productsData, ...fruitsData, ...organicData, ...dairyData];
     if (category && category !== "All") {
       if (category === "Organic") {
         staticList = staticList.filter(p => p.isOrganic || p.category === "Organic");
@@ -136,16 +193,11 @@ const CategoryProducts = ({ title = "All Products", category = "All", productsDa
       staticList = staticList.filter(p => p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q));
     }
 
-    if (sortBy === "Price: Low to High") {
-      staticList.sort((a, b) => Number(a.price) - Number(b.price));
-    } else if (sortBy === "Price: High to Low") {
-      staticList.sort((a, b) => Number(b.price) - Number(a.price));
-    }
-
-    const total = staticList.length;
-    const pages = Math.ceil(total / 18) || 1;
-    const startIndex = (currentPage - 1) * 18;
-    const paginated = staticList.slice(startIndex, startIndex + 18);
+    const sorted = sortInStockFirst(staticList, sortBy);
+    const total = sorted.length;
+    const pages = Math.ceil(total / limit) || 1;
+    const startIndex = (currentPage - 1) * limit;
+    const paginated = sorted.slice(startIndex, startIndex + limit);
 
     setProducts(paginated);
     setTotalProducts(total);
@@ -324,7 +376,7 @@ const CategoryProducts = ({ title = "All Products", category = "All", productsDa
                 ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6 lg:gap-8"
                 : "flex flex-col gap-3"
             }>
-              {Array.from({ length: 18 }).map((_, idx) => (
+              {Array.from({ length: 12 }).map((_, idx) => (
                 <div key={idx} className="bg-white rounded-2xl h-64 sm:h-72 p-3 sm:p-4 border border-slate-100 flex flex-col gap-3 animate-pulse">
                   <div className="w-full h-32 sm:h-36 bg-slate-100 rounded-xl" />
                   <div className="w-3/4 h-3.5 bg-slate-100 rounded-md" />

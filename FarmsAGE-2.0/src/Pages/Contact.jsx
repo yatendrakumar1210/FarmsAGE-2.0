@@ -40,10 +40,10 @@ const Contact = () => {
   ];
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen pt-28 pb-20">
-      <div className="max-w-7xl mx-auto px-6">
+    <div className="bg-[#F8FAFC] min-h-screen pt-10 sm:pt-16 md:pt-28 pb-10 sm:pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* 1. Header Section */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-16">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -55,24 +55,24 @@ const Contact = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-6xl font-black text-slate-800 mt-4 leading-tight"
+            className="text-2xl sm:text-4xl md:text-6xl font-black text-slate-800 mt-4 leading-tight"
           >
             We're here to help you{" "}
             <span className="text-emerald-600">Grow & Eat.</span>
           </motion.h1>
-          <p className="text-slate-500 mt-6 text-lg font-medium">
+          <p className="text-slate-500 mt-4 sm:mt-6 text-sm sm:text-lg font-medium px-2 sm:px-0">
             Have a question about your order or want to partner with us? Our
             team in NCR is ready to assist you.
           </p>
         </div>
 
         {/* 2. Contact Cards Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-10 sm:mb-20">
           {contactMethods.map((method, index) => (
             <motion.div
               key={index}
               whileHover={{ y: -5 }}
-              className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-emerald-100/30 transition-all text-center group"
+              className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-emerald-100/30 transition-all text-center group"
             >
               <div
                 className={`w-16 h-16 ${method.bg} ${method.color} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform`}
@@ -91,14 +91,14 @@ const Contact = () => {
         </div>
 
         {/* 3. Main Contact Area: Form & Map */}
-        <div className="grid lg:grid-cols-2 gap-12 bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 overflow-hidden border border-gray-50">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-0 bg-white rounded-2xl sm:rounded-[3rem] shadow-2xl shadow-slate-200/50 overflow-hidden border border-gray-50">
           {/* Contact Form */}
-          <div className="p-8 md:p-12">
+          <div className="p-5 sm:p-8 md:p-12">
             <h2 className="text-2xl font-black text-slate-800 mb-8 flex items-center gap-3">
               Send us a Message <Send size={20} className="text-emerald-500" />
             </h2>
             <form className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
                     Full Name
@@ -137,7 +137,7 @@ const Contact = () => {
           </div>
 
           {/* Sidebar / Info Area */}
-          <div className="bg-slate-900 p-8 md:p-12 text-white relative overflow-hidden">
+          <div className="bg-slate-900 p-6 sm:p-8 md:p-12 text-white relative overflow-hidden">
             {/* Background pattern */}
             <div className="absolute inset-0 opacity-10 pointer-events-none">
               <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full blur-[100px]" />

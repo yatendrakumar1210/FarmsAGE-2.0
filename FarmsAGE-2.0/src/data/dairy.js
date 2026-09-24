@@ -2,6 +2,8 @@ const dairy = [
   {
     id: 1,
     name: "Organic Milk - 1L",
+    category: "Dairy",
+    quantity: 0,
     price: 60,
     oldPrice: 75,
     discount: "20% OFF",
@@ -10,6 +12,8 @@ const dairy = [
   {
     id: 2,
     name: "Butter",
+    category: "Dairy",
+    quantity: 0,
     price: 120,
     oldPrice: 150,
     discount: "20% OFF",
@@ -18,6 +22,8 @@ const dairy = [
   {
     id: 3,
     name: "Cheese",
+    category: "Dairy",
+    quantity: 0,
     price: 180,
     oldPrice: 220,
     discount: "18% OFF",
@@ -26,6 +32,8 @@ const dairy = [
   {
     id: 4,
     name: "Paneer",
+    category: "Dairy",
+    quantity: 0,
     price: 220,
     oldPrice: 260,
     discount: "15% OFF",
@@ -34,6 +42,8 @@ const dairy = [
   {
     id: 5,
     name: "Curd (Yogurt)",
+    category: "Dairy",
+    quantity: 0,
     price: 50,
     oldPrice: 65,
     discount: "23% OFF",
@@ -42,6 +52,8 @@ const dairy = [
   {
     id: 6,
     name: "Cream",
+    category: "Dairy",
+    quantity: 0,
     price: 95,
     oldPrice: 120,
     discount: "21% OFF",
@@ -50,6 +62,8 @@ const dairy = [
   {
     id: 7,
     name: "Ghee",
+    category: "Dairy",
+    quantity: 0,
     price: 550,
     oldPrice: 620,
     discount: "11% OFF",
@@ -58,6 +72,8 @@ const dairy = [
   {
     id: 8,
     name: "Buttermilk",
+    category: "Dairy",
+    quantity: 0,
     price: 35,
     oldPrice: 50,
     discount: "30% OFF",
@@ -66,6 +82,8 @@ const dairy = [
   {
     id: 9,
     name: "Mozzarella Cheese",
+    category: "Dairy",
+    quantity: 0,
     price: 210,
     oldPrice: 260,
     discount: "19% OFF",
@@ -74,6 +92,8 @@ const dairy = [
   {
     id: 10,
     name: "Cheddar Cheese",
+    category: "Dairy",
+    quantity: 0,
     price: 230,
     oldPrice: 280,
     discount: "18% OFF",
@@ -82,6 +102,8 @@ const dairy = [
   {
     id: 11,
     name: "Condensed Milk",
+    category: "Dairy",
+    quantity: 0,
     price: 95,
     oldPrice: 120,
     discount: "21% OFF",
@@ -90,6 +112,8 @@ const dairy = [
   {
     id: 12,
     name: "Milk Powder",
+    category: "Dairy",
+    quantity: 0,
     price: 320,
     oldPrice: 360,
     discount: "11% OFF",
@@ -98,6 +122,8 @@ const dairy = [
   {
     id: 13,
     name: "Greek Yogurt",
+    category: "Dairy",
+    quantity: 0,
     price: 120,
     oldPrice: 150,
     discount: "20% OFF",
@@ -106,6 +132,8 @@ const dairy = [
   {
     id: 14,
     name: "Ricotta Cheese",
+    category: "Dairy",
+    quantity: 0,
     price: 260,
     oldPrice: 310,
     discount: "16% OFF",
@@ -114,6 +142,8 @@ const dairy = [
   {
     id: 15,
     name: "Cottage Cheese",
+    category: "Dairy",
+    quantity: 0,
     price: 150,
     oldPrice: 190,
     discount: "21% OFF",
@@ -122,6 +152,8 @@ const dairy = [
   {
     id: 16,
     name: "Flavored Milk",
+    category: "Dairy",
+    quantity: 0,
     price: 45,
     oldPrice: 60,
     discount: "25% OFF",
@@ -130,6 +162,8 @@ const dairy = [
   {
     id: 17,
     name: "Kefir",
+    category: "Dairy",
+    quantity: 0,
     price: 160,
     oldPrice: 200,
     discount: "20% OFF",
@@ -138,6 +172,8 @@ const dairy = [
   {
     id: 18,
     name: "Ice Cream",
+    category: "Dairy",
+    quantity: 0,
     price: 120,
     oldPrice: 150,
     discount: "20% OFF",
@@ -146,6 +182,8 @@ const dairy = [
   {
     id: 19,
     name: "Whipping Cream",
+    category: "Dairy",
+    quantity: 0,
     price: 140,
     oldPrice: 170,
     discount: "18% OFF",
@@ -154,6 +192,8 @@ const dairy = [
   {
     id: 20,
     name: "Lassi",
+    category: "Dairy",
+    quantity: 0,
     price: 40,
     oldPrice: 55,
     discount: "27% OFF",
@@ -162,5 +202,3 @@ const dairy = [
 ];
 
 export default dairy;
-
-

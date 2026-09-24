@@ -2,6 +2,9 @@ const organic = [
   {
     id: 1,
     name: "Organic Tomato",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 40,
     oldPrice: 55,
     discount: "27% OFF",
@@ -10,6 +13,9 @@ const organic = [
   {
     id: 2,
     name: "Organic Potato",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 30,
     oldPrice: 45,
     discount: "33% OFF",
@@ -18,6 +24,9 @@ const organic = [
   {
     id: 3,
     name: "Organic Onion",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 45,
     oldPrice: 60,
     discount: "25% OFF",
@@ -26,6 +35,9 @@ const organic = [
   {
     id: 4,
     name: "Organic Carrot",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 50,
     oldPrice: 70,
     discount: "28% OFF",
@@ -34,6 +46,9 @@ const organic = [
   {
     id: 5,
     name: "Organic Cabbage",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 35,
     oldPrice: 50,
     discount: "30% OFF",
@@ -42,6 +57,9 @@ const organic = [
   {
     id: 6,
     name: "Organic Cauliflower",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 48,
     oldPrice: 65,
     discount: "26% OFF",
@@ -50,6 +68,9 @@ const organic = [
   {
     id: 7,
     name: "Organic Spinach",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 25,
     oldPrice: 35,
     discount: "28% OFF",
@@ -58,6 +79,9 @@ const organic = [
   {
     id: 8,
     name: "Organic Brinjal",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 52,
     oldPrice: 70,
     discount: "25% OFF",
@@ -66,6 +90,9 @@ const organic = [
   {
     id: 9,
     name: "Organic Capsicum",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 95,
     oldPrice: 120,
     discount: "21% OFF",
@@ -74,6 +101,9 @@ const organic = [
   {
     id: 10,
     name: "Organic Green Chilli",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 60,
     oldPrice: 80,
     discount: "25% OFF",
@@ -82,6 +112,9 @@ const organic = [
   {
     id: 11,
     name: "Organic Radish",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 28,
     oldPrice: 40,
     discount: "30% OFF",
@@ -90,6 +123,9 @@ const organic = [
   {
     id: 12,
     name: "Organic Bottle Gourd",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 38,
     oldPrice: 55,
     discount: "31% OFF",
@@ -98,6 +134,9 @@ const organic = [
   {
     id: 13,
     name: "Organic Pumpkin",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 45,
     oldPrice: 65,
     discount: "30% OFF",
@@ -106,6 +145,9 @@ const organic = [
   {
     id: 14,
     name: "Organic Okra",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 58,
     oldPrice: 75,
     discount: "22% OFF",
@@ -114,6 +156,9 @@ const organic = [
   {
     id: 15,
     name: "Organic Broccoli",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 120,
     oldPrice: 150,
     discount: "20% OFF",
@@ -122,6 +167,9 @@ const organic = [
   {
     id: 16,
     name: "Organic Mushroom",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 110,
     oldPrice: 140,
     discount: "21% OFF",
@@ -130,6 +178,9 @@ const organic = [
   {
     id: 17,
     name: "Organic Ginger",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 90,
     oldPrice: 120,
     discount: "25% OFF",
@@ -138,6 +189,9 @@ const organic = [
   {
     id: 18,
     name: "Organic Garlic",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 95,
     oldPrice: 130,
     discount: "27% OFF",
@@ -146,6 +200,9 @@ const organic = [
   {
     id: 19,
     name: "Organic Cucumber",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 35,
     oldPrice: 50,
     discount: "30% OFF",
@@ -154,6 +211,9 @@ const organic = [
   {
     id: 20,
     name: "Organic Lemon",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 30,
     oldPrice: 45,
     discount: "33% OFF",
@@ -162,6 +222,9 @@ const organic = [
   {
     id: 21,
     name: "Organic Beetroot",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 47,
     oldPrice: 62,
     discount: "24% OFF",
@@ -170,6 +233,9 @@ const organic = [
   {
     id: 22,
     name: "Organic Sweet Corn",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 40,
     oldPrice: 55,
     discount: "27% OFF",
@@ -178,6 +244,9 @@ const organic = [
   {
     id: 23,
     name: "Organic Green Peas",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 65,
     oldPrice: 90,
     discount: "28% OFF",
@@ -186,6 +255,9 @@ const organic = [
   {
     id: 24,
     name: "Organic Mint Leaves",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 20,
     oldPrice: 30,
     discount: "33% OFF",
@@ -194,6 +266,9 @@ const organic = [
   {
     id: 25,
     name: "Organic Coriander",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 22,
     oldPrice: 32,
     discount: "31% OFF",
@@ -202,6 +277,9 @@ const organic = [
   {
     id: 26,
     name: "Organic Spring Onion",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 32,
     oldPrice: 45,
     discount: "29% OFF",
@@ -210,6 +288,9 @@ const organic = [
   {
     id: 27,
     name: "Organic Red Capsicum",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 110,
     oldPrice: 150,
     discount: "27% OFF",
@@ -218,6 +299,9 @@ const organic = [
   {
     id: 28,
     name: "Organic Yellow Capsicum",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 115,
     oldPrice: 150,
     discount: "23% OFF",
@@ -226,6 +310,9 @@ const organic = [
   {
     id: 29,
     name: "Organic Zucchini",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 60,
     oldPrice: 80,
     discount: "25% OFF",
@@ -234,11 +321,14 @@ const organic = [
   {
     id: 30,
     name: "Organic Lettuce",
+    category: "Organic",
+    isOrganic: true,
+    quantity: 0,
     price: 40,
     oldPrice: 55,
     discount: "27% OFF",
     image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=600",
   },
 ];
- export default organic;
 
+export default organic;

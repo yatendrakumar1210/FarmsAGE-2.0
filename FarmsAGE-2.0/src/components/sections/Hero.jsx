@@ -50,7 +50,7 @@ const Hero = () => {
                 <div className="inline-flex items-center gap-1.5 bg-emerald-500 text-white px-2.5 sm:px-4 py-0.5 sm:py-1.5 rounded-full mb-2 sm:mb-6 shadow-md shadow-emerald-500/20">
                   <TrendingUp size={12} className="shrink-0" />
                   <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">
-                    ⚡ 10-15 Min Delivery
+                    ⚡ 30-40 Min Delivery
                   </span>
                 </div>
 

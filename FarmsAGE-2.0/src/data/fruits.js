@@ -2,6 +2,8 @@ const fruits = [
   {
     id: 1,
     name: "Apple",
+    category: "Fruits",
+    quantity: 100,
     price: 140,
     oldPrice: 180,
     discount: "22% OFF",
@@ -11,6 +13,8 @@ const fruits = [
   {
     id: 2,
     name: "Banana",
+    category: "Fruits",
+    quantity: 100,
     price: 50,
     oldPrice: 65,
     discount: "23% OFF",
@@ -21,6 +25,8 @@ const fruits = [
   {
     id: 3,
     name: "Orange",
+    category: "Fruits",
+    quantity: 100,
     price: 80,
     oldPrice: 100,
     discount: "20% OFF",
@@ -30,6 +36,8 @@ const fruits = [
   {
     id: 4,
     name: "Mango",
+    category: "Fruits",
+    quantity: 100,
     price: 120,
     oldPrice: 150,
     discount: "20% OFF",
@@ -39,6 +47,8 @@ const fruits = [
   {
     id: 5,
     name: "Pineapple",
+    category: "Fruits",
+    quantity: 100,
     price: 90,
     oldPrice: 120,
     discount: "25% OFF",
@@ -49,6 +59,8 @@ const fruits = [
   {
     id: 6,
     name: "Strawberry",
+    category: "Fruits",
+    quantity: 100,
     price: 160,
     oldPrice: 200,
     discount: "20% OFF",
@@ -59,6 +71,8 @@ const fruits = [
   {
     id: 7,
     name: "Watermelon",
+    category: "Fruits",
+    quantity: 100,
     price: 70,
     oldPrice: 90,
     discount: "22% OFF",
@@ -68,6 +82,8 @@ const fruits = [
   {
     id: 8,
     name: "Papaya",
+    category: "Fruits",
+    quantity: 100,
     price: 60,
     oldPrice: 80,
     discount: "25% OFF",
@@ -77,6 +93,8 @@ const fruits = [
   {
     id: 9,
     name: "Guava",
+    category: "Fruits",
+    quantity: 100,
     price: 55,
     oldPrice: 75,
     discount: "27% OFF",
@@ -86,6 +104,8 @@ const fruits = [
   {
     id: 10,
     name: "Pomegranate",
+    category: "Fruits",
+    quantity: 100,
     price: 150,
     oldPrice: 190,
     discount: "21% OFF",
@@ -95,6 +115,8 @@ const fruits = [
   {
     id: 11,
     name: "Kiwi",
+    category: "Fruits",
+    quantity: 100,
     price: 180,
     oldPrice: 220,
     discount: "18% OFF",
@@ -105,6 +127,8 @@ const fruits = [
   {
     id: 12,
     name: "Blueberry",
+    category: "Fruits",
+    quantity: 100,
     price: 250,
     oldPrice: 300,
     discount: "16% OFF",
@@ -114,6 +138,8 @@ const fruits = [
   {
     id: 13,
     name: "Cherry",
+    category: "Fruits",
+    quantity: 100,
     price: 320,
     oldPrice: 400,
     discount: "20% OFF",
@@ -123,6 +149,8 @@ const fruits = [
   {
     id: 14,
     name: "Grapes",
+    category: "Fruits",
+    quantity: 100,
     price: 110,
     oldPrice: 140,
     discount: "21% OFF",
@@ -132,6 +160,8 @@ const fruits = [
   {
     id: 15,
     name: "Pear",
+    category: "Fruits",
+    quantity: 100,
     price: 130,
     oldPrice: 160,
     discount: "18% OFF",
@@ -141,6 +171,8 @@ const fruits = [
   {
     id: 16,
     name: "Peach",
+    category: "Fruits",
+    quantity: 100,
     price: 160,
     oldPrice: 200,
     discount: "20% OFF",
@@ -150,6 +182,8 @@ const fruits = [
   {
     id: 17,
     name: "Plum",
+    category: "Fruits",
+    quantity: 100,
     price: 140,
     oldPrice: 180,
     discount: "22% OFF",
@@ -159,6 +193,8 @@ const fruits = [
   {
     id: 18,
     name: "Dragon Fruit",
+    category: "Fruits",
+    quantity: 100,
     price: 200,
     oldPrice: 250,
     discount: "20% OFF",
@@ -169,6 +205,8 @@ const fruits = [
   {
     id: 19,
     name: "Coconut",
+    category: "Fruits",
+    quantity: 100,
     price: 40,
     oldPrice: 50,
     discount: "20% OFF",
@@ -179,6 +217,8 @@ const fruits = [
   {
     id: 20,
     name: "Avocado",
+    category: "Fruits",
+    quantity: 100,
     price: 250,
     oldPrice: 320,
     discount: "21% OFF",
@@ -188,4 +228,3 @@ const fruits = [
 ];
 
 export default fruits;
-

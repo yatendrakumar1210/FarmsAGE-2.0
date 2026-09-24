@@ -12,7 +12,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // REGISTER USER (Phone + Password)
 exports.register = async (req, res) => {
   try {
-    const { name, phone, email, password } = req.body;
+    const { name, phone, email, password, role } = req.body;
 
     if (!phone || !password) {
       return res.status(400).json({ message: "Phone number and password are required" });
@@ -23,18 +23,33 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "User with this phone number already exists" });
     }
 
+    if (email && email.trim()) {
+      const existingEmail = await User.findOne({ email: email.trim() });
+      if (existingEmail) {
+        return res.status(400).json({ message: "User with this email already exists" });
+      }
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({
+    const validRole = role && ["user", "vendor"].includes(role.toLowerCase()) ? role.toLowerCase() : "user";
+
+    const userData = {
       name: name || "",
       phone,
-      email: email || "",
       password: hashedPassword,
+      role: validRole,
       authProvider: "password",
       isProfileComplete: true,
-      isVerified: true
-    });
+      isVerified: true,
+    };
+
+    if (email && email.trim()) {
+      userData.email = email.trim();
+    }
+
+    const user = await User.create(userData);
 
     const token = jwt.sign(
       { id: user._id, role: user.role },
