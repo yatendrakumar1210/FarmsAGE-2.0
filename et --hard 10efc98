@@ -1,0 +1,42 @@
+[33m4285ae2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m ready for production
+[33m10efc98[m Vendor section polished
+[33m4bf0b13[m Homepage components polished
+[33m892c09c[m Phone View Updated with some Ui changes (Respnosive)
+[33m7262df2[m Map Intgration for detecting location and tarck orders and some ui changes
+[33m28271df[m server response time reduced
+[33m47e7b4e[m new updates
+[33mb7654ba[m navbar and notification funtion error fix
+[33mb8070fa[m nodemailer notification function added
+[33m6cbf214[m bugs fixed in vendor panel
+[33mea5d796[m vendor panel updated
+[33mb3738a5[m Optimizing Web Performance Issues
+[33m01d7405[m Admin page is now something responsive (maybe)
+[33m1befe13[m Footer height reduced
+[33m3d78593[m vendor dashboard added
+[33m2c5c5da[m admin panel modified
+[33m67f2427[m UI updated
+[33mb237151[m admin layout updated
+[33m99b1df3[m admin panel bugs fixed
+[33mdd46de5[m google auth error fix
+[33mb2c3524[m API updated
+[33m9fece24[m backend ready for deployed
+[33mbce2487[m error resolved
+[33md48facf[m google auth api added
+[33m2208dae[m Farmsage is now responsive, (navbar & pages are left)
+[33m703087a[m UI modified
+[33m64bd7b1[m db schema modified
+[33me68928c[m location detect function updated
+[33mce97732[m admin dashboard added
+[33m821f07b[m Product UI modified
+[33ma06d211[m COD function completed with user order section
+[33m83bb893[m razorpaypayment method added
+[33m5062824[m auth system updated
+[33m07d9b11[m removed .env file
+[33m1b7a7d9[m removed node_modules
+[33m01a0dca[m  database models created
+[33mcacdf3b[m folder restore
+[33m3ef5594[m Fixed submodule issue completely
+[33m8888967[m Updated project structure: added new  folder
+[33m6889746[m cart function completed
+[33m81789ea[m Nearby vendors option added
+[33mc0073c2[m code updated

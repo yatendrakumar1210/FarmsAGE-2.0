@@ -332,30 +332,30 @@ const Checkout = () => {
     <>
       <Navbar />
       <div className="bg-[#F8FAFC] min-h-screen pt-4 sm:pt-8 pb-32 sm:pb-20 font-sans">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center gap-4 mb-8">
-            <Link to="/cart" className="p-2 hover:bg-white rounded-xl transition-colors border border-transparent hover:border-slate-200">
-              <ArrowLeft size={24} />
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 w-full min-w-0">
+          <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <Link to="/cart" className="p-2 hover:bg-white rounded-xl transition-colors border border-transparent hover:border-slate-200 shrink-0">
+              <ArrowLeft size={22} />
             </Link>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-800">Checkout</h1>
+            <h1 className="text-xl sm:text-3xl font-black text-slate-800 truncate">Checkout</h1>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8 items-start">
-            <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+          <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 items-start w-full min-w-0">
+            <div className="lg:col-span-2 space-y-6 min-w-0 w-full">
+              <div className="bg-white p-4 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-gray-100 shadow-sm min-w-0 w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100/80 text-emerald-600">
-                      <Truck size={24} />
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="bg-emerald-50 p-2.5 sm:p-3 rounded-2xl border border-emerald-100/80 text-emerald-600 shrink-0">
+                      <Truck size={22} className="sm:w-6 sm:h-6" />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-xl font-black text-slate-800">Delivery Address</h2>
-                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-lg sm:text-xl font-black text-slate-800">Delivery Address</h2>
+                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full uppercase shrink-0">
                           ⚡ 10-15 Mins
                         </span>
                       </div>
-                      <p className="text-slate-500 text-xs font-semibold">Select saved address or pinpoint on interactive map</p>
+                      <p className="text-slate-500 text-xs font-semibold truncate sm:whitespace-normal">Select saved address or pinpoint on interactive map</p>
                     </div>
                   </div>
 
@@ -363,7 +363,7 @@ const Checkout = () => {
                   <button
                     type="button"
                     onClick={() => setShowMapPicker(true)}
-                    className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-black text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-95 shrink-0"
+                    className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-black text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-95 shrink-0 w-full sm:w-auto"
                   >
                     <Navigation size={15} />
                     <span>Pick on Map</span>
@@ -372,12 +372,12 @@ const Checkout = () => {
 
                 {/* GPS Pin Confirmation Banner */}
                 {address.latitude && address.longitude && (
-                  <div className="mb-6 p-3.5 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200/80 flex items-center justify-between">
-                    <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="mb-6 p-3 sm:p-3.5 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
                       <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
                         📍
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="text-xs font-black text-emerald-950">GPS Location Pin Confirmed</p>
                         <p className="text-[11px] font-semibold text-emerald-700 truncate">
                           {address.street || "Pin Dropped"}, {address.city} (Lat: {Number(address.latitude).toFixed(4)}, Lng: {Number(address.longitude).toFixed(4)})
@@ -387,7 +387,7 @@ const Checkout = () => {
                     <button
                       type="button"
                       onClick={() => setShowMapPicker(true)}
-                      className="text-xs font-black text-emerald-700 hover:text-emerald-900 bg-white px-3 py-1.5 rounded-lg border border-emerald-200 shadow-sm shrink-0 ml-2"
+                      className="text-xs font-black text-emerald-700 hover:text-emerald-900 bg-white px-3 py-1.5 rounded-lg border border-emerald-200 shadow-sm shrink-0 self-start sm:self-auto"
                     >
                       Adjust Pin
                     </button>
@@ -396,7 +396,7 @@ const Checkout = () => {
 
                 {/* 1-Click Saved Addresses List */}
                 {savedAddresses.length > 0 && (
-                  <div className="mb-6 space-y-3">
+                  <div className="mb-6 space-y-3 min-w-0">
                     <p className="text-xs font-black text-slate-400 uppercase tracking-wider">Saved Addresses</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
                       {savedAddresses.map((addr, idx) => {
@@ -411,7 +411,7 @@ const Checkout = () => {
                                 : "border-slate-100 bg-slate-50/50 hover:border-slate-200"
                             }`}
                           >
-                            <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-start justify-between gap-2.5">
                               <div className="space-y-1 min-w-0 flex-1">
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <p className="font-extrabold text-xs sm:text-sm text-slate-800 truncate">{addr.name}</p>
@@ -424,7 +424,7 @@ const Checkout = () => {
                                 </p>
                                 <p className="text-xs text-slate-400 font-semibold truncate">📞 {addr.phone}</p>
                               </div>
-                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? "border-emerald-500 bg-emerald-500" : "border-slate-300"}`}>
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${isSelected ? "border-emerald-500 bg-emerald-500" : "border-slate-300"}`}>
                                 {isSelected && <Check size={12} className="text-white" />}
                               </div>
                             </div>
@@ -446,16 +446,16 @@ const Checkout = () => {
                         setAddress({ name: "", phone: "", street: "", city: "", pincode: "", houseNumber: "", landmark: "", latitude: null, longitude: null, label: "Home" });
                       }
                     }}
-                    className="inline-flex items-center gap-2 text-xs font-black text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-4 py-2.5 rounded-xl border border-emerald-200 transition-colors"
+                    className="inline-flex items-center justify-center gap-2 text-xs font-black text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-3.5 py-2.5 rounded-xl border border-emerald-200 transition-colors shrink-0"
                   >
                     {showNewAddressForm ? <Edit3 size={15} /> : <Plus size={15} />}
-                    {showNewAddressForm ? "Use Saved Address" : "+ Enter Different Address Form"}
+                    <span>{showNewAddressForm ? "Use Saved Address" : "+ Enter Different Address Form"}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setShowMapPicker(true)}
-                    className="inline-flex items-center gap-2 text-xs font-black text-slate-700 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200 px-4 py-2.5 rounded-xl transition-colors"
+                    className="inline-flex items-center justify-center gap-2 text-xs font-black text-slate-700 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200 px-3.5 py-2.5 rounded-xl transition-colors shrink-0"
                   >
                     <Navigation size={14} className="text-emerald-600" />
                     <span>Drop Pin on Map</span>
@@ -467,9 +467,9 @@ const Checkout = () => {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
-                    className="grid sm:grid-cols-2 gap-4 border-t border-slate-100 pt-6"
+                    className="grid sm:grid-cols-2 gap-4 border-t border-slate-100 pt-6 min-w-0"
                   >
-                    <div className="space-y-1">
+                    <div className="space-y-1 min-w-0">
                       <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                         <User size={13} className="text-emerald-500" /> Full Name
                       </label>
@@ -481,7 +481,7 @@ const Checkout = () => {
                         className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 min-w-0">
                       <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                         <Phone size={13} className="text-emerald-500" /> Phone Number
                       </label>
@@ -493,7 +493,7 @@ const Checkout = () => {
                         className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 min-w-0">
                       <label className="text-xs font-bold text-slate-700">Flat / House / Floor No.</label>
                       <input 
                         name="houseNumber"
@@ -503,7 +503,7 @@ const Checkout = () => {
                         className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 min-w-0">
                       <label className="text-xs font-bold text-slate-700">Landmark</label>
                       <input 
                         name="landmark"
@@ -513,7 +513,7 @@ const Checkout = () => {
                         className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
-                    <div className="sm:col-span-2 space-y-1">
+                    <div className="sm:col-span-2 space-y-1 min-w-0">
                       <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                         <MapPin size={13} className="text-emerald-500" /> Street / Society / Area
                       </label>
@@ -525,7 +525,7 @@ const Checkout = () => {
                         className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 min-w-0">
                       <label className="text-xs font-bold text-slate-700">City</label>
                       <input 
                         name="city"
@@ -535,7 +535,7 @@ const Checkout = () => {
                         className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs sm:text-sm font-bold focus:bg-white focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 min-w-0">
                       <label className="text-xs font-bold text-slate-700">Pincode</label>
                       <input 
                         name="pincode"
@@ -550,18 +550,18 @@ const Checkout = () => {
               </div>
 
               {/* Payment Section */}
-              <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="bg-emerald-50 p-3 rounded-2xl">
-                    <CreditCard size={24} className="text-emerald-600" />
+              <div className="bg-white p-4 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-gray-100 shadow-sm min-w-0 w-full">
+                <div className="flex items-center gap-3 mb-6 sm:mb-8">
+                  <div className="bg-emerald-50 p-2.5 sm:p-3 rounded-2xl shrink-0">
+                    <CreditCard size={22} className="text-emerald-600 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-slate-800">Payment Option</h2>
-                    <p className="text-slate-500 text-sm">Choose how you'd like to pay</p>
+                    <h2 className="text-lg sm:text-xl font-black text-slate-800">Payment Option</h2>
+                    <p className="text-slate-500 text-xs sm:text-sm">Choose how you'd like to pay</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 sm:gap-6">
+                <div className="grid grid-cols-2 gap-3 sm:gap-6 min-w-0">
                   <motion.button 
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
@@ -570,18 +570,18 @@ const Checkout = () => {
                       handleOnlinePayment();
                     }}
                     disabled={loading}
-                    className={`p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center gap-2 sm:gap-4 transition-all text-center ${
+                    className={`p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center gap-2 sm:gap-4 transition-all text-center min-w-0 ${
                       paymentMethod === "online"
                         ? "border-emerald-500 bg-emerald-50/80 shadow-md shadow-emerald-50"
                         : "border-slate-200 bg-white hover:border-slate-300"
                     }`}
                   >
-                    <div className="bg-white p-2.5 sm:p-3 rounded-xl sm:rounded-2xl shadow-sm text-emerald-600">
-                      <CreditCard size={24} className="sm:w-8 sm:h-8" />
+                    <div className="bg-white p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-sm text-emerald-600 shrink-0">
+                      <CreditCard size={20} className="sm:w-8 sm:h-8" />
                     </div>
-                    <div>
-                      <p className="font-black text-xs sm:text-base text-slate-900">Pay Online</p>
-                      <p className="text-[10px] sm:text-xs text-emerald-700 font-bold mt-0.5">UPI, Cards, Banking</p>
+                    <div className="min-w-0 w-full">
+                      <p className="font-black text-xs sm:text-base text-slate-900 truncate">Pay Online</p>
+                      <p className="text-[9px] sm:text-xs text-emerald-700 font-bold mt-0.5 truncate">UPI, Cards, Banking</p>
                     </div>
                   </motion.button>
 
@@ -593,34 +593,34 @@ const Checkout = () => {
                       handleCOD();
                     }}
                     disabled={loading}
-                    className={`p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center gap-2 sm:gap-4 transition-all text-center ${
+                    className={`p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center gap-2 sm:gap-4 transition-all text-center min-w-0 ${
                       paymentMethod === "cod"
                         ? "border-emerald-500 bg-emerald-50/80 shadow-md shadow-emerald-50"
                         : "border-slate-200 bg-white hover:border-slate-300"
                     }`}
                   >
-                    <div className="bg-slate-50 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl shadow-sm text-slate-700">
-                      <Box size={24} className="sm:w-8 sm:h-8" />
+                    <div className="bg-slate-50 p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-sm text-slate-700 shrink-0">
+                      <Box size={20} className="sm:w-8 sm:h-8" />
                     </div>
-                    <div>
-                      <p className="font-black text-xs sm:text-base text-slate-900">Cash On Delivery</p>
-                      <p className="text-[10px] sm:text-xs text-slate-500 font-bold mt-0.5">Pay when delivered</p>
+                    <div className="min-w-0 w-full">
+                      <p className="font-black text-xs sm:text-base text-slate-900 truncate">Cash On Delivery</p>
+                      <p className="text-[9px] sm:text-xs text-slate-500 font-bold mt-0.5 truncate">Pay on delivery</p>
                     </div>
                   </motion.button>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-emerald-100/20 sticky top-8">
-                <h3 className="text-xl font-black text-slate-800 mb-6">Order Summary</h3>
+            <div className="space-y-6 min-w-0 w-full">
+              <div className="bg-white p-4 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-gray-100 shadow-xl shadow-emerald-100/20 sticky top-8 min-w-0 w-full">
+                <h3 className="text-lg sm:text-xl font-black text-slate-800 mb-6">Order Summary</h3>
                 
-                <div className="space-y-3 mb-6 max-h-[340px] overflow-y-auto pr-1 custom-scrollbar">
+                <div className="space-y-3 mb-6 max-h-[340px] overflow-y-auto pr-1 custom-scrollbar min-w-0">
                   {cart.map((item, idx) => {
                     const itemId = item._id || item.id;
                     return (
-                      <div key={idx} className="flex items-center gap-3 bg-slate-50/60 p-2.5 rounded-2xl border border-slate-100">
-                        <div className="w-12 h-12 bg-white rounded-xl overflow-hidden shrink-0 border border-slate-100">
+                      <div key={idx} className="flex items-center gap-2.5 sm:gap-3 bg-slate-50/60 p-2.5 rounded-2xl border border-slate-100 min-w-0">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-xl overflow-hidden shrink-0 border border-slate-100">
                           <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -633,7 +633,7 @@ const Checkout = () => {
                                 const { newUnitPrice } = calculateNewUnitPrice(item, newWeight);
                                 updateItemWeight(itemId, item.weight, newWeight, newUnitPrice);
                               }}
-                              className="bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-wider rounded border border-emerald-200 hover:border-emerald-300 transition-colors block px-1.5 py-0.5 cursor-pointer outline-none"
+                              className="bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-wider rounded border border-emerald-200 hover:border-emerald-300 transition-colors block px-1 py-0.5 cursor-pointer outline-none max-w-full"
                             >
                               <option value="1 kg">1 kg</option>
                               <option value="500 g">500 g</option>
@@ -642,14 +642,14 @@ const Checkout = () => {
                               <option value="1 Piece">1 Piece</option>
                             </select>
                           </div>
-                          <p className="font-black text-emerald-600 text-xs mt-1">
+                          <p className="font-black text-emerald-600 text-xs mt-1 truncate">
                             ₹{item.price * item.quantity} 
                             <span className="text-[10px] text-slate-400 font-normal ml-1">(₹{item.price}/unit)</span>
                           </p>
                         </div>
 
                         {/* Quantity Controls */}
-                        <div className="flex items-center gap-1.5 bg-white px-2 py-1 rounded-xl border border-slate-200 shadow-sm shrink-0">
+                        <div className="flex items-center gap-1 bg-white px-1.5 py-1 rounded-xl border border-slate-200 shadow-sm shrink-0">
                           <button
                             type="button"
                             onClick={() => {
@@ -713,14 +713,14 @@ const Checkout = () => {
       />
       {/* Mobile Sticky Payment Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] p-3 pb-safe flex items-center justify-between gap-3">
-        <div className="pl-1 leading-tight">
+        <div className="pl-1 leading-tight shrink-0">
           <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Total to Pay</p>
           <p className="text-lg font-black text-slate-950">₹{total}</p>
         </div>
         <button
           onClick={paymentMethod === "online" ? handleOnlinePayment : handleCOD}
           disabled={loading}
-          className="flex-1 max-w-[240px] py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+          className="flex-1 max-w-[240px] py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-2 min-w-0 truncate"
         >
           {loading ? "Processing..." : paymentMethod === "online" ? `Pay ₹${total} Online` : `Place COD (₹${total})`}
         </button>
@@ -732,3 +732,4 @@ const Checkout = () => {
 };
 
 export default Checkout;
+
