@@ -1,6 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, ArrowLeft, Truck, CreditCard, Box, CheckCircle2, User, Phone, MapPin, Plus, Minus, Trash2, Check, Edit3, Navigation, Crosshair } from "lucide-react";
+import { 
+  ShoppingBag, 
+  ArrowLeft, 
+  Truck, 
+  CreditCard, 
+  Box, 
+  CheckCircle2, 
+  User, 
+  Phone, 
+  MapPin, 
+  Plus, 
+  Minus, 
+  Trash2, 
+  Check, 
+  Edit3, 
+  Navigation, 
+  ArrowRight,
+  ShieldCheck,
+  Loader2
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import Navbar from "../components/layout/Navbar";
@@ -157,7 +176,18 @@ const Checkout = () => {
   };
 
   const validateAddress = () => {
-    return address.name && address.phone && address.street && address.city && address.pincode;
+    return (
+      address.name && 
+      address.name.trim() !== "" && 
+      address.phone && 
+      address.phone.trim() !== "" && 
+      address.street && 
+      address.street.trim() !== "" && 
+      address.city && 
+      address.city.trim() !== "" && 
+      address.pincode && 
+      address.pincode.trim() !== ""
+    );
   };
 
   const selectSavedAddress = (addr, index) => {
@@ -168,7 +198,9 @@ const Checkout = () => {
 
   const handleOnlinePayment = async () => {
     if (!validateAddress()) {
-      alert("Please fill in all address details");
+      alert("Please fill in all address details (Name, Phone, Street, City, Pincode)");
+      setShowNewAddressForm(true);
+      window.scrollTo({ top: 180, behavior: 'smooth' });
       return;
     }
 
@@ -180,22 +212,21 @@ const Checkout = () => {
 
     setLoading(true);
     try {
-      // Auto-save address to user profile
       saveCurrentAddressToProfile(address);
 
       const isLoaded = await loadRazorpay();
       if (!isLoaded) {
-        alert("Razorpay SDK failed to load. Are you online?");
+        alert("Razorpay SDK failed to load. Please check your internet connection.");
         setLoading(false);
         return;
       }
 
       const orderData = {
         items: cart.map(item => ({
-          productId: item._id || item.id,
-          price: item.price,
+          productId: String(item._id || item.id),
+          price: Number(item.price),
           quantity: item.quantity,
-          weight: item.weight,
+          weight: item.weight || "1 kg",
           name: item.name,
           image: item.image,
           vendorId: item.vendorId || null
@@ -216,17 +247,20 @@ const Checkout = () => {
         handleAuthError("Session expired. Please log in again to complete your order.");
         return;
       }
-      if (!res.ok) throw new Error(data.message || "Failed to create order");
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to create order");
+      }
       const { order } = data;
 
       const options = {
-        key: "rzp_test_SWa3PA5oApBh4b",
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SWa3PA5oApBh4b",
         amount: order.amount,
-        currency: "INR",
+        currency: order.currency || "INR",
         name: "FarmsAGE 2.0",
         description: "Organic Fresh Produce",
         order_id: order.id,
         handler: async (response) => {
+          setLoading(true);
           try {
             const verifyData = {
               razorpay_order_id: response.razorpay_order_id,
@@ -255,11 +289,14 @@ const Checkout = () => {
             if (verifyResult.success) {
               playOrderSuccessSound();
               clearCart();
+              const returnedOrder = verifyResult.order || (verifyResult.allOrders && verifyResult.allOrders[0]) || { _id: "FARMS-" + Date.now() };
+              const returnedId = verifyResult.orderId || returnedOrder._id || "FARMS-" + Date.now();
+
               navigate("/order-success", { 
                 state: { 
-                  orderId: verifyResult.order._id,
+                  orderId: returnedId,
                   paymentMethod: 'online',
-                  order: verifyResult.order
+                  order: returnedOrder
                 } 
               });
             } else {
@@ -267,7 +304,14 @@ const Checkout = () => {
             }
           } catch (err) {
             console.error("Verification failed", err);
-            alert("Payment verification failed. Please contact support.");
+            alert("Payment verification failed: " + (err.message || "Please try again"));
+          } finally {
+            setLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setLoading(false);
           }
         },
         prefill: {
@@ -280,18 +324,24 @@ const Checkout = () => {
       };
 
       const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        console.error("Payment failed:", response.error);
+        alert(`Payment Failed: ${response.error.description || "Reason unknown"}`);
+        setLoading(false);
+      });
       rzp.open();
     } catch (err) {
       console.error("Order creation failed", err);
       alert(err.message || "Failed to initiate payment");
-    } finally {
       setLoading(false);
     }
   };
 
   const handleCOD = async () => {
     if (!validateAddress()) {
-      alert("Please fill in all address details");
+      alert("Please fill in all address details (Name, Phone, Street, City, Pincode)");
+      setShowNewAddressForm(true);
+      window.scrollTo({ top: 180, behavior: 'smooth' });
       return;
     }
 
@@ -303,15 +353,14 @@ const Checkout = () => {
 
     setLoading(true);
     try {
-      // Auto-save address to user profile
       saveCurrentAddressToProfile(address);
 
       const orderData = {
         items: cart.map(item => ({
-          productId: item._id || item.id,
-          price: item.price,
+          productId: String(item._id || item.id),
+          price: Number(item.price),
           quantity: item.quantity,
-          weight: item.weight,
+          weight: item.weight || "1 kg",
           name: item.name,
           image: item.image,
           vendorId: item.vendorId || null
@@ -338,11 +387,14 @@ const Checkout = () => {
       if (result.success) {
         playOrderSuccessSound();
         clearCart();
+        const returnedOrder = result.order || (result.allOrders && result.allOrders[0]) || { _id: "FARMS-" + Date.now() };
+        const returnedId = result.orderId || returnedOrder._id || "FARMS-" + Date.now();
+
         navigate("/order-success", { 
           state: { 
-            orderId: result.order._id,
+            orderId: returnedId,
             paymentMethod: 'cod',
-            order: result.order
+            order: returnedOrder
           } 
         });
       } else {
@@ -356,10 +408,25 @@ const Checkout = () => {
     }
   };
 
+  const handlePlaceOrder = () => {
+    if (paymentMethod === "online") {
+      handleOnlinePayment();
+    } else {
+      handleCOD();
+    }
+  };
+
   if (cart.length === 0) {
     return (
-       <div className="min-h-screen flex items-center justify-center">
-         <p>Your cart is empty. <Link to="/category/all" className="text-emerald-600 underline">Go back to shopping</Link></p>
+       <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+         <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-slate-100 max-w-md">
+           <ShoppingBag size={48} className="mx-auto text-emerald-500 mb-4" />
+           <h2 className="text-xl font-black text-slate-800 mb-2">Your Cart is Empty</h2>
+           <p className="text-sm text-slate-500 mb-6">Add fresh produce to your cart before proceeding to checkout.</p>
+           <Link to="/category/all" className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-xs shadow-md transition-all inline-block">
+             Explore Fresh Produce
+           </Link>
+         </div>
        </div>
     );
   }
@@ -378,6 +445,7 @@ const Checkout = () => {
 
           <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 items-start w-full min-w-0">
             <div className="lg:col-span-2 space-y-6 min-w-0 w-full">
+              {/* Address Section */}
               <div className="bg-white p-4 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-gray-100 shadow-sm min-w-0 w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <div className="flex items-center gap-3 min-w-0">
@@ -507,7 +575,7 @@ const Checkout = () => {
                   >
                     <div className="space-y-1 min-w-0">
                       <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                        <User size={13} className="text-emerald-500" /> Full Name
+                        <User size={13} className="text-emerald-500" /> Full Name *
                       </label>
                       <input 
                         name="name"
@@ -519,7 +587,7 @@ const Checkout = () => {
                     </div>
                     <div className="space-y-1 min-w-0">
                       <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                        <Phone size={13} className="text-emerald-500" /> Phone Number
+                        <Phone size={13} className="text-emerald-500" /> Phone Number *
                       </label>
                       <input 
                         name="phone"
@@ -551,7 +619,7 @@ const Checkout = () => {
                     </div>
                     <div className="sm:col-span-2 space-y-1 min-w-0">
                       <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                        <MapPin size={13} className="text-emerald-500" /> Street / Society / Area
+                        <MapPin size={13} className="text-emerald-500" /> Street / Society / Area *
                       </label>
                       <input 
                         name="street"
@@ -562,7 +630,7 @@ const Checkout = () => {
                       />
                     </div>
                     <div className="space-y-1 min-w-0">
-                      <label className="text-xs font-bold text-slate-700">City</label>
+                      <label className="text-xs font-bold text-slate-700">City *</label>
                       <input 
                         name="city"
                         value={address.city}
@@ -572,7 +640,7 @@ const Checkout = () => {
                       />
                     </div>
                     <div className="space-y-1 min-w-0">
-                      <label className="text-xs font-bold text-slate-700">Pincode</label>
+                      <label className="text-xs font-bold text-slate-700">Pincode *</label>
                       <input 
                         name="pincode"
                         value={address.pincode}
@@ -585,7 +653,7 @@ const Checkout = () => {
                 )}
               </div>
 
-              {/* Payment Section */}
+              {/* Payment Option Selection */}
               <div className="bg-white p-4 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-gray-100 shadow-sm min-w-0 w-full">
                 <div className="flex items-center gap-3 mb-6 sm:mb-8">
                   <div className="bg-emerald-50 p-2.5 sm:p-3 rounded-2xl shrink-0">
@@ -593,20 +661,16 @@ const Checkout = () => {
                   </div>
                   <div>
                     <h2 className="text-lg sm:text-xl font-black text-slate-800">Payment Option</h2>
-                    <p className="text-slate-500 text-xs sm:text-sm">Choose how you'd like to pay</p>
+                    <p className="text-slate-500 text-xs sm:text-sm">Select payment method & click Place Order</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 sm:gap-6 min-w-0">
-                  <motion.button 
+                <div className="grid grid-cols-2 gap-3 sm:gap-6 min-w-0 mb-6">
+                  <motion.div 
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      setPaymentMethod("online");
-                      handleOnlinePayment();
-                    }}
-                    disabled={loading}
-                    className={`p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center gap-2 sm:gap-4 transition-all text-center min-w-0 ${
+                    onClick={() => setPaymentMethod("online")}
+                    className={`p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center gap-2 sm:gap-4 transition-all text-center min-w-0 cursor-pointer ${
                       paymentMethod === "online"
                         ? "border-emerald-500 bg-emerald-50/80 shadow-md shadow-emerald-50"
                         : "border-slate-200 bg-white hover:border-slate-300"
@@ -617,19 +681,15 @@ const Checkout = () => {
                     </div>
                     <div className="min-w-0 w-full">
                       <p className="font-black text-xs sm:text-base text-slate-900 truncate">Pay Online</p>
-                      <p className="text-[9px] sm:text-xs text-emerald-700 font-bold mt-0.5 truncate">UPI, Cards, Banking</p>
+                      <p className="text-[9px] sm:text-xs text-emerald-700 font-bold mt-0.5 truncate">UPI, Cards, NetBanking</p>
                     </div>
-                  </motion.button>
+                  </motion.div>
 
-                  <motion.button 
+                  <motion.div 
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      setPaymentMethod("cod");
-                      handleCOD();
-                    }}
-                    disabled={loading}
-                    className={`p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center gap-2 sm:gap-4 transition-all text-center min-w-0 ${
+                    onClick={() => setPaymentMethod("cod")}
+                    className={`p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center gap-2 sm:gap-4 transition-all text-center min-w-0 cursor-pointer ${
                       paymentMethod === "cod"
                         ? "border-emerald-500 bg-emerald-50/80 shadow-md shadow-emerald-50"
                         : "border-slate-200 bg-white hover:border-slate-300"
@@ -640,13 +700,39 @@ const Checkout = () => {
                     </div>
                     <div className="min-w-0 w-full">
                       <p className="font-black text-xs sm:text-base text-slate-900 truncate">Cash On Delivery</p>
-                      <p className="text-[9px] sm:text-xs text-slate-500 font-bold mt-0.5 truncate">Pay on delivery</p>
+                      <p className="text-[9px] sm:text-xs text-slate-500 font-bold mt-0.5 truncate">Pay on doorstep delivery</p>
                     </div>
-                  </motion.button>
+                  </motion.div>
                 </div>
+
+                {/* Primary Place Order Action Button inside Payment Section */}
+                <button
+                  type="button"
+                  onClick={handlePlaceOrder}
+                  disabled={loading}
+                  className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-2xl shadow-xl shadow-emerald-600/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      <span>Processing Order...</span>
+                    </>
+                  ) : paymentMethod === "online" ? (
+                    <>
+                      <CreditCard size={18} />
+                      <span>Pay ₹{total} Online Now</span>
+                    </>
+                  ) : (
+                    <>
+                      <Box size={18} />
+                      <span>Place Cash on Delivery Order (₹{total})</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
 
+            {/* Right Column: Order Summary */}
             <div className="space-y-6 min-w-0 w-full">
               <div className="bg-white p-4 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-gray-100 shadow-xl shadow-emerald-100/20 sticky top-8 min-w-0 w-full">
                 <h3 className="text-lg sm:text-xl font-black text-slate-800 mb-6">Order Summary</h3>
@@ -730,7 +816,32 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <div className="mt-8 flex items-center gap-3 p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                {/* Primary Place Order Button in Order Summary Box */}
+                <button
+                  type="button"
+                  onClick={handlePlaceOrder}
+                  disabled={loading}
+                  className="w-full mt-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-2xl shadow-xl shadow-emerald-600/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      <span>Processing Order...</span>
+                    </>
+                  ) : paymentMethod === "online" ? (
+                    <>
+                      <CreditCard size={18} />
+                      <span>Pay ₹{total} Online</span>
+                    </>
+                  ) : (
+                    <>
+                      <Box size={18} />
+                      <span>Place COD Order (₹{total})</span>
+                    </>
+                  )}
+                </button>
+
+                <div className="mt-6 flex items-center gap-3 p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
                   <CheckCircle2 size={20} className="text-emerald-600 shrink-0" />
                   <p className="text-[10px] font-black text-emerald-700 uppercase tracking-wider">Fastest Delivery Guaranteed</p>
                 </div>
@@ -739,6 +850,7 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+
       {/* Map Location Picker Modal */}
       <MapLocationPicker
         isOpen={showMapPicker}
@@ -747,6 +859,7 @@ const Checkout = () => {
         initialCoords={address.latitude ? { lat: address.latitude, lng: address.longitude } : null}
         initialAddress={address}
       />
+
       {/* Mobile Sticky Payment Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] p-3 pb-safe flex items-center justify-between gap-3">
         <div className="pl-1 leading-tight shrink-0">
@@ -754,11 +867,20 @@ const Checkout = () => {
           <p className="text-lg font-black text-slate-950">₹{total}</p>
         </div>
         <button
-          onClick={paymentMethod === "online" ? handleOnlinePayment : handleCOD}
+          onClick={handlePlaceOrder}
           disabled={loading}
-          className="flex-1 max-w-[240px] py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-2 min-w-0 truncate"
+          className="flex-1 max-w-[240px] py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-2 min-w-0 truncate disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {loading ? "Processing..." : paymentMethod === "online" ? `Pay ₹${total} Online` : `Place COD (₹${total})`}
+          {loading ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              <span>Processing...</span>
+            </>
+          ) : paymentMethod === "online" ? (
+            `Pay ₹${total} Online`
+          ) : (
+            `Place COD (₹${total})`
+          )}
         </button>
       </div>
 
@@ -768,4 +890,3 @@ const Checkout = () => {
 };
 
 export default Checkout;
-

@@ -3,13 +3,22 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      console.error("Failed to parse user from local storage", error);
+      return null;
+    }
+  });
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsed = JSON.parse(storedUser);
+        setUser(parsed);
       } catch (error) {
         console.error("Failed to parse user from local storage");
       }
@@ -43,7 +52,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-
 export const useAuth = () => useContext(AuthContext);
-
-

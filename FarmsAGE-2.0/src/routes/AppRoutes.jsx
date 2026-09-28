@@ -29,13 +29,16 @@ const Checkout = lazy(() => import("../Pages/Checkout"));
 const OrderSuccess = lazy(() => import("../Pages/OrderSuccess"));
 const MyOrders = lazy(() => import("../Pages/MyOrders"));
 
+import AdminRoute from "./AdminRoute";
+import VendorRoute from "./VendorRoute";
+import ProtectedRoute from "./ProtectedRoute";
+
 // Admin Lazy Imports
 const AdminLayout = lazy(() => import("../Pages/Admin/AdminLayout"));
 const Dashboard = lazy(() => import("../Pages/Admin/Dashboard"));
 const ManageProducts = lazy(() => import("../Pages/Admin/ManageProducts"));
 const ManageOrders = lazy(() => import("../Pages/Admin/ManageOrders"));
 const ManageUsers = lazy(() => import("../Pages/Admin/ManageUsers"));
-const AdminRoute = lazy(() => import("./AdminRoute"));
 
 // Vendor Lazy Imports
 const VendorLayout = lazy(() => import("../Pages/Vendor/VendorLayout"));
@@ -43,10 +46,8 @@ const VendorDashboard = lazy(() => import("../Pages/Vendor/VendorDashboard"));
 const VendorProducts = lazy(() => import("../Pages/Vendor/VendorProducts"));
 const VendorOrders = lazy(() => import("../Pages/Vendor/VendorOrders"));
 const VendorProfile = lazy(() => import("../Pages/Vendor/VendorProfile"));
-const VendorRoute = lazy(() => import("./VendorRoute"));
 const VendorStore = lazy(() => import("../Pages/VendorStore"));
 
-const ProtectedRoute = lazy(() => import("./ProtectedRoute"));
 
 const AppRoutes = () => {
   return (

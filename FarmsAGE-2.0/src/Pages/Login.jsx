@@ -72,10 +72,17 @@ const Login = () => {
             navigate("/complete-profile");
           } else {
             const role = data.user?.role?.toLowerCase();
-            const fromPath = location.state?.from || (role === "admin" ? "/admin" : role === "vendor" ? "/vendor" : "/");
-            navigate(fromPath);
+            if (role === "admin") {
+              navigate("/admin/dashboard", { replace: true });
+            } else if (role === "vendor") {
+              navigate("/vendor/dashboard", { replace: true });
+            } else {
+              const fromPath = location.state?.from || "/";
+              navigate(fromPath, { replace: true });
+            }
           }
         } else {
+
           setError(data.message || "Google Login failed");
         }
       } catch (err) {
@@ -143,9 +150,16 @@ const Login = () => {
       if (resp.ok) {
         login(data.user, data.token);
         const role = data.user?.role?.toLowerCase();
-        const fromPath = location.state?.from || (role === "admin" ? "/admin" : role === "vendor" ? "/vendor" : "/");
-        navigate(fromPath);
+        if (role === "admin") {
+          navigate("/admin/dashboard", { replace: true });
+        } else if (role === "vendor") {
+          navigate("/vendor/dashboard", { replace: true });
+        } else {
+          const fromPath = location.state?.from || "/";
+          navigate(fromPath, { replace: true });
+        }
       } else {
+
         setError(data.message || "Login failed");
       }
     } catch (err) {

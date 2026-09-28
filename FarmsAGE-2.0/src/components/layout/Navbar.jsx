@@ -235,12 +235,31 @@ const Navbar = React.memo(() => {
                   <Package size={14} className="text-emerald-600" />
                   <span>My Orders</span>
                 </Link>
+                {user?.role?.toLowerCase() === "admin" && (
+                  <Link
+                    to="/admin"
+                    className="px-4 py-2.5 text-xs font-bold text-amber-700 bg-amber-50/60 hover:bg-amber-100/80 flex items-center gap-2"
+                  >
+                    <ShieldCheck size={14} className="text-amber-600" />
+                    <span>Admin Panel Console</span>
+                  </Link>
+                )}
+                {user?.role?.toLowerCase() === "vendor" && (
+                  <Link
+                    to="/vendor"
+                    className="px-4 py-2.5 text-xs font-bold text-emerald-800 bg-emerald-50/60 hover:bg-emerald-100/80 flex items-center gap-2"
+                  >
+                    <Store size={14} className="text-emerald-600" />
+                    <span>Vendor Dashboard</span>
+                  </Link>
+                )}
                 <button
                   onClick={logout}
                   className="w-full text-left px-4 py-2.5 text-xs font-black text-rose-500 hover:bg-rose-50 transition-colors border-t border-slate-50"
                 >
                   Logout Account
                 </button>
+
               </div>
             </div>
           ) : (
