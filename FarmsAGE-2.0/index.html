@@ -5,17 +5,37 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FarmsAGE 2.0 | Freshness Delivered</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
-    <link rel="dns-prefetch" href="https://images.unsplash.com">
-    <link rel="preconnect" href="https://farmsage-2-0-2.onrender.com">
-    <link rel="dns-prefetch" href="https://farmsage-2-0-2.onrender.com">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="FarmsAGE 2.0 — Fresh fruits, vegetables & organic produce delivered in 30-40 minutes. Support local farmers directly." />
+
+    <!-- ─── DNS / Preconnect ───────────────────────────────────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+    <link rel="dns-prefetch" href="https://images.unsplash.com" />
+    <link rel="preconnect" href="https://farmsage-2-0-2.onrender.com" crossorigin />
+    <link rel="dns-prefetch" href="https://farmsage-2-0-2.onrender.com" />
+    <link rel="dns-prefetch" href="https://cdn-icons-png.flaticon.com" />
+
+    <!-- ─── LCP Image Preload (Hero banner — largest above-fold image) ─── -->
+    <!-- Preloads the hero image so LCP resource starts fetching immediately -->
+    <link
+      rel="preload"
+      as="image"
+      href="https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=70&w=800"
+      imagesrcset="https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=70&w=480 480w, https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=70&w=800 800w, https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=70&w=1200 1200w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
+
+    <!-- ─── Fonts — only needed weights, display=swap prevents FOIT ──── -->
+    <!-- Outfit: 700,800,900 only (headings). Inter: 400,500,600,700 only (body). -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="root"></div>
-    
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

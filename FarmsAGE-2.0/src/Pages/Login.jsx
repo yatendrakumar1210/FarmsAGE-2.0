@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, ArrowRight, ShieldCheck, Leaf, ChevronDown, Mail, Search, Store } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useGoogleLogin } from '@react-oauth/google';
 import logo from "../assets/logo.jpg"
@@ -17,6 +17,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const { user, login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleAdminClick = (e) => {
     e.preventDefault();
@@ -71,13 +72,8 @@ const Login = () => {
             navigate("/complete-profile");
           } else {
             const role = data.user?.role?.toLowerCase();
-            if (role === "admin") {
-              navigate("/admin");
-            } else if (role === "vendor") {
-              navigate("/vendor");
-            } else {
-              navigate("/");
-            }
+            const fromPath = location.state?.from || (role === "admin" ? "/admin" : role === "vendor" ? "/vendor" : "/");
+            navigate(fromPath);
           }
         } else {
           setError(data.message || "Google Login failed");
@@ -147,11 +143,8 @@ const Login = () => {
       if (resp.ok) {
         login(data.user, data.token);
         const role = data.user?.role?.toLowerCase();
-        if (role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
+        const fromPath = location.state?.from || (role === "admin" ? "/admin" : role === "vendor" ? "/vendor" : "/");
+        navigate(fromPath);
       } else {
         setError(data.message || "Login failed");
       }

@@ -21,18 +21,16 @@ const Hero = () => {
         {/* Main Banner Container */}
         <div className="relative group cursor-pointer overflow-hidden rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-slate-50">
           <div className="relative min-h-[170px] sm:min-h-[260px] md:min-h-[450px] lg:min-h-[520px] xl:min-h-[580px] w-full overflow-hidden">
-            <motion.img
-              initial={{ scale: 1.05 }}
-              animate={{ scale: 1 }}
-              transition={{
-                duration: 10,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "linear",
-              }}
-              src="https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=70&w=1600"
+            <img
+              src="https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=70&w=1200"
+              srcSet="https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=70&w=480 480w, https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=70&w=800 800w, https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=70&w=1200 1200w"
+              sizes="100vw"
               alt="Fresh Harvest"
               fetchpriority="high"
+              loading="eager"
+              decoding="sync"
+              width="1200"
+              height="630"
               className="w-full h-full object-cover"
             />
             {/* Overlay Gradient */}

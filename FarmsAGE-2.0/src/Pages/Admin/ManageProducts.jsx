@@ -7,7 +7,7 @@ import staticFruits from '../../data/fruits';
 import staticOrganic from '../../data/organic';
 import staticDairy from '../../data/dairy';
 
-const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+import { API_BASE_URL as API } from "../../config/api";
 
 const EMPTY_FORM = {
     name: '', category: 'Vegetables', image: '',

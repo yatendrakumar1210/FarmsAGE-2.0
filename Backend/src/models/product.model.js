@@ -48,8 +48,16 @@ const productSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-productSchema.index({ vendorId: 1, category: 1, createdAt: -1 });
-productSchema.index({ category: 1 });
-productSchema.index({ price: 1 });
+// ─── Indexes optimized for getPublicProducts sort/filter patterns ───────────
+// vendorId null check + category filter
+productSchema.index({ vendorId: 1, category: 1, quantity: -1, createdAt: -1 });
+// Default sort: quantity desc, createdAt desc (most common hit)
+productSchema.index({ quantity: -1, createdAt: -1 });
+// Price sort variants
+productSchema.index({ quantity: -1, price: 1 });
+productSchema.index({ quantity: -1, price: -1 });
+// Text search support on name
+productSchema.index({ name: "text" });
 
-module.exports = mongoose.model('Product', productSchema);
+module.exports = mongoose.model('Product', productSchema);
+

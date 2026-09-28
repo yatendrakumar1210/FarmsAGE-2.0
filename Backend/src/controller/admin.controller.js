@@ -106,15 +106,26 @@ exports.getPublicProducts = async (req, res) => {
       sortOptions = { quantity: -1, createdAt: -1 };
     }
 
-    const totalProducts = await Product.countDocuments(query);
+    // ✅ Parallelize count + find — saves one MongoDB round-trip
+    const [totalProducts, products] = await Promise.all([
+      Product.countDocuments(query),
+      Product.find(query)
+        .select("_id name image category price oldPrice discount unit quantity isOrganic createdAt")
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit)
+        .lean()
+    ]);
+
     const totalPages = Math.ceil(totalProducts / limit) || 1;
 
-    const products = await Product.find(query)
-      .select("_id name image category price oldPrice discount unit quantity isOrganic createdAt")
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(limit)
-      .lean();
+    // ✅ HTTP Cache headers for public product data (non-personalized)
+    // 60s browser cache, 2min CDN cache, stale-while-revalidate for fast UX
+    if (!search) {
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=120, stale-while-revalidate=60');
+    } else {
+      res.set('Cache-Control', 'no-store');
+    }
 
     res.json({
       products,

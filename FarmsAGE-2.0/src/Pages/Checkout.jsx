@@ -57,13 +57,27 @@ const Checkout = () => {
     fetchProfile();
   }, []);
 
+  const handleAuthError = (message) => {
+    alert(message || "Your session has expired or is invalid. Please log in again to place your order.");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login", { state: { from: "/checkout" } });
+  };
+
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return;
+      if (!token || token === "null" || token === "undefined") {
+        handleAuthError("Please log in to continue with checkout.");
+        return;
+      }
       const res = await fetch(`${API}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (res.status === 401) {
+        handleAuthError("Your login session has expired. Please log in again.");
+        return;
+      }
       const data = await res.json();
       if (res.ok && data.user) {
         const userAddrs = data.user.addresses || [];
@@ -106,7 +120,7 @@ const Checkout = () => {
   const saveCurrentAddressToProfile = async (addrToSave) => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return;
+      if (!token || token === "null" || token === "undefined") return;
       await fetch(`${API}/api/auth/address`, {
         method: "POST",
         headers: {
@@ -158,10 +172,14 @@ const Checkout = () => {
       return;
     }
 
+    const token = localStorage.getItem('token');
+    if (!token || token === "null" || token === "undefined") {
+      handleAuthError("Please log in to place your order.");
+      return;
+    }
+
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      
       // Auto-save address to user profile
       saveCurrentAddressToProfile(address);
 
@@ -194,6 +212,10 @@ const Checkout = () => {
       });
       
       const data = await res.json();
+      if (res.status === 401 || data.message?.toLowerCase().includes("token")) {
+        handleAuthError("Session expired. Please log in again to complete your order.");
+        return;
+      }
       if (!res.ok) throw new Error(data.message || "Failed to create order");
       const { order } = data;
 
@@ -224,6 +246,11 @@ const Checkout = () => {
               body: JSON.stringify(verifyData)
             });
 
+            if (verifyRes.status === 401) {
+              handleAuthError("Session expired during payment verification. Please log in again.");
+              return;
+            }
+
             const verifyResult = await verifyRes.json();
             if (verifyResult.success) {
               playOrderSuccessSound();
@@ -236,7 +263,7 @@ const Checkout = () => {
                 } 
               });
             } else {
-              alert("Payment verification failed");
+              alert(verifyResult.message || "Payment verification failed");
             }
           } catch (err) {
             console.error("Verification failed", err);
@@ -256,7 +283,7 @@ const Checkout = () => {
       rzp.open();
     } catch (err) {
       console.error("Order creation failed", err);
-      alert("Failed to initiate payment: " + err.message);
+      alert(err.message || "Failed to initiate payment");
     } finally {
       setLoading(false);
     }
@@ -268,10 +295,14 @@ const Checkout = () => {
       return;
     }
 
+    const token = localStorage.getItem('token');
+    if (!token || token === "null" || token === "undefined") {
+      handleAuthError("Please log in to place your order.");
+      return;
+    }
+
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-
       // Auto-save address to user profile
       saveCurrentAddressToProfile(address);
 
@@ -299,6 +330,11 @@ const Checkout = () => {
       });
 
       const result = await res.json();
+      if (res.status === 401 || result.message?.toLowerCase().includes("token")) {
+        handleAuthError("Session expired. Please log in again to place your COD order.");
+        return;
+      }
+
       if (result.success) {
         playOrderSuccessSound();
         clearCart();
@@ -310,7 +346,7 @@ const Checkout = () => {
           } 
         });
       } else {
-        alert("Failed to place COD order");
+        alert(result.message || "Failed to place COD order");
       }
     } catch (err) {
       console.error("COD creation failed", err);

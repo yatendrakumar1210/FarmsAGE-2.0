@@ -16,10 +16,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import MapLocationPicker from "./MapLocationPicker";
 
-const API =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:3000"
-    : "https://farmsage-2-0-2.onrender.com";
+import { API_BASE_URL as API } from "../../config/api";
 
 const LocationModal = ({ isOpen, onClose, onSelectLocation, currentLocationName }) => {
   const { user } = useAuth();

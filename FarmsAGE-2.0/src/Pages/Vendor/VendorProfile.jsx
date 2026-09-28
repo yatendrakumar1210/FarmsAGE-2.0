@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MapPin, Save, Loader, Navigation } from "lucide-react";
 import MapLocationPicker from "../../components/location/MapLocationPicker";
 import "./vendor.css";
-
-const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+import { API_BASE_URL as API } from "../../config/api";
 
 const VendorProfile = () => {
   const [profile, setProfile] = useState({

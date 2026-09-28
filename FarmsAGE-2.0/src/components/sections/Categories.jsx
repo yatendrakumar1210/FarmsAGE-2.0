@@ -94,11 +94,14 @@ const Categories = () => {
             <div
               className={`relative w-14 h-14 min-[380px]:w-16 min-[380px]:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full ${cat.bgColor} flex items-center justify-center mb-1.5 sm:mb-3 transition-all duration-300 group-hover:shadow-[0_15px_30px_-10px_rgba(16,185,129,0.3)] border border-white group-hover:border-emerald-100 overflow-hidden shadow-xs`}
             >
-              <motion.img
-                whileHover={{ scale: 1.15 }}
+              <img
                 src={cat.image}
                 alt={cat.name}
-                className="w-full h-full object-cover transition-transform duration-500"
+                loading="lazy"
+                decoding="async"
+                width="112"
+                height="112"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
 
               <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />

@@ -4,8 +4,7 @@ import { Store, MapPin, Tag, Image as ImageIcon, CheckCircle, AlertCircle, Clock
 import { useAuth } from "../../context/AuthContext";
 import DetectLocation from "../../components/location/DetectLocation";
 import MapLocationPicker from "../../components/location/MapLocationPicker";
-
-const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+import { API_BASE_URL as API } from "../../config/api";
 
 const VendorRegistration = ({ onStatusChange }) => {
   const { user, login } = useAuth();

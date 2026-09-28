@@ -4,11 +4,12 @@ module.exports = (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
 
-    if (!token) {
-      return res.status(401).json({ message: "No token" });
+    if (!token || token === "null" || token === "undefined") {
+      return res.status(401).json({ message: "No token provided. Please log in." });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || "secret";
+    const decoded = jwt.verify(token, secret);
 
     req.user = decoded;
 
@@ -17,4 +18,5 @@ module.exports = (req, res, next) => {
     res.status(401).json({ message: "Invalid token" });
   }
 };
+
 

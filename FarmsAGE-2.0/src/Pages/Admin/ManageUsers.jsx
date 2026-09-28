@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Store } from "lucide-react";
-
-const API =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:3000"
-    : "https://farmsage-2-0-2.onrender.com";
+import { API_BASE_URL as API } from "../../config/api";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);

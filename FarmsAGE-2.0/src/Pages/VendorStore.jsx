@@ -5,8 +5,7 @@ import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import CategoryProducts from "../components/sections/CategoryProducts";
 import { motion } from "framer-motion";
-
-const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+import { API_BASE_URL as API } from "../config/api";
 
 const VendorStore = () => {
   const { vendorId } = useParams();

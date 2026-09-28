@@ -9,7 +9,7 @@ import fruitsData from "../../data/fruits";
 import organicData from "../../data/organic";
 import dairyData from "../../data/dairy";
 
-const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+import { API_BASE_URL as API } from "../../config/api";
 
 const SIDEBAR_CATEGORIES = [
   {

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ShoppingCart, User, MapPin, Clock } from "lucide-react";
 import "./vendor.css";
-
-const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+import { API_BASE_URL as API } from "../../config/api";
 
 const VendorOrders = () => {
   const [orders, setOrders] = useState([]);

@@ -84,8 +84,7 @@ const MainLayout = ({ children }) => {
           </motion.button>
         )}
       </AnimatePresence>
-      {/* 6. Background Grain/Texture (Optional for "Organic" vibe) */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.02] z-0 bg-[url('https://www.transparenttextures.com/patterns/p6.png')]"></div>{" "}
+      {/* Scroll-to-top handled above */}
     </div>
   );
 };

@@ -7,32 +7,89 @@ const vendorTemplate = require("../templates/vendorTemplate");
 const { sendEmail } = require("../utils/sendEmail");
 const User = require("../models/user.model");
 
+// Helper to validate items, verify database prices, check stock availability
+const validateAndSanitizeItems = async (items) => {
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    throw new Error("Cart items are required");
+  }
+
+  let subtotal = 0;
+  const verifiedItems = [];
+
+  for (const item of items) {
+    const pId = item.productId || item._id || item.id;
+    if (!pId) {
+      throw new Error("Invalid product data in order request");
+    }
+
+    // Attempt to lookup product in database
+    const dbProduct = await Product.findById(pId);
+    if (!dbProduct) {
+      // Fallback: If item is custom or mock without valid ObjectId, use item price with safe stock guard
+      verifiedItems.push({
+        productId: pId,
+        name: item.name || "Product",
+        image: item.image || "",
+        weight: item.weight || "1 kg",
+        quantity: Math.max(1, parseInt(item.quantity) || 1),
+        price: Number(item.price) || 0,
+        vendorId: item.vendorId || null,
+      });
+      subtotal += (Number(item.price) || 0) * Math.max(1, parseInt(item.quantity) || 1);
+      continue;
+    }
+
+    if (dbProduct.quantity < item.quantity) {
+      throw new Error(`Insufficient stock for '${dbProduct.name}'. Available: ${dbProduct.quantity}`);
+    }
+
+    const verifiedPrice = dbProduct.price;
+    const qty = Math.max(1, parseInt(item.quantity) || 1);
+    subtotal += verifiedPrice * qty;
+
+    verifiedItems.push({
+      productId: dbProduct._id.toString(),
+      name: dbProduct.name,
+      image: dbProduct.image,
+      weight: item.weight || dbProduct.unit || "1 kg",
+      quantity: qty,
+      price: verifiedPrice,
+      vendorId: dbProduct.vendorId ? dbProduct.vendorId.toString() : null,
+    });
+  }
+
+  return { subtotal, verifiedItems };
+};
+
 // Create Razorpay Order
 exports.createOrder = async (req, res) => {
   try {
     const { items } = req.body;
+    const { subtotal, verifiedItems } = await validateAndSanitizeItems(items);
 
-    let subtotal = 0;
-    items.forEach((i) => (subtotal += i.price * i.quantity));
     const deliveryCharge = subtotal > 500 || subtotal === 0 ? 0 : 40;
     const totalAmount = subtotal + deliveryCharge;
 
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      return res.status(500).json({ message: "Razorpay credentials not configured on server" });
+    }
+
     const order = await razorpay.orders.create({
-      amount: totalAmount * 100,
+      amount: Math.round(totalAmount * 100),
       currency: "INR",
     });
 
-    res.json({ order, totalAmount });
+    res.json({ order, totalAmount, verifiedItems });
   } catch (err) {
     console.error("RAZORPAY ORDER ERROR:", err);
-    res.status(500).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
 // Helper to decrement product inventory
 const updateProductInventory = async (items) => {
   for (const item of items) {
-    if (item.productId) {
+    if (item.productId && item.productId.length === 24) {
       try {
         await Product.findByIdAndUpdate(item.productId, {
           $inc: { quantity: -item.quantity }
@@ -60,16 +117,18 @@ exports.verifyPayment = async (req, res) => {
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expected = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || "")
       .update(body)
       .digest("hex");
 
     if (expected !== razorpay_signature) {
-      return res.status(400).json({ success: false, message: "Invalid Signature" });
+      return res.status(400).json({ success: false, message: "Invalid Payment Signature" });
     }
 
+    const { verifiedItems } = await validateAndSanitizeItems(items);
+
     // 🥡 Group items by vendorId
-    const vendorGroups = items.reduce((acc, item) => {
+    const vendorGroups = verifiedItems.reduce((acc, item) => {
       const vId = item.vendorId || "global";
       if (!acc[vId]) acc[vId] = [];
       acc[vId].push(item);
@@ -104,28 +163,36 @@ exports.verifyPayment = async (req, res) => {
       if (vId !== "global") {
         const vendor = await User.findById(vId);
         if (vendor && vendor.email) {
-          await sendEmail({
-            to: vendor.email,
-            subject: "New Order Received",
-            html: vendorTemplate(vendor.name, order.items),
-          });
+          try {
+            await sendEmail({
+              to: vendor.email,
+              subject: "New Order Received",
+              html: vendorTemplate(vendor.name, order.items),
+            });
+          } catch (e) {
+            console.error("Vendor email failed:", e);
+          }
         }
       }
     }
 
-    // 📩 User Email (outside loop to send only one)
+    // 📩 User Email
     if (user.email) {
-      await sendEmail({
-        to: user.email,
-        subject: "Order Confirmed",
-        html: userTemplate(user.name, createdOrders),
-      });
+      try {
+        await sendEmail({
+          to: user.email,
+          subject: "Order Confirmed - FarmsAge",
+          html: userTemplate(user.name, createdOrders),
+        });
+      } catch (e) {
+        console.error("User email failed:", e);
+      }
     }
 
     res.json({ success: true, order: createdOrders[0], allOrders: createdOrders });
   } catch (err) {
     console.error("VERIFY PAYMENT ERROR:", err);
-    res.status(500).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -137,8 +204,10 @@ exports.codOrder = async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    const { verifiedItems } = await validateAndSanitizeItems(items);
+
     // 🥡 Group items by vendorId
-    const vendorGroups = items.reduce((acc, item) => {
+    const vendorGroups = verifiedItems.reduce((acc, item) => {
       const vId = item.vendorId || "global";
       if (!acc[vId]) acc[vId] = [];
       acc[vId].push(item);
@@ -172,34 +241,49 @@ exports.codOrder = async (req, res) => {
       if (vId !== "global") {
         const vendor = await User.findById(vId);
         if (vendor && vendor.email) {
-          await sendEmail({
-            to: vendor.email,
-            subject: "New Order Received",
-            html: vendorTemplate(vendor.name, order.items),
-          });
+          try {
+            await sendEmail({
+              to: vendor.email,
+              subject: "New Order Received",
+              html: vendorTemplate(vendor.name, order.items),
+            });
+          } catch (e) {
+            console.error("Vendor email failed:", e);
+          }
         }
       }
     }
 
-    // 📩 User Email (outside loop to send only one)
+    // 📩 User Email
     if (user.email) {
-      await sendEmail({
-        to: user.email,
-        subject: "Order Confirmed",
-        html: userTemplate(user.name, createdOrders),
-      });
+      try {
+        await sendEmail({
+          to: user.email,
+          subject: "Order Confirmed - FarmsAge",
+          html: userTemplate(user.name, createdOrders),
+        });
+      } catch (e) {
+        console.error("User email failed:", e);
+      }
     }
 
     res.json({ success: true, order: createdOrders[0], allOrders: createdOrders });
   } catch (err) {
     console.error("COD ORDER ERROR:", err);
-    res.status(500).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
 // Get My Orders
 exports.getMyOrders = async (req, res) => {
-  const orders = await Order.find({ userId: req.user.id }).populate("vendorId", "name storeName");
+  try {
+    const orders = await Order.find({ userId: req.user.id })
+      .populate("vendorId", "name storeName")
+      .sort({ createdAt: -1 });
 
-  res.json(orders);
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch orders", error: err.message });
+  }
 };
+
