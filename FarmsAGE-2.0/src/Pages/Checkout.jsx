@@ -26,9 +26,8 @@ import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import MapLocationPicker from "../components/location/MapLocationPicker";
 import { calculateNewUnitPrice } from "../utils/weightUtils";
+import { API_BASE_URL as API } from "../config/api";
 import { playOrderSuccessSound } from "../utils/playOrderSound";
-
-const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
 
 const Checkout = () => {
   const { cart, clearCart, updateQuantity, removeFromCart, updateItemWeight } = useCart();

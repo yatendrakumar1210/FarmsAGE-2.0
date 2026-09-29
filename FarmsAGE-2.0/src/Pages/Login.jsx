@@ -1,12 +1,12 @@
 import React, { useState } from "react";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, ArrowRight, ShieldCheck, Leaf, ChevronDown, Mail, Search, Store } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useGoogleLogin } from '@react-oauth/google';
-import logo from "../assets/logo.jpg"
-
-const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+import { API_BASE_URL as API } from "../config/api";
+import logo from "../assets/logo.jpg";
 
 
 const Login = () => {

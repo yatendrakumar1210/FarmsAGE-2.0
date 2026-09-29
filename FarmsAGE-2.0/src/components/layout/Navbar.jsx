@@ -13,6 +13,11 @@ import {
   ShieldCheck,
   Store,
   Loader2,
+  LogOut,
+  Phone,
+  Mail,
+  Headphones,
+  History,
 } from "lucide-react";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -209,7 +214,10 @@ const Navbar = React.memo(() => {
         <div className="flex items-center gap-2 sm:gap-4">
           {/* User Profile */}
           {user ? (
-            <div className="relative group flex items-center gap-2 font-bold text-slate-700 cursor-pointer py-1">
+            <div 
+              onClick={() => setOpen((prev) => !prev)}
+              className="relative group flex items-center gap-2 font-bold text-slate-700 cursor-pointer py-1"
+            >
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-extrabold text-xs shadow-sm shrink-0">
                 {user.name?.charAt(0).toUpperCase() || <User size={16} />}
               </div>
@@ -255,9 +263,10 @@ const Navbar = React.memo(() => {
                 )}
                 <button
                   onClick={logout}
-                  className="w-full text-left px-4 py-2.5 text-xs font-black text-rose-500 hover:bg-rose-50 transition-colors border-t border-slate-50"
+                  className="w-full text-left px-4 py-2.5 text-xs font-black text-rose-500 hover:bg-rose-50 transition-colors border-t border-slate-50 flex items-center gap-2"
                 >
-                  Logout Account
+                  <LogOut size={14} />
+                  <span>Logout Account</span>
                 </button>
 
               </div>
@@ -409,19 +418,61 @@ const Navbar = React.memo(() => {
         <div className="flex-1 overflow-y-auto p-4 space-y-5">
           {/* User Profile Card */}
           {user ? (
-            <div className="p-3.5 bg-gradient-to-r from-emerald-900 to-teal-900 text-white rounded-2xl shadow-md border border-emerald-700/40">
+            <div className="p-4 bg-gradient-to-br from-slate-900 via-emerald-950 to-teal-950 text-white rounded-3xl shadow-xl border border-emerald-500/20 space-y-3.5">
+              {/* Header Info */}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">
-                  {user.name?.charAt(0).toUpperCase() || "U"}
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-lg shadow-lg shrink-0 border-2 border-emerald-400/40">
+                  {user.name?.charAt(0).toUpperCase() || <User size={22} />}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="font-extrabold text-xs text-white truncate">{user.name || "Customer Account"}</p>
-                  <p className="text-[10px] text-emerald-200 truncate">{user.email || user.phone}</p>
-                  <span className="inline-block text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-400/20 px-1.5 py-0.5 rounded mt-1 border border-amber-400/30">
-                    {user.role || "Member"}
+                  <h3 className="font-black text-sm text-white truncate font-['Outfit']">
+                    {user.name || "FarmsAge Member"}
+                  </h3>
+                  <div className="flex items-center gap-1.5 text-[11px] text-emerald-300 font-medium truncate mt-0.5">
+                    {user.email && <span className="flex items-center gap-1 truncate"><Mail size={11} className="shrink-0 text-emerald-400" /> {user.email}</span>}
+                  </div>
+                  {user.phone && (
+                    <p className="flex items-center gap-1 text-[11px] text-emerald-200/90 font-medium mt-0.5">
+                      <Phone size={11} className="shrink-0 text-emerald-400" /> {user.phone}
+                    </p>
+                  )}
+                  <span className="inline-block text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-400/20 px-2 py-0.5 rounded-full mt-1.5 border border-amber-400/30">
+                    {user.role || "Customer"}
                   </span>
                 </div>
               </div>
+
+              {/* Quick Action Badges / Shortcuts */}
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-emerald-800/60">
+                <Link
+                  to="/my-orders"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 p-2 bg-emerald-900/60 hover:bg-emerald-800/80 border border-emerald-700/50 rounded-xl text-xs font-bold text-emerald-100 transition"
+                >
+                  <History size={14} className="text-emerald-400 shrink-0" />
+                  <span className="truncate">Order History</span>
+                </Link>
+
+                <Link
+                  to="/contact"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 p-2 bg-emerald-900/60 hover:bg-emerald-800/80 border border-emerald-700/50 rounded-xl text-xs font-bold text-emerald-100 transition"
+                >
+                  <Headphones size={14} className="text-emerald-400 shrink-0" />
+                  <span className="truncate">Customer Support</span>
+                </Link>
+              </div>
+
+              {/* Mobile Quick Log Out Button */}
+              <button
+                onClick={() => {
+                  logout();
+                  setOpen(false);
+                }}
+                className="w-full py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 hover:text-rose-200 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-rose-500/30 transition mt-1"
+              >
+                <LogOut size={14} /> Log Out Account
+              </button>
             </div>
           ) : (
             <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100/80 text-center">
@@ -599,25 +650,25 @@ const Navbar = React.memo(() => {
           </div>
         </div>
 
-        {/* Footer Logout / Auth Button */}
-        <div className="p-4 border-t border-slate-100 bg-white">
+        {/* Footer Logout / Auth Button (Sticky Bottom) */}
+        <div className="p-4 border-t border-slate-100 bg-white sticky bottom-0 z-20 shadow-lg">
           {user ? (
             <button
               onClick={() => {
                 logout();
                 setOpen(false);
               }}
-              className="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-rose-100 transition"
+              className="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-rose-600/20 active:scale-95 transition-all"
             >
-              Log Out Account
+              <LogOut size={16} /> Log Out Account
             </button>
           ) : (
             <Link
               to="/login"
               onClick={() => setOpen(false)}
-              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center shadow-md transition"
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-xs flex items-center justify-center gap-2 shadow-md transition"
             >
-              Login / Sign Up
+              <User size={16} /> Login / Sign Up
             </Link>
           )}
         </div>

@@ -25,9 +25,7 @@ import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import products from "../data/products";
 import { useCart } from "../context/CartContext";
-import OrderTrackingMap from "../components/location/OrderTrackingMap";
-
-const API = import.meta.env.MODE === "development" ? "http://localhost:3000" : "https://farmsage-2-0-2.onrender.com";
+import { API_BASE_URL as API } from "../config/api";
 
 const MyOrders = () => {
   const navigate = useNavigate();

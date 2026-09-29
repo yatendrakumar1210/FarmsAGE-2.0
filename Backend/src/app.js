@@ -22,27 +22,34 @@ app.use(compression({
   }
 }));
 
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 
 // ─── CORS ───
-const allowedOrigins = [
+const envOrigins = (process.env.ALLOWED_ORIGINS || "").split(",").map(o => o.trim()).filter(Boolean);
+const allowedOrigins = Array.from(new Set([
   'http://localhost:5173',
   'http://localhost:4173',
+  'http://localhost:3000',
   process.env.FRONTEND_URL,
-].filter(Boolean);
+  ...envOrigins
+])).filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // allow requests with no origin (mobile apps, curl, etc.)
-    if (!origin || allowedOrigins.includes(origin)) {
+    // allow requests with no origin (like mobile apps, curl, or server-to-server)
+    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== "production") {
       callback(null, true);
     } else {
-      callback(null, true); // open CORS for now (production deploy will tighten)
+      callback(new Error(`CORS policy error: Origin ${origin} is not allowed`));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Razorpay-Signature'],
 }));
 
 connectDB();

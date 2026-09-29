@@ -1,15 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, ArrowRight, Filter, ChevronRight } from "lucide-react";
+import { Sparkles, ArrowRight, Filter } from "lucide-react";
 import ProductCard from "../common/ProductCard";
-import products from "../../data/products";
+import staticProducts from "../../data/products";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../config/api";
 
 const filterOptions = ["All", "Vegetables", "Fruits", "Organic"];
 
 const Products = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
+  const [productList, setProductList] = useState(staticProducts);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/products`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setProductList(data);
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to fetch products from API, using static catalog fallback:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter & sort logic (in-stock items first)
   const isOutOfStock = (p) => {
@@ -26,12 +49,12 @@ const Products = () => {
 
   const filteredProducts =
     activeFilter === "All"
-      ? sortInStockFirst(products).slice(0, 10)
-      : sortInStockFirst(products.filter((p) => p.category === activeFilter)).slice(0, 8);
+      ? sortInStockFirst(productList).slice(0, 10)
+      : sortInStockFirst(productList.filter((p) => p.category?.toLowerCase() === activeFilter.toLowerCase())).slice(0, 8);
 
   return (
     <section className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-10 md:py-12 font-sans overflow-hidden">
-      {/* 1. Enhanced Header Section */}
+      {/* 1. Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 mb-8 sm:mb-10 md:mb-12">
         <div>
           <div className="flex items-center gap-2 text-emerald-600 font-bold text-[10px] uppercase tracking-[0.2em] mb-2">
@@ -66,15 +89,15 @@ const Products = () => {
         </div>
       </div>
 
-      {/* 3. Responsive Product Grid with Animations */}
+      {/* 3. Responsive Product Grid */}
       <motion.div
         layout
         className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 md:gap-6"
       >
         <AnimatePresence mode="popLayout">
-          {filteredProducts.map((item) => (
+          {filteredProducts.map((item, idx) => (
             <motion.div
-              key={item.id}
+              key={item._id || item.id || idx}
               layout
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -105,5 +128,3 @@ const Products = () => {
 };
 
 export default Products;
-
-

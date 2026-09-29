@@ -178,7 +178,7 @@ exports.registerShop = async (req, res) => {
     // 🔑 Generate NEW token with updated role
     const token = jwt.sign(
       { id: vendor._id, role: vendor.role },
-      process.env.JWT_SECRET || "secret",
+      process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 

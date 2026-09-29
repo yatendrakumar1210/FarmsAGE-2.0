@@ -20,37 +20,24 @@ const validateAndSanitizeItems = async (items) => {
   for (const item of items) {
     const pId = item.productId || item._id || item.id;
     if (!pId) {
-      throw new Error("Invalid product data in order request");
+      throw new Error("Invalid product ID in order request");
     }
 
     let dbProduct = null;
     if (mongoose.Types.ObjectId.isValid(pId) && String(pId).length === 24) {
-      try {
-        dbProduct = await Product.findById(pId);
-      } catch (e) {
-        dbProduct = null;
-      }
+      dbProduct = await Product.findById(pId);
     }
 
     if (!dbProduct) {
-      // Fallback: If item is custom or static product without valid ObjectId, use item price safely
-      const qty = Math.max(1, parseInt(item.quantity) || 1);
-      const price = Number(item.price) || 0;
-      verifiedItems.push({
-        productId: String(pId),
-        name: item.name || "Produce Item",
-        image: item.image || "",
-        weight: item.weight || "1 kg",
-        quantity: qty,
-        price: price,
-        vendorId: item.vendorId || null,
-      });
-      subtotal += price * qty;
-      continue;
+      throw new Error(`Product with ID '${pId}' not found or unavailable`);
     }
 
-    const verifiedPrice = dbProduct.price;
     const qty = Math.max(1, parseInt(item.quantity) || 1);
+    if (dbProduct.quantity < qty) {
+      throw new Error(`Insufficient stock for '${dbProduct.name}'. Available: ${dbProduct.quantity}, Requested: ${qty}`);
+    }
+
+    const verifiedPrice = Number(dbProduct.price);
     subtotal += verifiedPrice * qty;
 
     verifiedItems.push({
@@ -65,6 +52,40 @@ const validateAndSanitizeItems = async (items) => {
   }
 
   return { subtotal, verifiedItems };
+};
+
+// Helper for ATOMIC product inventory decrements with rollback protection
+const updateProductInventoryAtomic = async (items) => {
+  const decrementedItems = [];
+
+  try {
+    for (const item of items) {
+      if (item.productId && mongoose.Types.ObjectId.isValid(item.productId)) {
+        const updatedProduct = await Product.findOneAndUpdate(
+          { _id: item.productId, quantity: { $gte: item.quantity } },
+          { $inc: { quantity: -item.quantity } },
+          { new: true }
+        );
+
+        if (!updatedProduct) {
+          throw new Error(`Insufficient stock for '${item.name}' during allocation.`);
+        }
+        decrementedItems.push(item);
+      }
+    }
+  } catch (err) {
+    // Rollback decremented stock if any item in the batch failed
+    for (const dItem of decrementedItems) {
+      try {
+        await Product.findByIdAndUpdate(dItem.productId, {
+          $inc: { quantity: dItem.quantity }
+        });
+      } catch (rollbackErr) {
+        console.error(`Rollback stock failed for product ${dItem.productId}:`, rollbackErr);
+      }
+    }
+    throw err;
+  }
 };
 
 // Create Razorpay Order
@@ -83,27 +104,12 @@ exports.createOrder = async (req, res) => {
 
     res.json({ order, totalAmount, verifiedItems });
   } catch (err) {
-    console.error("RAZORPAY ORDER ERROR:", err);
+    console.error("RAZORPAY ORDER CREATION ERROR:", err);
     res.status(400).json({ message: err.message || "Failed to create payment order" });
   }
 };
 
-// Helper to decrement product inventory asynchronously
-const updateProductInventory = async (items) => {
-  for (const item of items) {
-    if (item.productId && mongoose.Types.ObjectId.isValid(item.productId) && String(item.productId).length === 24) {
-      try {
-        await Product.findByIdAndUpdate(item.productId, {
-          $inc: { quantity: -item.quantity }
-        });
-      } catch (err) {
-        console.error(`Failed to decrement stock for product ${item.productId}:`, err);
-      }
-    }
-  }
-};
-
-// Verify Payment (Handles Multi-Vendor Splitting)
+// Verify Payment (Handles Multi-Vendor Splitting & Signature Verification)
 exports.verifyPayment = async (req, res) => {
   try {
     const {
@@ -117,9 +123,15 @@ exports.verifyPayment = async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const keySecret = process.env.RAZORPAY_KEY_SECRET || "SwqyIaHNcC2KeBOzNKddApnJ";
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
-    if (razorpay_order_id && razorpay_payment_id && razorpay_signature) {
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({ success: false, message: "Missing Razorpay payment parameters" });
+    }
+
+    if (!keySecret) {
+      console.warn("RAZORPAY_KEY_SECRET missing in environment; payment signature verification skipped in non-prod mode.");
+    } else {
       const body = razorpay_order_id + "|" + razorpay_payment_id;
       const expected = crypto
         .createHmac("sha256", keySecret)
@@ -127,14 +139,14 @@ exports.verifyPayment = async (req, res) => {
         .digest("hex");
 
       if (expected !== razorpay_signature) {
-        console.warn("Signature mismatch:", { expected, razorpay_signature });
-        if (process.env.NODE_ENV === "production") {
-          return res.status(400).json({ success: false, message: "Invalid Payment Signature" });
-        }
+        return res.status(400).json({ success: false, message: "Invalid Payment Signature" });
       }
     }
 
     const { verifiedItems } = await validateAndSanitizeItems(items);
+
+    // Perform atomic stock decrement before order creation
+    await updateProductInventoryAtomic(verifiedItems);
 
     // Group items by vendorId
     const vendorGroups = verifiedItems.reduce((acc, item) => {
@@ -160,13 +172,10 @@ exports.verifyPayment = async (req, res) => {
         totalAmount: vTotal,
         paymentMethod: "Online",
         paymentStatus: "Paid",
-        paymentId: razorpay_payment_id || "PAY_" + Date.now(),
+        paymentId: razorpay_payment_id,
         status: "Placed",
       });
       createdOrders.push(order);
-      
-      // Decrement stock asynchronously
-      updateProductInventory(vItems).catch(e => console.error("Stock update error:", e));
 
       // Send Vendor Email asynchronously
       if (vId !== "global" && mongoose.Types.ObjectId.isValid(vId)) {
@@ -205,7 +214,7 @@ exports.verifyPayment = async (req, res) => {
   }
 };
 
-// COD Order (Handles Multi-Vendor Splitting)
+// COD Order (Handles Multi-Vendor Splitting & Atomic Stock)
 exports.codOrder = async (req, res) => {
   try {
     const { items, deliveryAddress } = req.body;
@@ -214,6 +223,9 @@ exports.codOrder = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const { verifiedItems } = await validateAndSanitizeItems(items);
+
+    // Perform atomic stock decrement
+    await updateProductInventoryAtomic(verifiedItems);
 
     // Group items by vendorId
     const vendorGroups = verifiedItems.reduce((acc, item) => {
@@ -241,9 +253,6 @@ exports.codOrder = async (req, res) => {
         status: "Placed",
       });
       createdOrders.push(order);
-
-      // Decrement stock asynchronously
-      updateProductInventory(vItems).catch(e => console.error("Stock update error:", e));
 
       // Send Vendor Email asynchronously
       if (vId !== "global" && mongoose.Types.ObjectId.isValid(vId)) {
@@ -279,6 +288,48 @@ exports.codOrder = async (req, res) => {
   } catch (err) {
     console.error("COD ORDER ERROR:", err);
     res.status(400).json({ success: false, message: err.message || "Failed to place COD order" });
+  }
+};
+
+// Razorpay Webhook Handler
+exports.handleWebhook = async (req, res) => {
+  try {
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET || process.env.RAZORPAY_KEY_SECRET;
+    const signature = req.headers["x-razorpay-signature"];
+
+    if (!webhookSecret || !signature) {
+      return res.status(400).json({ status: "ignored", message: "Webhook secret or signature missing" });
+    }
+
+    const rawPayload = req.rawBody ? req.rawBody.toString("utf8") : JSON.stringify(req.body);
+
+    const expectedSignature = crypto
+      .createHmac("sha256", webhookSecret)
+      .update(rawPayload)
+      .digest("hex");
+
+    if (expectedSignature !== signature) {
+      return res.status(400).json({ status: "error", message: "Invalid webhook signature" });
+    }
+
+    const event = req.body;
+    if (event.event === "payment.captured" || event.event === "order.paid") {
+      const paymentEntity = event.payload?.payment?.entity;
+      const razorpayOrderId = paymentEntity?.order_id;
+      const paymentId = paymentEntity?.id;
+
+      if (razorpayOrderId) {
+        await Order.updateMany(
+          { paymentId: razorpayOrderId, paymentStatus: { $ne: "Paid" } },
+          { $set: { paymentStatus: "Paid", paymentId: paymentId || razorpayOrderId } }
+        );
+      }
+    }
+
+    res.status(200).json({ status: "ok" });
+  } catch (err) {
+    console.error("WEBHOOK ERROR:", err);
+    res.status(500).json({ status: "error", message: err.message });
   }
 };
 

@@ -15,12 +15,8 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL as API } from "../config/api";
 import logo from "../assets/logo.jpg";
-
-const API =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:3000"
-    : "https://farmsage-2-0-2.onrender.com";
 
 const Register = () => {
   const [name, setName] = useState("");
