@@ -4,7 +4,13 @@ const productSchema = new mongoose.Schema({
 
     name: {
         type: String,
-        required: true
+        required: true,
+        trim: true
+    },
+    description: {
+        type: String,
+        default: "",
+        trim: true
     },
     category: {
         type: String,
@@ -13,7 +19,8 @@ const productSchema = new mongoose.Schema({
     },
     image: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     isOrganic: {
         type: Boolean,
@@ -21,15 +28,18 @@ const productSchema = new mongoose.Schema({
     },
     discount: {
         type: Number,
-        default: 0
+        default: 0,
+        min: 0
     },
     price: {
         type: Number,
-        required: true
+        required: true,
+        min: 0
     },
     oldPrice: {
         type: Number,
-        default: null
+        default: null,
+        min: 0
     },
     quantity: {
         type: Number,
@@ -38,7 +48,8 @@ const productSchema = new mongoose.Schema({
     },
     unit: {
         type: String,
-        default: '1 kg'
+        default: '1 kg',
+        trim: true
     },
     vendorId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -60,4 +71,4 @@ productSchema.index({ quantity: -1, price: -1 });
 productSchema.index({ name: "text" });
 
 module.exports = mongoose.model('Product', productSchema);
-
+

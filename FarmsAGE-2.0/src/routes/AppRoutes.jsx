@@ -23,6 +23,7 @@ const Register = lazy(() => import("../Pages/Register"));
 const Fruits = lazy(() => import("../Pages/Fruits"));
 const Vegetables = lazy(() => import("../Pages/Vegetables"));
 const Organic = lazy(() => import("../Pages/Organic"));
+const Dairy = lazy(() => import("../Pages/Dairy"));
 const AllProducts = lazy(() => import("../Pages/AllProducts"));
 const CompleteProfile = lazy(() => import("../Pages/CompleteProfile"));
 const Checkout = lazy(() => import("../Pages/Checkout"));
@@ -63,6 +64,7 @@ const AppRoutes = () => {
         <Route path="/category/fruits" element={<Fruits />} />
         <Route path="/category/vegetables" element={<Vegetables />} />
         <Route path="/category/organic" element={<Organic />} />
+        <Route path="/category/dairy" element={<Dairy />} />
         <Route path="/category/all" element={<AllProducts />} />
         <Route path="/checkout" element={
           <ProtectedRoute>

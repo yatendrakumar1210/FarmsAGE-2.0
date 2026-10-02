@@ -23,7 +23,6 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
-import products from "../data/products";
 import { useCart } from "../context/CartContext";
 import { API_BASE_URL as API } from "../config/api";
 
@@ -37,10 +36,6 @@ const MyOrders = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [trackingOrder, setTrackingOrder] = useState(null);
-
-  const getProductDetails = (id) => {
-    return products.find(p => p.id == id) || { name: "Organic Produce", image: "" };
-  };
 
   useEffect(() => {
     fetchOrders();
@@ -304,8 +299,8 @@ const MyOrders = () => {
 
                         <div className="space-y-3.5">
                           {order.items.map((item, iIdx) => {
-                            const name = item.name || getProductDetails(item.productId).name;
-                            const image = item.image || getProductDetails(item.productId).image;
+                            const name = item.name || "Farm Fresh Item";
+                            const image = item.image || "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=100";
 
                             return (
                               <div key={iIdx} className="flex items-center gap-3.5 bg-slate-50/40 p-2.5 rounded-2xl border border-slate-100/60">

@@ -1,54 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
-// Static product data (always visible in admin as base catalog)
-import staticVegetables from '../../data/products';
-import staticFruits from '../../data/fruits';
-import staticOrganic from '../../data/organic';
-import staticDairy from '../../data/dairy';
-
 import { API_BASE_URL as API } from "../../config/api";
 
 const EMPTY_FORM = {
     name: '', category: 'Vegetables', image: '',
-    isOrganic: false, discount: 0, price: '',
+    description: '', isOrganic: false, discount: 0, price: '',
     oldPrice: '', quantity: 100, unit: '1 kg'
 };
-
-// Normalize category for static items
-const normalizeStatic = (items, category) =>
-    items.map(p => ({
-        ...p,
-        _id: null,           // no DB id = static item
-        category,
-        isOrganic: category === 'Organic',
-        quantity: 100,
-        unit: p.unit || '1 kg',
-        discount: typeof p.discount === 'string' ? parseInt(p.discount) : (p.discount || 0),
-        _isStatic: true,
-    }));
-
-const allStaticProducts = [
-    ...normalizeStatic(staticVegetables, 'Vegetables'),
-    ...normalizeStatic(staticFruits, 'Fruits'),
-    ...normalizeStatic(staticOrganic, 'Organic'),
-    ...normalizeStatic(staticDairy, 'Dairy'),
-];
 
 const ManageProducts = () => {
     const [dbProducts, setDbProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [formData, setFormData] = useState(EMPTY_FORM);
     const [saving, setSaving] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('All');
-    const [savingToDb, setSavingToDb] = useState(null);
 
     useEffect(() => { fetchDbProducts(); }, []);
 
     const fetchDbProducts = async () => {
+        setLoading(true);
+        setError(null);
         try {
             const token = localStorage.getItem('token');
             const res = await axios.get(`${API}/api/admin/products`, {
@@ -57,28 +32,20 @@ const ManageProducts = () => {
             setDbProducts(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
             console.error('Failed to fetch DB products:', err);
+            setError(err.response?.data?.message || err.message || 'Failed to fetch products');
         } finally {
             setLoading(false);
         }
     };
 
-    // Build merged list: DB products override static ones with same name
-    const dbProductNames = new Set(dbProducts.map(p => p.name.toLowerCase()));
-
-    const mergedProducts = [
-        ...dbProducts,
-        ...allStaticProducts.filter(p => !dbProductNames.has(p.name.toLowerCase()))
-    ];
-
     // Apply filters
-    const filteredProducts = mergedProducts.filter(p => {
-        const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const filteredProducts = dbProducts.filter(p => {
+        const matchSearch = (p.name || '').toLowerCase().includes(searchQuery.toLowerCase());
         const matchCat = categoryFilter === 'All' || p.category === categoryFilter;
         return matchSearch && matchCat;
     });
 
     const dbCount = dbProducts.length;
-    const staticOnlyCount = mergedProducts.filter(p => p._isStatic).length;
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -92,6 +59,7 @@ const ManageProducts = () => {
                 name: product.name,
                 category: product.category,
                 image: product.image,
+                description: product.description || '',
                 isOrganic: product.isOrganic || false,
                 discount: product.discount || 0,
                 price: product.price,
@@ -122,7 +90,6 @@ const ManageProducts = () => {
             if (editingProduct?._id) {
                 await axios.put(`${API}/api/admin/products/${editingProduct._id}`, payload, { headers });
             } else {
-                // new product OR saving a static product to DB
                 await axios.post(`${API}/api/admin/products`, payload, { headers });
             }
             setShowModal(false);
@@ -134,35 +101,8 @@ const ManageProducts = () => {
         }
     };
 
-    // One-click save static product to DB
-    const saveStaticToDB = async (product) => {
-        setSavingToDb(product.name);
-        const token = localStorage.getItem('token');
-        const payload = {
-            name: product.name,
-            category: product.category,
-            image: product.image,
-            isOrganic: product.isOrganic || false,
-            discount: product.discount || 0,
-            price: product.price,
-            oldPrice: product.oldPrice || null,
-            quantity: 100,
-            unit: product.unit || '1 kg'
-        };
-        try {
-            await axios.post(`${API}/api/admin/products`, payload, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            fetchDbProducts();
-        } catch (err) {
-            alert("Failed to save to DB: " + (err.response?.data?.message || err.message));
-        } finally {
-            setSavingToDb(null);
-        }
-    };
-
     const handleDelete = async (id) => {
-        if (!id) return alert("This product is from local data. Click 'Save to DB' first, then you can delete it.");
+        if (!id) return;
         if (window.confirm("Are you sure you want to delete this product?")) {
             try {
                 const token = localStorage.getItem('token');
@@ -171,7 +111,7 @@ const ManageProducts = () => {
                 });
                 fetchDbProducts();
             } catch (err) {
-                alert("Delete failed!");
+                alert("Delete failed! " + (err.response?.data?.message || err.message));
             }
         }
     };
@@ -191,8 +131,7 @@ const ManageProducts = () => {
                         All Products ({filteredProducts.length})
                     </h3>
                     <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#64748b' }}>
-                        <span style={{ color: '#15803d', fontWeight: 700 }}>{dbCount} in database</span>
-                        {staticOnlyCount > 0 && <span style={{ color: '#f59e0b', fontWeight: 700 }}> · {staticOnlyCount} local only</span>}
+                        <span style={{ color: '#15803d', fontWeight: 700 }}>{dbCount} in MongoDB</span>
                     </p>
                 </div>
                 <button className="add-btn" onClick={() => openModal()}>
@@ -212,7 +151,7 @@ const ManageProducts = () => {
                         fontSize: '0.85rem', outline: 'none', minWidth: '220px', flex: 1
                     }}
                 />
-                {['All', 'Vegetables', 'Fruits', 'Organic'].map(cat => (
+                {['All', 'Vegetables', 'Fruits', 'Organic', 'Dairy'].map(cat => (
                     <button
                         key={cat}
                         onClick={() => setCategoryFilter(cat)}
@@ -230,7 +169,15 @@ const ManageProducts = () => {
             </div>
 
             {loading ? (
-                <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>Loading products...</div>
+                <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>Loading products from database...</div>
+            ) : error ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: '#dc2626', background: '#fef2f2', borderRadius: '12px', margin: '16px 0' }}>
+                    <p style={{ fontWeight: 700, margin: '0 0 8px' }}>⚠️ Error loading products</p>
+                    <p style={{ fontSize: '0.85rem', margin: '0 0 16px' }}>{error}</p>
+                    <button onClick={fetchDbProducts} style={{ padding: '8px 16px', background: '#15803d', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 700 }}>
+                        Retry
+                    </button>
+                </div>
             ) : (
                 <div className="data-table-container">
                     <table className="custom-table">
@@ -246,13 +193,12 @@ const ManageProducts = () => {
                                 <th>Unit</th>
                                 <th>Organic</th>
                                 <th>Vendor</th>
-                                <th>Source</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredProducts.map((p, idx) => (
-                                <tr key={p._id || `static-${p.name}-${idx}`} style={{ opacity: p.quantity === 0 ? 0.65 : 1 }}>
+                            {filteredProducts.map((p) => (
+                                <tr key={p._id} style={{ opacity: p.quantity === 0 ? 0.65 : 1 }}>
                                     <td>
                                         <img src={p.image} alt={p.name}
                                             style={{ width: '46px', height: '46px', objectFit: 'cover', borderRadius: '8px' }}
@@ -282,37 +228,9 @@ const ManageProducts = () => {
                                             {p.vendorId ? (p.vendorId.storeName || p.vendorId.name) : "Admin"}
                                         </span>
                                     </td>
-                                    <td>
-                                        {p._isStatic ? (
-                                            <span style={{ background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '12px', fontSize: '0.68rem', fontWeight: 700 }}>
-                                                Local
-                                            </span>
-                                        ) : (
-                                            <span style={{ background: '#d1fae5', color: '#065f46', padding: '2px 8px', borderRadius: '12px', fontSize: '0.68rem', fontWeight: 700 }}>
-                                                DB ✓
-                                            </span>
-                                        )}
-                                    </td>
-                                    <td className="action-btns" style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                                        {p._isStatic ? (
-                                            <button
-                                                title="Save to Database to enable full editing"
-                                                onClick={() => saveStaticToDB(p)}
-                                                disabled={savingToDb === p.name}
-                                                style={{
-                                                    padding: '4px 10px', borderRadius: '8px', border: 'none',
-                                                    background: '#f59e0b', color: '#fff', fontWeight: 700,
-                                                    fontSize: '0.72rem', cursor: 'pointer', whiteSpace: 'nowrap'
-                                                }}
-                                            >
-                                                {savingToDb === p.name ? '...' : '💾 Save to DB'}
-                                            </button>
-                                        ) : (
-                                            <>
-                                                <button className="icon-btn edit-btn" onClick={() => openModal(p)} title="Edit">✏️</button>
-                                                <button className="icon-btn delete-btn" onClick={() => handleDelete(p._id)} title="Delete">🗑️</button>
-                                            </>
-                                        )}
+                                    <td className="action-btns" style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                        <button className="icon-btn edit-btn" onClick={() => openModal(p)} title="Edit">✏️</button>
+                                        <button className="icon-btn delete-btn" onClick={() => handleDelete(p._id)} title="Delete">🗑️</button>
                                     </td>
                                 </tr>
                             ))}
@@ -347,6 +265,7 @@ const ManageProducts = () => {
                                         <option value="Vegetables">Vegetables</option>
                                         <option value="Fruits">Fruits</option>
                                         <option value="Organic">Organic</option>
+                                        <option value="Dairy">Dairy</option>
                                     </select>
                                 </div>
                                 <div className="form-group">
@@ -392,6 +311,10 @@ const ManageProducts = () => {
                                     <img src={formData.image} alt="preview" style={{ height: '80px', borderRadius: '10px', objectFit: 'cover' }} />
                                 </div>
                             )}
+                            <div className="form-group">
+                                <label>Description (Optional)</label>
+                                <textarea name="description" value={formData.description} onChange={handleInputChange} rows="2" style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                            </div>
                             <div className="form-group checkbox-group">
                                 <input type="checkbox" name="isOrganic" checked={formData.isOrganic} onChange={handleInputChange} id="check-organic" />
                                 <label htmlFor="check-organic">Is Organic Product?</label>

@@ -2,12 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "../common/ProductCard";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import { ChevronRight, ChevronLeft, LayoutGrid, List, Search, X, Loader2 } from "lucide-react";
-
-import productsData from "../../data/products";
-import fruitsData from "../../data/fruits";
-import organicData from "../../data/organic";
-import dairyData from "../../data/dairy";
+import { ChevronRight, ChevronLeft, LayoutGrid, List, Search, X, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 
 import { API_BASE_URL as API } from "../../config/api";
 
@@ -34,6 +29,13 @@ const SIDEBAR_CATEGORIES = [
     icon: "https://cdn-icons-png.flaticon.com/512/1046/1046857.png",
   },
   {
+    name: "Dairy & Milk",
+    path: "/category/dairy",
+    id: "dairy",
+    categoryKey: "Dairy",
+    icon: "https://cdn-icons-png.flaticon.com/512/3050/3050158.png",
+  },
+  {
     name: "Leafy & Herbs",
     path: "/category/herbs",
     id: "herbs",
@@ -51,19 +53,11 @@ const SIDEBAR_CATEGORIES = [
 
 const checkIsOutOfStock = (p) => {
   if (!p) return true;
-  const catName = (p.category || "").toLowerCase();
-  const prodName = (p.name || "").toLowerCase();
-  const isOrganic = p.isOrganic || catName.includes("organic") || prodName.includes("organic");
-  const isFruitsOrVegetables = 
-    (catName === "vegetables" || catName === "fruits" || catName === "fresh vegetables" || catName === "fresh fruits") && !isOrganic;
-
   return (
-    !isFruitsOrVegetables ||
-    p.quantity === 0 || 
-    p.quantity === '0' || 
-    p.isOutOfStock === true || 
+    Number(p.quantity) <= 0 ||
+    p.isOutOfStock === true ||
     p.inStock === false ||
-    p.stockStatus === 'out_of_stock'
+    p.stockStatus === "out_of_stock"
   );
 };
 
@@ -101,6 +95,7 @@ const CategoryProducts = ({ title = "All Products", category = "All", productsDa
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Sync search input with searchParams
   useEffect(() => {
@@ -125,9 +120,10 @@ const CategoryProducts = ({ title = "All Products", category = "All", productsDa
     return () => clearTimeout(handler);
   }, [searchTerm, setSearchParams, querySearch]);
 
-  // Fetch paginated products from API with static fallback
+  // Fetch paginated products dynamically from API
   const fetchProducts = useCallback(async () => {
     setLoading(true);
+    setError(null);
     const limit = 12;
 
     // If propProducts is explicitly supplied (e.g. VendorStore), paginate locally
@@ -165,6 +161,9 @@ const CategoryProducts = ({ title = "All Products", category = "All", productsDa
       }
 
       const res = await fetch(`${API}/api/products?${params.toString()}`);
+      if (!res.ok) {
+        throw new Error(`Failed to load products (HTTP ${res.status})`);
+      }
       const data = await res.json();
 
       if (data && Array.isArray(data.products)) {
@@ -172,37 +171,18 @@ const CategoryProducts = ({ title = "All Products", category = "All", productsDa
         setProducts(sorted);
         setTotalProducts(data.totalProducts || data.products.length);
         setTotalPages(data.totalPages || 1);
-        setLoading(false);
-        return;
+      } else {
+        throw new Error("Invalid response format received from product catalog");
       }
     } catch (err) {
-      console.warn("API pagination fetch warning, using static fallback:", err.message);
+      console.error("CategoryProducts API error:", err);
+      setError("Unable to connect to the product database. Please check your connection and retry.");
+      setProducts([]);
+      setTotalProducts(0);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
     }
-
-    // Static Fallback - STRICTLY 12 ITEMS PER PAGE
-    let staticList = [...productsData, ...fruitsData, ...organicData, ...dairyData];
-    if (category && category !== "All") {
-      if (category === "Organic") {
-        staticList = staticList.filter(p => p.isOrganic || p.category === "Organic");
-      } else {
-        staticList = staticList.filter(p => p.category?.toLowerCase() === category.toLowerCase());
-      }
-    }
-    if (debouncedSearch.trim()) {
-      const q = debouncedSearch.toLowerCase().trim();
-      staticList = staticList.filter(p => p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q));
-    }
-
-    const sorted = sortInStockFirst(staticList, sortBy);
-    const total = sorted.length;
-    const pages = Math.ceil(total / limit) || 1;
-    const startIndex = (currentPage - 1) * limit;
-    const paginated = sorted.slice(startIndex, startIndex + limit);
-
-    setProducts(paginated);
-    setTotalProducts(total);
-    setTotalPages(pages);
-    setLoading(false);
   }, [category, debouncedSearch, sortBy, currentPage, propProducts]);
 
   useEffect(() => {
@@ -386,8 +366,26 @@ const CategoryProducts = ({ title = "All Products", category = "All", productsDa
             </div>
           )}
 
+          {/* Error State with Retry Button */}
+          {error && !loading && (
+            <div className="bg-rose-50/60 border border-rose-100 rounded-3xl p-8 sm:p-12 text-center max-w-lg mx-auto my-8">
+              <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <AlertCircle size={24} />
+              </div>
+              <h3 className="text-base font-bold text-slate-800 mb-1">Catalog Connection Issue</h3>
+              <p className="text-xs sm:text-sm text-slate-500 mb-5">{error}</p>
+              <button
+                onClick={fetchProducts}
+                className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-colors shadow-sm cursor-pointer"
+              >
+                <RefreshCw size={14} />
+                Retry
+              </button>
+            </div>
+          )}
+
           {/* Product Grid - Ultra Responsive */}
-          {!loading && (
+          {!loading && !error && products.length > 0 && (
             <div className={
               viewMode === 'grid' 
                 ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6 lg:gap-8"
@@ -412,7 +410,7 @@ const CategoryProducts = ({ title = "All Products", category = "All", productsDa
           )}
 
           {/* Empty State */}
-          {!loading && products.length === 0 && (
+          {!loading && !error && products.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 sm:py-20 text-center">
                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-slate-100 rounded-full flex items-center justify-center mb-4 sm:mb-6">
                   <Search size={36} className="text-slate-300" />

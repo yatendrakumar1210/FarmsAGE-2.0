@@ -524,6 +524,18 @@ const Navbar = React.memo(() => {
               </Link>
 
               <Link
+                to="/category/dairy"
+                onClick={() => setOpen(false)}
+                className="p-3 bg-cyan-50/80 hover:bg-cyan-100 border border-cyan-100 rounded-xl flex items-center gap-2.5 transition group"
+              >
+                <span className="text-lg group-hover:scale-110 transition-transform">🥛</span>
+                <div>
+                  <p className="text-xs font-bold text-cyan-900">Dairy & Milk</p>
+                  <p className="text-[9px] text-cyan-600/80 font-medium">Farm Fresh</p>
+                </div>
+              </Link>
+
+              <Link
                 to="/category/all"
                 onClick={() => setOpen(false)}
                 className="p-3 bg-blue-50/80 hover:bg-blue-100 border border-blue-100 rounded-xl flex items-center gap-2.5 transition group"

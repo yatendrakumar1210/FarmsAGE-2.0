@@ -30,7 +30,7 @@ const categories = [
   {
     name: "Dairy & Milk",
     image: "https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?auto=format&fit=crop&q=60&w=250",
-    path: "all?search=milk",
+    path: "dairy",
     bgColor: "bg-blue-50 border-blue-100",
   },
   {

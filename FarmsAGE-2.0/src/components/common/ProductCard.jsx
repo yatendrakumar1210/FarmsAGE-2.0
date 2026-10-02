@@ -73,19 +73,8 @@ const ProductCard = ({ product, priority = false }) => {
 
   const { cart, addToCart, updateQuantity, removeFromCart } = useCart();
 
-  const catName = (product.category || "").toLowerCase();
-  const prodName = (product.name || "").toLowerCase();
-  const isOrganic = product.isOrganic || catName.includes("organic") || prodName.includes("organic");
-  const isFruitsOrVegetables = 
-    (catName === "vegetables" || catName === "fruits" || catName === "fresh vegetables" || catName === "fresh fruits") && !isOrganic;
-
   const isOutOfStock = 
-    !isFruitsOrVegetables ||
-    product.quantity === 0 || 
-    product.quantity === '0' || 
-    product.isOutOfStock === true || 
-    product.inStock === false ||
-    product.stockStatus === 'out_of_stock';
+    Number(product.quantity) <= 0 || product.isOutOfStock === true || product.inStock === false || product.stockStatus === 'out_of_stock';
 
   const currentWeight = weightOptions[selectedWeight] || weightOptions[0];
   const currentPrice = Math.round(product.price * currentWeight.multiplier);

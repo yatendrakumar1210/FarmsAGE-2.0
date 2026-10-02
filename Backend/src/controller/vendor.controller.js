@@ -27,11 +27,19 @@ exports.getGlobalProducts = async (req, res) => {
   }
 };
 
+const mongoose = require("mongoose");
+const { validateProductInput } = require("../utils/productValidation");
+
 // ➕ Add product to vendor's store (clone from global or create new)
 exports.addProduct = async (req, res) => {
   try {
-    const productData = { ...req.body, vendorId: req.user.id };
-    const product = await Product.create(productData);
+    const { isValid, errors, sanitized } = validateProductInput(req.body, false);
+    if (!isValid) {
+      return res.status(400).json({ success: false, message: "Validation failed", errors });
+    }
+
+    sanitized.vendorId = req.user.id;
+    const product = await Product.create(sanitized);
     res.status(201).json(product);
   } catch (err) {
     res.status(500).json({ message: "Failed to add product", error: err.message });
@@ -41,9 +49,20 @@ exports.addProduct = async (req, res) => {
 // ✏️ Update vendor's product
 exports.updateProduct = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid product ID format" });
+    }
+
+    const { isValid, errors, sanitized } = validateProductInput(req.body, true);
+    if (!isValid) {
+      return res.status(400).json({ success: false, message: "Validation failed", errors });
+    }
+
+    delete sanitized.vendorId; // Never allow vendor to change ownership
+
     const product = await Product.findOneAndUpdate(
       { _id: req.params.id, vendorId: req.user.id },
-      req.body,
+      sanitized,
       { returnDocument: "after", runValidators: true }
     );
     if (!product) return res.status(404).json({ message: "Product not found or access denied" });
@@ -56,6 +75,10 @@ exports.updateProduct = async (req, res) => {
 // ❌ Delete vendor's product
 exports.deleteProduct = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid product ID format" });
+    }
+
     const product = await Product.findOneAndDelete({ _id: req.params.id, vendorId: req.user.id });
     if (!product) return res.status(404).json({ message: "Product not found or access denied" });
     res.json({ msg: "Deleted" });

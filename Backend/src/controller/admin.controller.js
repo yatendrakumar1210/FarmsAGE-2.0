@@ -138,10 +138,24 @@ exports.getPublicProducts = async (req, res) => {
   }
 };
 
+const mongoose = require("mongoose");
+const { validateProductInput } = require("../utils/productValidation");
+
 // 🛒 Add product
 exports.addProduct = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    const { isValid, errors, sanitized } = validateProductInput(req.body, false);
+    if (!isValid) {
+      return res.status(400).json({ success: false, message: "Validation failed", errors });
+    }
+
+    if (req.body.vendorId && mongoose.Types.ObjectId.isValid(req.body.vendorId)) {
+      sanitized.vendorId = req.body.vendorId;
+    } else {
+      sanitized.vendorId = null;
+    }
+
+    const product = await Product.create(sanitized);
     res.status(201).json(product);
   } catch (err) {
     res.status(500).json({ message: "Failed to add product", error: err.message });
@@ -151,7 +165,20 @@ exports.addProduct = async (req, res) => {
 // ✏️ Update product (price, quantity, name, etc.)
 exports.updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid product ID format" });
+    }
+
+    const { isValid, errors, sanitized } = validateProductInput(req.body, true);
+    if (!isValid) {
+      return res.status(400).json({ success: false, message: "Validation failed", errors });
+    }
+
+    if (req.body.vendorId !== undefined) {
+      sanitized.vendorId = req.body.vendorId || null;
+    }
+
+    const product = await Product.findByIdAndUpdate(req.params.id, sanitized, {
       returnDocument: "after",
       runValidators: true,
     });
@@ -165,6 +192,9 @@ exports.updateProduct = async (req, res) => {
 // ❌ Delete product
 exports.deleteProduct = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid product ID format" });
+    }
     await Product.findByIdAndDelete(req.params.id);
     res.json({ msg: "Deleted" });
   } catch (err) {
