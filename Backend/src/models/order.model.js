@@ -64,7 +64,22 @@ const orderSchema = new mongoose.Schema(
       default: "COD",
     },
 
-    paymentId: String,
+    paymentId: {
+      type: String,
+      sparse: true,
+      index: true,
+    },
+
+    razorpayOrderId: {
+      type: String,
+      sparse: true,
+      index: true,
+    },
+
+    currency: {
+      type: String,
+      default: "INR",
+    },
 
     deliveryAddress: {
       name: String,

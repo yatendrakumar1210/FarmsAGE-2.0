@@ -91,49 +91,6 @@ const Navbar = React.memo(() => {
     }
   }, [user]);
 
-  const handleDetectLocation = () => {
-    setLoadingLocation(true);
-
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
-      setLoadingLocation(false);
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          const { latitude, longitude } = pos.coords;
-          const addressData = await getAddressFromCoords(latitude, longitude);
-
-          if (addressData) {
-            const locName = addressData.city || addressData.fullAddress;
-            setLocationName(locName);
-            localStorage.setItem("detectedLocation", locName);
-
-            if (user) {
-              await saveAddress({
-                address: addressData.fullAddress,
-                latitude,
-                longitude,
-              });
-            }
-          }
-        } catch (err) {
-          console.error("Location error:", err);
-        } finally {
-          setLoadingLocation(false);
-        }
-      },
-      (err) => {
-        console.error(err);
-        alert("Unable to fetch location");
-        setLoadingLocation(false);
-      },
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
-    );
-  };
-
   return (
     <nav
       className={`w-full z-[110] transition-all duration-300 sticky top-0 ${

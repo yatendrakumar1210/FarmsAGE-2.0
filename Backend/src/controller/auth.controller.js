@@ -3,6 +3,7 @@ const User = require("../models/user.model");
 const generateOTP = require("../utils/generateOtp");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const { sendEmail } = require("../utils/sendEmail");
 const welcomeTemplate = require("../templates/welcomeTemplate");
 
@@ -33,13 +34,12 @@ exports.register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const validRole = role && ["user", "vendor"].includes(role.toLowerCase()) ? role.toLowerCase() : "user";
-
     const userData = {
       name: name || "",
       phone,
       password: hashedPassword,
-      role: validRole,
+      role: "user",
+      shopStatus: "none",
       authProvider: "password",
       isProfileComplete: true,
       isVerified: true,
@@ -196,16 +196,37 @@ exports.googleLogin = async (req, res) => {
 exports.sendOTP = async (req, res) => {
   try {
     const { phone } = req.body;
+    if (!phone || typeof phone !== "string" || phone.trim().length === 0) {
+      return res.status(400).json({ message: "Valid phone number is required" });
+    }
 
-    const otp = generateOTP();
+    const cleanPhone = phone.trim();
+
+    // Invalidate previous OTPs for this phone to prevent old codes from being reused
+    await OTP.deleteMany({ phone: cleanPhone });
+
+    const rawOtp = generateOTP();
+
+    if (!process.env.OTP_HASH_SECRET) {
+      return res.status(500).json({ message: "OTP configuration error: OTP_HASH_SECRET missing" });
+    }
+
+    // Store salted cryptographic hash of OTP directly using dedicated OTP_HASH_SECRET (no fallback)
+    const hashedOtp = crypto
+      .createHash("sha256")
+      .update(rawOtp + process.env.OTP_HASH_SECRET)
+      .digest("hex");
 
     await OTP.create({
-      phone,
-      otp,
+      phone: cleanPhone,
+      otp: hashedOtp,
+      attempts: 0,
       expiresAt: Date.now() + 5 * 60 * 1000,
     });
 
-    console.log("OTP:", otp); 
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[DEV ONLY] OTP for ${cleanPhone}: ${rawOtp}`);
+    }
 
     res.json({
       success: true,
@@ -224,21 +245,64 @@ exports.verifyOTP = async (req, res) => {
   try {
     const { phone, otp } = req.body;
 
-    const record = await OTP.findOne({ phone, otp });
+    if (!phone || !otp) {
+      return res.status(400).json({ message: "Phone number and OTP are required" });
+    }
+
+    const cleanPhone = phone.trim();
+    const cleanOtp = String(otp).trim();
+
+    const record = await OTP.findOne({ phone: cleanPhone }).sort({ createdAt: -1 });
 
     if (!record) {
-      return res.status(400).json({ message: "Invalid OTP" });
+      return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
     if (record.expiresAt < Date.now()) {
-      return res.status(400).json({ message: "OTP expired" });
+      await OTP.deleteMany({ phone: cleanPhone });
+      return res.status(400).json({ message: "OTP expired. Please request a new OTP." });
     }
 
-    let user = await User.findOne({ phone });
+    // Maximum 5 verification attempts to prevent brute-force attacks
+    if (record.attempts >= 5) {
+      await OTP.deleteMany({ phone: cleanPhone });
+      return res.status(429).json({
+        message: "Too many failed attempts. This OTP has been invalidated. Please request a new one.",
+      });
+    }
+
+    if (!process.env.OTP_HASH_SECRET) {
+      return res.status(500).json({ message: "OTP configuration error: OTP_HASH_SECRET missing" });
+    }
+
+    const computedHash = crypto
+      .createHash("sha256")
+      .update(cleanOtp + process.env.OTP_HASH_SECRET)
+      .digest("hex");
+
+    const recordBuf = Buffer.from(record.otp, "utf8");
+    const computedBuf = Buffer.from(computedHash, "utf8");
+
+    if (
+      recordBuf.length !== computedBuf.length ||
+      !crypto.timingSafeEqual(recordBuf, computedBuf)
+    ) {
+      record.attempts += 1;
+      await record.save();
+      const remainingAttempts = 5 - record.attempts;
+      return res.status(400).json({
+        message: `Invalid OTP. ${remainingAttempts} attempt${remainingAttempts === 1 ? "" : "s"} remaining.`,
+      });
+    }
+
+    // Invalidate immediately upon successful verification (prevents replay)
+    await OTP.deleteMany({ phone: cleanPhone });
+
+    let user = await User.findOne({ phone: cleanPhone });
     let isNewUser = false;
 
     if (!user) {
-      user = await User.create({ phone, isProfileComplete: false });
+      user = await User.create({ phone: cleanPhone, isProfileComplete: false, role: "user", shopStatus: "none" });
       isNewUser = true;
     } else if (!user.isProfileComplete) {
       isNewUser = true;
@@ -249,8 +313,6 @@ exports.verifyOTP = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
     );
-
-    await OTP.deleteMany({ phone });
 
     res.json({
       success: true,
@@ -267,7 +329,7 @@ exports.verifyOTP = async (req, res) => {
 // COMPLETE PROFILE 
 exports.completeProfile = async (req, res) => {
   try {
-    const { name, role, email } = req.body;
+    const { name, email } = req.body;
 
     if (email) {
       const existingUser = await User.findOne({ email, _id: { $ne: req.user.id } });
@@ -277,10 +339,19 @@ exports.completeProfile = async (req, res) => {
     }
 
     const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    user.name = name;
-    user.role = role; // user / vendor
-    if (email) user.email = email;
+    user.name = name ? String(name).trim() : user.name;
+
+    // Normal users can NEVER promote themselves to vendor or admin through completeProfile.
+    // Vendor access strictly requires registering a shop and admin approval.
+    if (!user.role) {
+      user.role = "user";
+    }
+
+    if (email) user.email = email.trim();
     user.isProfileComplete = true;
 
     await user.save();

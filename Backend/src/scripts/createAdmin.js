@@ -4,7 +4,11 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
 
 const connectDB = async () => {
-  await mongoose.connect(process.env.MONGO_URI);
+  const uri = process.env.MONGODB_URI || process.env.MONGO_URI;
+  if (!uri) {
+    throw new Error("MONGODB_URI / MONGO_URI is required");
+  }
+  await mongoose.connect(uri);
   console.log("DB Connected");
 };
 
@@ -12,16 +16,20 @@ const createAdmin = async () => {
   try {
     await connectDB();
 
-    // 🔐 hash password
-    const adminPhone = process.env.ADMIN_PHONE || "9359266118";
-    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+    const adminPhone = process.env.ADMIN_PHONE;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminPhone || !adminPassword) {
+      throw new Error("ADMIN_PHONE and ADMIN_PASSWORD environment variables are required to create an admin account.");
+    }
+
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
     const admin = await User.findOneAndUpdate(
       { phone: adminPhone },
       {
         name: "Admin",
-        email: "admin@farmsage.com",
+        email: process.env.ADMIN_EMAIL || "admin@farmsage.com",
         password: hashedPassword,
         phone: adminPhone,
         role: "admin",
@@ -33,9 +41,8 @@ const createAdmin = async () => {
     );
 
     console.log("✅ Admin user created/updated successfully!");
-    console.log(`Phone: ${adminPhone}`);
-    console.log(`Password: ${adminPassword}`);
-    process.exit();
+    console.log(`Admin configured for phone: ${adminPhone}`);
+    process.exit(0);
   } catch (error) {
     console.log(error);
     process.exit(1);

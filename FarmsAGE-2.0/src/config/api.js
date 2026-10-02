@@ -1,11 +1,5 @@
-import apiClient, { API_BASE_URL } from "../api/client";
+import apiClient from "../api/client";
+import { API_BASE_URL, getAuthHeaders } from "../services/api";
 
-export { API_BASE_URL, apiClient };
-
-export const getAuthHeaders = () => {
-  const token = localStorage.getItem("token");
-  return {
-    "Content-Type": "application/json",
-    ...(token && token !== "null" && token !== "undefined" ? { Authorization: `Bearer ${token}` } : {}),
-  };
-};
+export { API_BASE_URL, apiClient, getAuthHeaders };
+export default API_BASE_URL;

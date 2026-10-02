@@ -1,23 +1,32 @@
 const nodemailer = require("nodemailer");
 
+const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
+const smtpPort = parseInt(process.env.SMTP_PORT, 10) || 465;
+const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
+
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpPort === 465,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: smtpUser,
+    pass: smtpPass,
   },
 });
 
-// ✅ Verify connection (keep this)
-transporter.verify(function (error, success) {
-  if (error) {
-    console.error("❌ Mail Server Error:", error.message);
-  } else {
-    console.log("✅ Mail Server is ready to take our messages");
-  }
-});
+// Verify connection only if credentials configured
+if (smtpUser && smtpPass) {
+  transporter.verify(function (error) {
+    if (error) {
+      console.warn("Mail Server verification notice:", error.message);
+    } else {
+      console.log("Mail Server is ready to deliver messages");
+    }
+  });
+} else {
+  console.warn("[EMAIL CONFIG] SMTP credentials (SMTP_USER/PASS or EMAIL_USER/PASS) not configured. Outgoing emails will be skipped.");
+}
 
 const sendEmail = async ({ to, subject, html }) => {
   try {

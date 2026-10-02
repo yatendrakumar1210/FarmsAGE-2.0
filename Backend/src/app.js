@@ -29,23 +29,42 @@ app.use(express.json({
 }));
 
 // ─── CORS ───
-const envOrigins = (process.env.ALLOWED_ORIGINS || "").split(",").map(o => o.trim()).filter(Boolean);
-const allowedOrigins = Array.from(new Set([
+const isProduction = process.env.NODE_ENV === "production";
+
+const devOrigins = [
   'http://localhost:5173',
   'http://localhost:4173',
   'http://localhost:3000',
-  process.env.FRONTEND_URL,
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:4173',
+  'http://127.0.0.1:3000',
+];
+
+const envOrigins = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map(o => o.trim())
+  .filter(Boolean);
+
+const configuredFrontend = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.trim() : null;
+const prodOrigins = Array.from(new Set([
+  configuredFrontend,
   ...envOrigins
 ])).filter(Boolean);
+
+const allowedOrigins = isProduction
+  ? prodOrigins
+  : Array.from(new Set([...devOrigins, ...prodOrigins]));
 
 app.use(cors({
   origin: (origin, callback) => {
     // allow requests with no origin (like mobile apps, curl, or server-to-server)
-    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== "production") {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS policy error: Origin ${origin} is not allowed`));
+    if (!origin) {
+      return callback(null, true);
     }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS policy error: Origin ${origin} is not allowed`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -73,9 +92,21 @@ app.get('/', (req, res) => {
 // Centralized Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
-  res.status(err.status || 500).json({
+
+  // Handle CORS errors specifically
+  if (err.message && err.message.startsWith("CORS policy error")) {
+    return res.status(403).json({
+      success: false,
+      message: "Access forbidden by CORS policy",
+    });
+  }
+
+  const statusCode = err.status || err.statusCode || 500;
+  const isProd = process.env.NODE_ENV === "production";
+
+  res.status(statusCode).json({
     success: false,
-    message: err.message || "Internal Server Error"
+    message: isProd && statusCode >= 500 ? "Internal Server Error" : (err.message || "An error occurred"),
   });
 });
 

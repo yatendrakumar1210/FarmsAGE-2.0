@@ -1,10 +1,8 @@
 import axios from "axios";
 
-export const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.MODE === "development"
-    ? "http://localhost:3000"
-    : "https://farmsage-2-0-2.onrender.com");
+import { API_BASE_URL } from "../services/api";
+
+export { API_BASE_URL };
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

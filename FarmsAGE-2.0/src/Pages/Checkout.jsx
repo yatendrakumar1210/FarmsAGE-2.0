@@ -221,6 +221,7 @@ const Checkout = () => {
       }
 
       const orderData = {
+        deliveryAddress: address,
         items: cart.map(item => ({
           productId: String(item._id || item.id),
           price: Number(item.price),
@@ -249,10 +250,13 @@ const Checkout = () => {
       if (!res.ok) {
         throw new Error(data.message || "Failed to create order");
       }
-      const { order } = data;
+      const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || data.key_id;
+      if (!razorpayKey) {
+        throw new Error("Online payment gateway key is not configured. Please use Cash on Delivery or try again later.");
+      }
 
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SWa3PA5oApBh4b",
+        key: razorpayKey,
         amount: order.amount,
         currency: order.currency || "INR",
         name: "FarmsAGE 2.0",

@@ -9,8 +9,7 @@ const connectDB = async () => {
   try {
     const uri = process.env.MONGODB_URI || process.env.MONGO_URI;
     if (!uri) {
-      console.error("Database connection error: MONGO_URI / MONGODB_URI environment variable is missing");
-      return;
+      throw new Error("Database connection error: MONGODB_URI / MONGO_URI environment variable is missing");
     }
 
     const conn = await mongoose.connect(uri, {
