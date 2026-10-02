@@ -29,19 +29,39 @@ app.use(express.json({
 }));
 
 // ─── CORS ───
-const envOrigins = (process.env.ALLOWED_ORIGINS || "").split(",").map(o => o.trim()).filter(Boolean);
-const allowedOrigins = Array.from(new Set([
+const normalizeOrigin = (originUrl) => (originUrl ? originUrl.trim().replace(/\/+$/, '') : '');
+
+const defaultAllowedOrigins = [
   'http://localhost:5173',
   'http://localhost:4173',
   'http://localhost:3000',
-  process.env.FRONTEND_URL,
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:4173',
+  'http://127.0.0.1:3000',
+  'https://farms-age-2-0-7fik.vercel.app',
+  'https://farms-age-2-0-v32x.vercel.app'
+];
+
+const envOrigins = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map(normalizeOrigin)
+  .filter(Boolean);
+
+const allowedOrigins = Array.from(new Set([
+  ...defaultAllowedOrigins,
+  normalizeOrigin(process.env.FRONTEND_URL),
+  normalizeOrigin(process.env.ADMIN_URL),
   ...envOrigins
 ])).filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
     // allow requests with no origin (like mobile apps, curl, or server-to-server)
-    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== "production") {
+    if (!origin) {
+      return callback(null, true);
+    }
+    const normalizedOrigin = normalizeOrigin(origin);
+    if (allowedOrigins.includes(normalizedOrigin) || process.env.NODE_ENV !== "production") {
       callback(null, true);
     } else {
       callback(new Error(`CORS policy error: Origin ${origin} is not allowed`));
