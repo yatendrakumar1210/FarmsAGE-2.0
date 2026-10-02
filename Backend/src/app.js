@@ -31,6 +31,8 @@ app.use(express.json({
 // ─── CORS ───
 const isProduction = process.env.NODE_ENV === "production";
 
+const normalizeOrigin = (originUrl) => (originUrl ? String(originUrl).trim().replace(/\/+$/, '') : '');
+
 const devOrigins = [
   'http://localhost:5173',
   'http://localhost:4173',
@@ -38,16 +40,18 @@ const devOrigins = [
   'http://127.0.0.1:5173',
   'http://127.0.0.1:4173',
   'http://127.0.0.1:3000',
-];
+].map(normalizeOrigin);
 
 const envOrigins = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
-  .map(o => o.trim())
+  .map(normalizeOrigin)
   .filter(Boolean);
 
-const configuredFrontend = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.trim() : null;
+const configuredFrontend = normalizeOrigin(process.env.FRONTEND_URL);
+const configuredAdmin = normalizeOrigin(process.env.ADMIN_URL);
 const prodOrigins = Array.from(new Set([
   configuredFrontend,
+  configuredAdmin,
   ...envOrigins
 ])).filter(Boolean);
 
@@ -61,7 +65,8 @@ app.use(cors({
     if (!origin) {
       return callback(null, true);
     }
-    if (allowedOrigins.includes(origin)) {
+    const normalizedOrigin = normalizeOrigin(origin);
+    if (allowedOrigins.includes(normalizedOrigin)) {
       return callback(null, true);
     }
     return callback(new Error(`CORS policy error: Origin ${origin} is not allowed`));
