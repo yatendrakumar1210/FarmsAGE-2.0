@@ -230,6 +230,12 @@ async function run() {
     createdUserIds.push(adminUser._id);
     const adminToken = jwt.sign({ id: adminUser._id, role: "admin" }, process.env.JWT_SECRET);
 
+    // Pending vendor calls /api/auth/me
+    const pendingMeRes = await api("/api/auth/me", {
+      headers: { Authorization: `Bearer ${vendorToken}` },
+    });
+    assert(pendingMeRes.status === 200 && pendingMeRes.data?.user?.shopStatus === "pending", "/api/auth/me returns shopStatus='pending' on initial refresh");
+
     // Admin approves vendor
     const approveRes = await api(`/api/admin/users/${vendorId}/shop-status`, {
       method: "PUT",
@@ -241,6 +247,15 @@ async function run() {
 
     const approvedDbVendor = await User.findById(vendorId);
     assert(approvedDbVendor.shopStatus === "approved", "Database confirms vendor is now approved");
+
+    // REFRESH CHECK: Vendor calls /api/auth/me WITHOUT logout/login
+    const approvedMeRes = await api("/api/auth/me", {
+      headers: { Authorization: `Bearer ${vendorToken}` },
+    });
+    assert(
+      approvedMeRes.status === 200 && approvedMeRes.data?.user?.shopStatus === "approved",
+      "Browser refresh: /api/auth/me returns shopStatus='approved' without logout/login"
+    );
 
     // ----------------------------------------------------
     // 6. APPROVED VENDOR FUNCTIONALITY
@@ -290,6 +305,15 @@ async function run() {
     assert(rejectedDbVendor.role === "vendor", "Rejected vendor remains role='vendor' (NOT converted to customer)");
     assert(rejectedDbVendor.shopStatus === "rejected", "Rejected vendor shopStatus is 'rejected'");
 
+    // REFRESH CHECK: Vendor calls /api/auth/me on refresh after rejection
+    const rejectedMeRes = await api("/api/auth/me", {
+      headers: { Authorization: `Bearer ${vendorToken}` },
+    });
+    assert(
+      rejectedMeRes.status === 200 && rejectedMeRes.data?.user?.shopStatus === "rejected",
+      "Browser refresh: /api/auth/me returns shopStatus='rejected' without logout/login"
+    );
+
     // Blocked from product management
     const rejectedProductAccess = await api("/api/vendor/products", {
       headers: { Authorization: `Bearer ${vendorToken}` },
@@ -317,6 +341,15 @@ async function run() {
     const suspendedDbVendor = await User.findById(vendorId);
     assert(suspendedDbVendor.role === "vendor", "Suspended vendor remains role='vendor'");
     assert(suspendedDbVendor.shopStatus === "suspended", "Suspended vendor shopStatus is 'suspended'");
+
+    // REFRESH CHECK: Vendor calls /api/auth/me on refresh after suspension
+    const suspendedMeRes = await api("/api/auth/me", {
+      headers: { Authorization: `Bearer ${vendorToken}` },
+    });
+    assert(
+      suspendedMeRes.status === 200 && suspendedMeRes.data?.user?.shopStatus === "suspended",
+      "Browser refresh: /api/auth/me returns shopStatus='suspended' without logout/login"
+    );
 
     // Blocked from product management
     const suspendedProductAccess = await api("/api/vendor/products", {

@@ -389,6 +389,7 @@ exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.json({ success: true, user });
   } catch (error) {
     res.status(500).json({ message: error.message });

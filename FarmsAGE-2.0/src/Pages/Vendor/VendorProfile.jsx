@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { MapPin, Save, Loader, Navigation, Clock, AlertCircle, AlertTriangle, CheckCircle2 } from "lucide-react";
 import MapLocationPicker from "../../components/location/MapLocationPicker";
 import { useAuth } from "../../context/AuthContext";
@@ -37,6 +38,9 @@ const VendorProfile = () => {
             lng: data.coordinates?.lng || "",
           },
         });
+        if (data.shopStatus && data.shopStatus !== user?.shopStatus) {
+          updateUser({ shopStatus: data.shopStatus });
+        }
       } catch (err) {
         console.error("Failed to fetch profile:", err);
       } finally {
@@ -254,20 +258,38 @@ const VendorProfile = () => {
           <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#15803d" }}>
             Your store is approved and active on FarmsAGE Marketplace.
           </span>
-          <span style={{
-            marginLeft: "auto",
-            background: "#dcfce7",
-            color: "#15803d",
-            border: "1px solid #bbf7d0",
-            fontSize: "0.65rem",
-            fontWeight: 900,
-            padding: "2px 8px",
-            borderRadius: "9999px",
-            letterSpacing: "0.05em",
-            textTransform: "uppercase"
-          }}>
-            Approved
-          </span>
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span style={{
+              background: "#dcfce7",
+              color: "#15803d",
+              border: "1px solid #bbf7d0",
+              fontSize: "0.65rem",
+              fontWeight: 900,
+              padding: "2px 8px",
+              borderRadius: "9999px",
+              letterSpacing: "0.05em",
+              textTransform: "uppercase"
+            }}>
+              Approved
+            </span>
+            <Link
+              to="/vendor/dashboard"
+              style={{
+                background: "#16a34a",
+                color: "#ffffff",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                padding: "4px 10px",
+                borderRadius: "0.5rem",
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+            >
+              Dashboard &rarr;
+            </Link>
+          </div>
         </div>
       )}
 
