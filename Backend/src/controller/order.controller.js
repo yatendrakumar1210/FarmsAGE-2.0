@@ -8,6 +8,48 @@ const userTemplate = require("../templates/userTemplate");
 const vendorTemplate = require("../templates/vendorTemplate");
 const { sendEmail } = require("../utils/sendEmail");
 
+// Helper to validate and sanitize delivery address
+const validateDeliveryAddress = (addr) => {
+  if (!addr || typeof addr !== "object") {
+    throw new Error("Delivery address is required");
+  }
+
+  const { name, phone, street, city, pincode } = addr;
+
+  if (!name || typeof name !== "string" || name.trim().length === 0) {
+    throw new Error("Recipient name is required in delivery address");
+  }
+
+  if (!phone || typeof phone !== "string" || phone.trim().length === 0) {
+    throw new Error("Contact phone is required in delivery address");
+  }
+
+  if (!street || typeof street !== "string" || street.trim().length === 0) {
+    throw new Error("Street address is required in delivery address");
+  }
+
+  if (!city || typeof city !== "string" || city.trim().length === 0) {
+    throw new Error("City is required in delivery address");
+  }
+
+  if (!pincode || typeof pincode !== "string" || pincode.trim().length === 0) {
+    throw new Error("Pincode is required in delivery address");
+  }
+
+  return {
+    name: name.trim(),
+    phone: phone.trim(),
+    street: street.trim(),
+    city: city.trim(),
+    pincode: pincode.trim(),
+    houseNumber: typeof addr.houseNumber === "string" ? addr.houseNumber.trim() : (addr.houseNumber || ""),
+    landmark: typeof addr.landmark === "string" ? addr.landmark.trim() : (addr.landmark || ""),
+    latitude: addr.latitude !== undefined && addr.latitude !== null ? Number(addr.latitude) : null,
+    longitude: addr.longitude !== undefined && addr.longitude !== null ? Number(addr.longitude) : null,
+    label: typeof addr.label === "string" && addr.label.trim() ? addr.label.trim() : "Home",
+  };
+};
+
 // Helper to validate items, verify database prices, check stock availability
 const validateAndSanitizeItems = async (items) => {
   if (!items || !Array.isArray(items) || items.length === 0) {
@@ -32,7 +74,28 @@ const validateAndSanitizeItems = async (items) => {
       throw new Error(`Product with ID '${pId}' not found or unavailable`);
     }
 
-    const qty = Math.max(1, parseInt(item.quantity) || 1);
+    // Strict quantity validation: positive integer between 1 and 50
+    const rawQty = item.quantity;
+    let qty;
+    if (typeof rawQty === "number") {
+      if (!Number.isInteger(rawQty)) {
+        throw new Error(`Invalid quantity for '${dbProduct.name}'. Quantity must be a whole integer.`);
+      }
+      qty = rawQty;
+    } else if (typeof rawQty === "string" && /^-?\d+(\.\d+)?$/.test(rawQty.trim())) {
+      const parsedNum = Number(rawQty.trim());
+      if (!Number.isInteger(parsedNum)) {
+        throw new Error(`Invalid quantity for '${dbProduct.name}'. Quantity must be a whole integer.`);
+      }
+      qty = parsedNum;
+    } else {
+      throw new Error(`Invalid quantity for '${dbProduct.name}'. Quantity must be a positive integer between 1 and 50.`);
+    }
+
+    if (qty < 1 || qty > 50) {
+      throw new Error(`Invalid quantity for '${dbProduct.name}'. Quantity must be between 1 and 50.`);
+    }
+
     if (dbProduct.quantity < qty) {
       throw new Error(`Insufficient stock for '${dbProduct.name}'. Available: ${dbProduct.quantity}, Requested: ${qty}`);
     }
@@ -93,7 +156,10 @@ exports.createOrder = async (req, res) => {
   try {
     const { items, deliveryAddress } = req.body;
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    // Validate delivery address BEFORE Razorpay order or DB order creation
+    const sanitizedAddress = validateDeliveryAddress(deliveryAddress || user.defaultAddress);
 
     const { subtotal, verifiedItems } = await validateAndSanitizeItems(items);
 
@@ -127,7 +193,7 @@ exports.createOrder = async (req, res) => {
         userId: req.user.id,
         vendorId: (vId !== "global" && mongoose.Types.ObjectId.isValid(vId)) ? vId : null,
         items: vItems,
-        deliveryAddress: deliveryAddress || user.defaultAddress || {},
+        deliveryAddress: sanitizedAddress,
         totalAmount: vTotal,
         paymentMethod: "Online",
         paymentStatus: "Pending",
@@ -139,6 +205,7 @@ exports.createOrder = async (req, res) => {
     }
 
     res.json({
+      success: true,
       order: razorpayOrder,
       totalAmount,
       verifiedItems,
@@ -146,7 +213,7 @@ exports.createOrder = async (req, res) => {
     });
   } catch (err) {
     console.error("RAZORPAY ORDER CREATION ERROR:", err);
-    res.status(400).json({ message: err.message || "Failed to create payment order" });
+    res.status(400).json({ success: false, message: err.message || "Failed to create payment order" });
   }
 };
 
@@ -330,11 +397,15 @@ exports.codOrder = async (req, res) => {
     const { items, deliveryAddress } = req.body;
 
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    const { verifiedItems } = await validateAndSanitizeItems(items);
+    // Validate delivery address BEFORE modifying stock or creating order
+    const sanitizedAddress = validateDeliveryAddress(deliveryAddress || user.defaultAddress);
 
-    // Perform atomic stock decrement
+    const { subtotal, verifiedItems } = await validateAndSanitizeItems(items);
+    const deliveryCharge = subtotal > 500 || subtotal === 0 ? 0 : 40;
+
+    // Perform atomic stock decrement AFTER all validations pass
     await updateProductInventoryAtomic(verifiedItems);
 
     // Group items by vendorId
@@ -346,17 +417,20 @@ exports.codOrder = async (req, res) => {
     }, {});
 
     const createdOrders = [];
+    const vendorKeys = Object.keys(vendorGroups);
 
-    for (const [vId, vItems] of Object.entries(vendorGroups)) {
-      const subtotal = vItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-      const deliveryCharge = subtotal > 500 || subtotal === 0 ? 0 : 40;
-      const vTotal = subtotal + deliveryCharge;
+    for (const vId of vendorKeys) {
+      const vItems = vendorGroups[vId];
+      const vSubtotal = vItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+      // For multi-vendor orders, distribute delivery charge to first sub-order (consistent with online checkout)
+      const vDelivery = vendorKeys.length === 1 ? deliveryCharge : (vId === vendorKeys[0] ? deliveryCharge : 0);
+      const vTotal = vSubtotal + vDelivery;
 
       const order = await Order.create({
         userId: req.user.id,
         vendorId: (vId !== "global" && mongoose.Types.ObjectId.isValid(vId)) ? vId : null,
         items: vItems,
-        deliveryAddress: deliveryAddress || user.defaultAddress || {},
+        deliveryAddress: sanitizedAddress,
         totalAmount: vTotal,
         paymentMethod: "COD",
         paymentStatus: "Pending",
