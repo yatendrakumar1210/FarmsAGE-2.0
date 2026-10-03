@@ -76,6 +76,22 @@ const orderSchema = new mongoose.Schema(
       index: true,
     },
 
+    inventoryDeducted: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+
+    paymentProcessingAt: {
+      type: Date,
+      default: null,
+    },
+
+    emailSent: {
+      type: Boolean,
+      default: false,
+    },
+
     currency: {
       type: String,
       default: "INR",
