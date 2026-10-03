@@ -6,6 +6,8 @@
  * In production mode, requires `VITE_API_URL` to prevent unintentional routing.
  */
 
+const PRODUCTION_FALLBACK_URL = "https://farmsage-2-0-2.onrender.com";
+
 const resolveBaseUrl = () => {
   const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl && typeof envUrl === "string" && envUrl.trim().length > 0) {
@@ -16,10 +18,7 @@ const resolveBaseUrl = () => {
     return "http://localhost:3000";
   }
 
-  console.warn(
-    "[API CONFIG WARNING] VITE_API_URL is not set in production. Please set VITE_API_URL in your deployment environment."
-  );
-  return "";
+  return PRODUCTION_FALLBACK_URL;
 };
 
 export const API_BASE_URL = resolveBaseUrl();

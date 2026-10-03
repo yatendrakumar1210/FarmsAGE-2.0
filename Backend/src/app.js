@@ -35,9 +35,11 @@ const normalizeOrigin = (originUrl) => (originUrl ? String(originUrl).trim().rep
 
 const devOrigins = [
   'http://localhost:5173',
+  'http://localhost:5174',
   'http://localhost:4173',
   'http://localhost:3000',
   'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
   'http://127.0.0.1:4173',
   'http://127.0.0.1:3000',
 ].map(normalizeOrigin);
@@ -55,9 +57,7 @@ const prodOrigins = Array.from(new Set([
   ...envOrigins
 ])).filter(Boolean);
 
-const allowedOrigins = isProduction
-  ? prodOrigins
-  : Array.from(new Set([...devOrigins, ...prodOrigins]));
+const isLocalhostOrigin = (origin) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -66,9 +66,18 @@ app.use(cors({
       return callback(null, true);
     }
     const normalizedOrigin = normalizeOrigin(origin);
-    if (allowedOrigins.includes(normalizedOrigin)) {
+
+    if (isProduction) {
+      if (prodOrigins.includes(normalizedOrigin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS policy error: Origin ${origin} is not allowed`));
+    }
+
+    if (isLocalhostOrigin(normalizedOrigin) || devOrigins.includes(normalizedOrigin) || prodOrigins.includes(normalizedOrigin)) {
       return callback(null, true);
     }
+
     return callback(new Error(`CORS policy error: Origin ${origin} is not allowed`));
   },
   credentials: true,
