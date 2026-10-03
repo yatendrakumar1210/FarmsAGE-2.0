@@ -273,7 +273,17 @@ exports.getNearbyVendors = async (req, res) => {
 // 🏪 Get a specific vendor's public products
 exports.getVendorProducts = async (req, res) => {
   try {
-    const products = await Product.find({ vendorId: req.params.vendorId }).sort({ createdAt: -1 });
+    const { vendorId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(vendorId)) {
+      return res.status(400).json({ success: false, message: "Invalid vendor ID format" });
+    }
+
+    const vendor = await User.findById(vendorId).select("role shopStatus");
+    if (!vendor || vendor.role !== "vendor" || vendor.shopStatus !== "approved") {
+      return res.status(404).json({ success: false, message: "Vendor not found or not approved" });
+    }
+
+    const products = await Product.find({ vendorId }).sort({ createdAt: -1 });
     res.json(products);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch vendor products", error: err.message });
@@ -283,9 +293,24 @@ exports.getVendorProducts = async (req, res) => {
 // 🏪 Get a specific vendor's public info
 exports.getVendorInfo = async (req, res) => {
   try {
-    const vendor = await User.findById(req.params.vendorId).select("name storeName specialty storeImage coordinates");
-    if (!vendor) return res.status(404).json({ message: "Vendor not found" });
-    res.json(vendor);
+    const { vendorId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(vendorId)) {
+      return res.status(400).json({ success: false, message: "Invalid vendor ID format" });
+    }
+
+    const vendor = await User.findById(vendorId).select("name storeName specialty storeImage coordinates role shopStatus");
+    if (!vendor || vendor.role !== "vendor" || vendor.shopStatus !== "approved") {
+      return res.status(404).json({ success: false, message: "Vendor not found or not approved" });
+    }
+
+    res.json({
+      _id: vendor._id,
+      name: vendor.name,
+      storeName: vendor.storeName,
+      specialty: vendor.specialty,
+      storeImage: vendor.storeImage,
+      coordinates: vendor.coordinates,
+    });
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch vendor info", error: err.message });
   }

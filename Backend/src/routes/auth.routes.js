@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   register,
   login,
+  logout,
   sendOTP,
   verifyOTP,
   completeProfile,
@@ -44,6 +45,7 @@ router.get("/me", authMiddleware, getMe);
 router.post("/address", authMiddleware, saveAddress);
 router.post("/register", register);
 router.post("/login", login);
+router.post("/logout", logout);
 router.post("/send-otp", otpSendLimiter, sendOTP);
 router.post("/verify-otp", otpVerifyLimiter, verifyOTP);
 router.post("/complete-profile", authMiddleware, completeProfile);

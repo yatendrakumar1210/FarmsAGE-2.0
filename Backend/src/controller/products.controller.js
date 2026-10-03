@@ -231,6 +231,14 @@ exports.updateProduct = async (req, res) => {
 
     // Vendor authorization check
     if (req.user.role === "vendor") {
+      const dbUser = await User.findById(req.user.id).select("role shopStatus");
+      if (dbUser && (dbUser.role !== "vendor" || dbUser.shopStatus !== "approved")) {
+        return res.status(403).json({
+          success: false,
+          message: "Only approved vendors can update products",
+        });
+      }
+
       if (!existingProduct.vendorId || existingProduct.vendorId.toString() !== req.user.id) {
         return res.status(403).json({
           success: false,
@@ -307,6 +315,14 @@ exports.deleteProduct = async (req, res) => {
 
     // Vendor authorization check
     if (req.user.role === "vendor") {
+      const dbUser = await User.findById(req.user.id).select("role shopStatus");
+      if (dbUser && (dbUser.role !== "vendor" || dbUser.shopStatus !== "approved")) {
+        return res.status(403).json({
+          success: false,
+          message: "Only approved vendors can delete products",
+        });
+      }
+
       if (!existingProduct.vendorId || existingProduct.vendorId.toString() !== req.user.id) {
         return res.status(403).json({
           success: false,

@@ -76,7 +76,7 @@ const userSchema = new mongoose.Schema(
 
     shopStatus: {
       type: String,
-      enum: ["none", "pending", "approved", "rejected"],
+      enum: ["none", "pending", "approved", "rejected", "suspended"],
       default: "none",
     },
 
@@ -109,7 +109,15 @@ const userSchema = new mongoose.Schema(
 
     lastLogin: Date,
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: {
+      transform(doc, ret) {
+        delete ret.password;
+        return ret;
+      },
+    },
+  },
 );
 
 module.exports = mongoose.model("User", userSchema);

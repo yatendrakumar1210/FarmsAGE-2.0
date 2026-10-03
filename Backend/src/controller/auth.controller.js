@@ -442,3 +442,11 @@ exports.saveAddress = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// LOGOUT USER
+exports.logout = async (req, res) => {
+  res.json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};
