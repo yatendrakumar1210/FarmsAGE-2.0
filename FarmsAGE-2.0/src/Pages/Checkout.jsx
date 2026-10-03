@@ -250,6 +250,14 @@ const Checkout = () => {
       if (!res.ok) {
         throw new Error(data.message || "Failed to create order");
       }
+
+      const razorpayOrder = data.order;
+      if (!razorpayOrder || !razorpayOrder.id) {
+        throw new Error(
+          data.message || "Failed to initialize payment gateway order"
+        );
+      }
+
       const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || data.key_id;
       if (!razorpayKey) {
         throw new Error("Online payment gateway key is not configured. Please use Cash on Delivery or try again later.");
@@ -257,11 +265,11 @@ const Checkout = () => {
 
       const options = {
         key: razorpayKey,
-        amount: order.amount,
-        currency: order.currency || "INR",
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency || "INR",
         name: "FarmsAGE 2.0",
         description: "Organic Fresh Produce",
-        order_id: order.id,
+        order_id: razorpayOrder.id,
         handler: async (response) => {
           setLoading(true);
           try {
