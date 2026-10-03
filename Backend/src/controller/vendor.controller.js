@@ -4,7 +4,7 @@ const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("../utils/sendEmail");
 const orderStatusTemplate = require("../templates/orderStatusTemplate");
-const { restoreOrderInventoryAtomic } = require("./order.controller");
+const { restoreOrderInventoryAtomic, initiateOrderRefund } = require("./order.controller");
 
 // ─── Vendor Product Management ───
 
@@ -109,12 +109,13 @@ exports.updateOrderStatus = async (req, res) => {
     const order = await Order.findOne({ _id: req.params.id, vendorId: req.user.id });
     if (!order) return res.status(404).json({ message: "Order not found or access denied" });
 
-    if (order.status === "Cancelled" && status === "Cancelled") {
-      return res.status(400).json({ message: "Order is already cancelled" });
+    // Terminal state protection: Cancelled and Delivered are terminal
+    if (order.status === "Cancelled") {
+      return res.status(400).json({ message: "Order is already cancelled and cannot be changed" });
     }
 
-    if (order.status === "Delivered" && status === "Cancelled") {
-      return res.status(400).json({ message: "Delivered orders cannot be cancelled" });
+    if (order.status === "Delivered") {
+      return res.status(400).json({ message: "Delivered orders cannot be changed" });
     }
 
     order.status = status;
@@ -126,6 +127,9 @@ exports.updateOrderStatus = async (req, res) => {
 
     if (status === "Cancelled") {
       await restoreOrderInventoryAtomic(order._id);
+      if (order.paymentMethod === "Online" && order.paymentStatus === "Paid") {
+        await initiateOrderRefund(order, "Vendor cancelled sub-order");
+      }
     }
 
     const updatedOrder = await Order.findById(order._id);

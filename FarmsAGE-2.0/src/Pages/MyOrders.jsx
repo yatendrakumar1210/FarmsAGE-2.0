@@ -298,8 +298,16 @@ const MyOrders = () => {
                               </>
                             ) : (
                               <>
-                                <CreditCard size={14} className="text-emerald-500" />
-                                <span>Online Paid</span>
+                                  <CreditCard size={14} className="text-emerald-500" />
+                                  <span>
+                                    Online {order.paymentStatus === "Refunded"
+                                      ? "Refunded"
+                                      : (order.refundStatus === "Pending"
+                                        ? "Refund Pending"
+                                        : (order.refundStatus === "Failed"
+                                          ? "Refund Failed"
+                                          : (order.paymentStatus === "Paid" ? "Paid" : order.paymentStatus)))}
+                                  </span>
                               </>
                             )}
                           </div>

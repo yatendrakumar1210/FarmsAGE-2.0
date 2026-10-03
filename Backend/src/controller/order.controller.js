@@ -728,6 +728,59 @@ exports.handleWebhook = async (req, res) => {
       }
 
       return res.status(200).json({ status: "ok", message: "Recorded payment failure" });
+    } else if (event.event === "refund.processed") {
+      const refundEntity = event.payload?.refund?.entity;
+      const refundId = refundEntity?.id;
+      const paymentId = refundEntity?.payment_id;
+      const orderNoteId = refundEntity?.notes?.orderId;
+
+      let targetOrder = null;
+      if (refundId) {
+        targetOrder = await Order.findOne({ refundId });
+      }
+      if (!targetOrder && orderNoteId && mongoose.Types.ObjectId.isValid(orderNoteId)) {
+        targetOrder = await Order.findById(orderNoteId);
+      }
+      if (!targetOrder && paymentId) {
+        targetOrder = await Order.findOne({
+          paymentId,
+          refundStatus: { $in: ["Pending", "None"] },
+        });
+      }
+
+      if (targetOrder) {
+        targetOrder.refundStatus = "Processed";
+        targetOrder.paymentStatus = "Refunded";
+        targetOrder.refundedAt = new Date();
+        if (refundId && !targetOrder.refundId) {
+          targetOrder.refundId = refundId;
+        }
+        if (refundEntity?.amount) {
+          targetOrder.refundAmount = Number(refundEntity.amount) / 100;
+        }
+        await targetOrder.save();
+      }
+
+      return res.status(200).json({ status: "ok", message: "Recorded refund processed" });
+    } else if (event.event === "refund.failed") {
+      const refundEntity = event.payload?.refund?.entity;
+      const refundId = refundEntity?.id;
+      const orderNoteId = refundEntity?.notes?.orderId;
+
+      let targetOrder = null;
+      if (refundId) {
+        targetOrder = await Order.findOne({ refundId });
+      }
+      if (!targetOrder && orderNoteId && mongoose.Types.ObjectId.isValid(orderNoteId)) {
+        targetOrder = await Order.findById(orderNoteId);
+      }
+
+      if (targetOrder) {
+        targetOrder.refundStatus = "Failed";
+        await targetOrder.save();
+      }
+
+      return res.status(200).json({ status: "ok", message: "Recorded refund failure" });
     }
 
     res.status(200).json({ status: "ok", message: `Event ${event.event} received` });
@@ -786,6 +839,112 @@ const restoreOrderInventoryAtomic = async (orderId) => {
   }
 
   return true;
+};
+
+// Helper to safely, idempotently, and concurrency-safely initiate a Razorpay refund
+const initiateOrderRefund = async (order, reason = "Order cancellation") => {
+  if (!order || !order._id) {
+    return { success: false, reason: "invalid_order" };
+  }
+
+  // Eligibility check:
+  // - paymentMethod === "Online"
+  // - paymentStatus === "Paid"
+  // - paymentId exists
+  // - order is not already refunded
+  // - refundStatus === "None"
+  if (
+    order.paymentMethod !== "Online" ||
+    order.paymentStatus !== "Paid" ||
+    !order.paymentId ||
+    order.refundStatus !== "None"
+  ) {
+    return { success: false, reason: "not_eligible_for_refund" };
+  }
+
+  // Atomic refund claim: transition refundStatus from "None" to "Pending"
+  // This MUST prevent concurrent duplicate Razorpay refund calls
+  const orderClaim = await Order.findOneAndUpdate(
+    {
+      _id: order._id,
+      paymentMethod: "Online",
+      paymentStatus: "Paid",
+      refundStatus: "None",
+    },
+    {
+      $set: {
+        refundStatus: "Pending",
+        refundReason: reason,
+      },
+    },
+    { returnDocument: "after" }
+  );
+
+  if (!orderClaim) {
+    return { success: false, reason: "already_claimed_or_ineligible" };
+  }
+
+  const refundAmountPaise = Math.round(orderClaim.totalAmount * 100);
+
+  try {
+    const refundResponse = await razorpay.payments.refund(orderClaim.paymentId, {
+      amount: refundAmountPaise,
+      notes: {
+        orderId: String(orderClaim._id),
+        reason: reason,
+      },
+    });
+
+    // On successful refund request:
+    // - save refundId
+    // - save refundAmount
+    // - keep refundStatus = "Pending" (DO NOT fake paymentStatus = "Refunded" until webhook confirmation)
+    // - save refundReason
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderClaim._id,
+      {
+        $set: {
+          refundId: refundResponse?.id || `rfnd_${Date.now()}`,
+          refundAmount: orderClaim.totalAmount,
+          refundStatus: "Pending",
+          refundReason: reason,
+        },
+      },
+      { returnDocument: "after" }
+    );
+
+    return {
+      success: true,
+      refundId: updatedOrder.refundId,
+      refundStatus: "Pending",
+      order: updatedOrder,
+    };
+  } catch (err) {
+    console.error(`[RAZORPAY REFUND ERROR] Failed for order ${orderClaim._id}:`, err.message);
+
+    // On Razorpay API failure:
+    // - refundStatus = "Failed"
+    // - preserve accurate paymentStatus (remains "Paid")
+    // - return a controlled error
+    // - do not crash the server
+    const failedOrder = await Order.findByIdAndUpdate(
+      orderClaim._id,
+      {
+        $set: {
+          refundStatus: "Failed",
+          refundReason: `Refund initiation failed: ${err.message}`,
+        },
+      },
+      { returnDocument: "after" }
+    );
+
+    return {
+      success: false,
+      refundStatus: "Failed",
+      error: err.message,
+      order: failedOrder,
+    };
+  }
 };
 
 // Customer Order Cancellation (Dedicated endpoint: PUT /api/orders/:id/cancel)
@@ -851,6 +1010,11 @@ exports.cancelOrder = async (req, res) => {
     // Atomically restore inventory if previously deducted
     await restoreOrderInventoryAtomic(id);
 
+    // If paid Online order, initiate refund (keeps refundStatus = "Pending")
+    if (updatedOrder.paymentMethod === "Online" && updatedOrder.paymentStatus === "Paid") {
+      await initiateOrderRefund(updatedOrder, "Customer cancelled order");
+    }
+
     // Fetch refreshed order
     const finalOrder = await Order.findById(id);
 
@@ -875,4 +1039,5 @@ exports.cancelOrder = async (req, res) => {
   }
 };
 
+exports.initiateOrderRefund = initiateOrderRefund;
 exports.restoreOrderInventoryAtomic = restoreOrderInventoryAtomic;

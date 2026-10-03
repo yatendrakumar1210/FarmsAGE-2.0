@@ -29,6 +29,7 @@ const StatusBadge = ({ value, type }) => {
     // Payment status
     Paid: { bg: "#d1fae5", color: "#065f46" },
     Failed: { bg: "#fee2e2", color: "#991b1b" },
+    Refunded: { bg: "#e0e7ff", color: "#3730a3" },
   };
   const style = colors[value] || { bg: "#f1f5f9", color: "#475569" };
   return (
@@ -284,6 +285,11 @@ const ManageOrders = () => {
                         </p>
                         <p>
                           Status: <StatusBadge value={order.paymentStatus} />
+                          {order.refundStatus && order.refundStatus !== "None" && (
+                            <span className="ml-2 text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+                              Refund: {order.refundStatus}
+                            </span>
+                          )}
                         </p>
                         <p>
                           Total:{" "}

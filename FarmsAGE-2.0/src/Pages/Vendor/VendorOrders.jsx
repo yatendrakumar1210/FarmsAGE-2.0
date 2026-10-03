@@ -148,8 +148,17 @@ const VendorOrders = () => {
             <div className="vendor-order-footer">
               <div>
                 <span className="vendor-order-total">₹{order.totalAmount}</span>
-                <span style={{ marginLeft: 10, fontSize: "0.75rem", fontWeight: 600, color: order.paymentStatus === "Paid" ? "#15803d" : "#b45309", background: order.paymentStatus === "Paid" ? "#f0fdf4" : "#fffbeb", padding: "2px 10px", borderRadius: 20 }}>
+                <span style={{
+                  marginLeft: 10,
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  color: order.paymentStatus === "Paid" ? "#15803d" : (order.paymentStatus === "Refunded" ? "#3730a3" : "#b45309"),
+                  background: order.paymentStatus === "Paid" ? "#f0fdf4" : (order.paymentStatus === "Refunded" ? "#e0e7ff" : "#fffbeb"),
+                  padding: "2px 10px",
+                  borderRadius: 20
+                }}>
                   {order.paymentMethod} • {order.paymentStatus}
+                  {order.refundStatus && order.refundStatus !== "None" && ` (${order.refundStatus})`}
                 </span>
               </div>
             </div>
