@@ -36,10 +36,35 @@ const MyOrders = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [trackingOrder, setTrackingOrder] = useState(null);
+  const [cancellingId, setCancellingId] = useState(null);
 
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) return;
+    setCancellingId(orderId);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API}/api/orders/${orderId}/cancel`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to cancel order");
+      }
+      await fetchOrders();
+    } catch (err) {
+      alert(err.message || "Could not cancel order");
+    } finally {
+      setCancellingId(null);
+    }
+  };
 
   const fetchOrders = async () => {
     try {
@@ -345,6 +370,17 @@ const MyOrders = () => {
                             <FileText size={14} className="text-slate-500" />
                             <span>Invoice</span>
                           </button>
+
+                          {["Placed", "Pending", "Accepted", "Packing", "Processing"].includes(order.status) && (
+                            <button
+                              onClick={() => handleCancelOrder(order._id)}
+                              disabled={cancellingId === order._id}
+                              className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl border border-rose-200 text-xs font-extrabold text-rose-600 hover:bg-rose-50 flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                            >
+                              <XCircle size={14} className="text-rose-500" />
+                              <span>{cancellingId === order._id ? "Cancelling..." : "Cancel"}</span>
+                            </button>
+                          )}
 
                           <button
                             onClick={() => handleReorder(order.items)}

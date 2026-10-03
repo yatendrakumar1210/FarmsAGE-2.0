@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const mongoose = require("mongoose");
 const userTemplate = require("../templates/userTemplate");
 const vendorTemplate = require("../templates/vendorTemplate");
+const orderStatusTemplate = require("../templates/orderStatusTemplate");
 const { sendEmail } = require("../utils/sendEmail");
 
 // Helper to validate and sanitize delivery address
@@ -750,3 +751,128 @@ exports.getMyOrders = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch orders", error: err.message });
   }
 };
+
+// Helper to safely and atomically restore product inventory if and only if inventory was deducted
+const restoreOrderInventoryAtomic = async (orderId) => {
+  // Atomically claim the restoration right by transitioning inventoryDeducted from true to false
+  const orderClaim = await Order.findOneAndUpdate(
+    { _id: orderId, inventoryDeducted: true },
+    { $set: { inventoryDeducted: false } },
+    { returnDocument: "before" }
+  );
+
+  if (!orderClaim) {
+    // Either order does not exist or inventory was never deducted (or already restored)
+    return false;
+  }
+
+  // Restore inventory for each item in the order
+  if (Array.isArray(orderClaim.items)) {
+    for (const item of orderClaim.items) {
+      if (item.productId && mongoose.Types.ObjectId.isValid(item.productId)) {
+        const qtyToRestore = Number(item.quantity);
+        if (qtyToRestore > 0) {
+          const updatedProduct = await Product.findByIdAndUpdate(
+            item.productId,
+            { $inc: { quantity: qtyToRestore } },
+            { returnDocument: "after" }
+          );
+          if (!updatedProduct) {
+            console.warn(`[CANCELLATION WARNING] Product ${item.productId} (${item.name}) no longer exists. Could not increment stock.`);
+          }
+        }
+      }
+    }
+  }
+
+  return true;
+};
+
+// Customer Order Cancellation (Dedicated endpoint: PUT /api/orders/:id/cancel)
+exports.cancelOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid order ID" });
+    }
+
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // Customer must own the order
+    if (order.userId.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized: You cannot cancel another customer's order",
+      });
+    }
+
+    // State validation
+    if (order.status === "Cancelled") {
+      return res.status(400).json({ success: false, message: "Order is already cancelled" });
+    }
+
+    if (order.status === "Delivered") {
+      return res.status(400).json({ success: false, message: "Delivered orders cannot be cancelled" });
+    }
+
+    if (order.status === "OutForDelivery") {
+      return res.status(400).json({ success: false, message: "Orders out for delivery cannot be cancelled" });
+    }
+
+    const cancellableStates = ["Placed", "Pending", "Accepted", "Packing", "Processing"];
+    if (!cancellableStates.includes(order.status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Order in state '${order.status}' cannot be cancelled`,
+      });
+    }
+
+    // Atomically transition status to Cancelled (prevents concurrent double transitions)
+    const updatedOrder = await Order.findOneAndUpdate(
+      {
+        _id: id,
+        userId: req.user.id,
+        status: { $nin: ["Cancelled", "Delivered", "OutForDelivery"] },
+      },
+      {
+        $set: { status: "Cancelled" },
+      },
+      { returnDocument: "after" }
+    );
+
+    if (!updatedOrder) {
+      return res.status(400).json({ success: false, message: "Order is already cancelled or delivered" });
+    }
+
+    // Atomically restore inventory if previously deducted
+    await restoreOrderInventoryAtomic(id);
+
+    // Fetch refreshed order
+    const finalOrder = await Order.findById(id);
+
+    // Send customer notification email asynchronously
+    const customer = await User.findById(finalOrder.userId);
+    if (customer && customer.email) {
+      sendEmail({
+        to: customer.email,
+        subject: `Order Cancelled: #${finalOrder._id.toString().slice(-6)}`,
+        html: orderStatusTemplate(customer.name, finalOrder._id.toString().slice(-6), "Cancelled"),
+      }).catch((e) => console.error("Cancellation email error:", e));
+    }
+
+    res.json({
+      success: true,
+      message: "Order cancelled successfully",
+      order: finalOrder,
+    });
+  } catch (err) {
+    console.error("CUSTOMER CANCELLATION ERROR:", err);
+    res.status(500).json({ success: false, message: "Failed to cancel order", error: err.message });
+  }
+};
+
+exports.restoreOrderInventoryAtomic = restoreOrderInventoryAtomic;

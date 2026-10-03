@@ -4,6 +4,7 @@ const User = require("../models/user.model");
 const { sendEmail } = require("../utils/sendEmail");
 const orderStatusTemplate = require("../templates/orderStatusTemplate");
 const shopStatusTemplate = require("../templates/shopStatusTemplate");
+const { restoreOrderInventoryAtomic } = require("./order.controller");
 
 // 📦 Get all orders (with populated user info)
 exports.getOrders = async (req, res) => {
@@ -22,23 +23,41 @@ exports.getOrders = async (req, res) => {
 exports.updateOrder = async (req, res) => {
   try {
     const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { returnDocument: "after" },
-    );
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    if (order.status === "Cancelled" && status === "Cancelled") {
+      return res.status(400).json({ message: "Order is already cancelled" });
+    }
+
+    if (order.status === "Delivered" && status === "Cancelled") {
+      return res.status(400).json({ message: "Delivered orders cannot be cancelled" });
+    }
+
+    order.status = status;
+    if (status === "Delivered" && order.paymentMethod === "COD") {
+      order.paymentStatus = "Paid";
+    }
+
+    await order.save();
+
+    if (status === "Cancelled") {
+      await restoreOrderInventoryAtomic(order._id);
+    }
+
+    const updatedOrder = await Order.findById(order._id);
 
     // 📩 Notify User of Order Update
     const customer = await User.findById(order.userId);
     if (customer && customer.email) {
-      await sendEmail({
+      sendEmail({
         to: customer.email,
         subject: `Order Update: #${order._id.toString().slice(-6)}`,
         html: orderStatusTemplate(customer.name, order._id.toString().slice(-6), status)
-      });
+      }).catch(e => console.error("Admin order email error:", e));
     }
 
-    res.json(order);
+    res.json(updatedOrder);
   } catch (err) {
     res.status(500).json({ message: "Failed to update order", error: err.message });
   }
