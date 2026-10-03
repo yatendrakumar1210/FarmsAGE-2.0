@@ -211,11 +211,11 @@ const Navbar = React.memo(() => {
                 )}
                 {user?.role?.toLowerCase() === "vendor" && (
                   <Link
-                    to="/vendor"
+                    to={user?.shopStatus === "approved" ? "/vendor/dashboard" : "/vendor/profile"}
                     className="px-4 py-2.5 text-xs font-bold text-emerald-800 bg-emerald-50/60 hover:bg-emerald-100/80 flex items-center gap-2"
                   >
                     <Store size={14} className="text-emerald-600" />
-                    <span>Vendor Dashboard</span>
+                    <span>{user?.shopStatus === "approved" ? "Vendor Dashboard" : "Vendor Onboarding"}</span>
                   </Link>
                 )}
                 <button
@@ -263,11 +263,11 @@ const Navbar = React.memo(() => {
           {/* Vendor */}
           {user?.role?.toLowerCase() === "vendor" && (
             <Link
-              to="/vendor"
+              to={user?.shopStatus === "approved" ? "/vendor/dashboard" : "/vendor/profile"}
               className="hidden md:flex items-center gap-1.5 font-black text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200/60 text-xs"
             >
               <Store size={16} />
-              <span>Vendor</span>
+              <span>{user?.shopStatus === "approved" ? "Vendor" : "Vendor Onboarding"}</span>
             </Link>
           )}
 
@@ -394,7 +394,7 @@ const Navbar = React.memo(() => {
                     </p>
                   )}
                   <span className="inline-block text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-400/20 px-2 py-0.5 rounded-full mt-1.5 border border-amber-400/30">
-                    {user.role || "Customer"}
+                    {user.role === "vendor" ? (user.shopStatus === "approved" ? "Approved Vendor" : "Pending Vendor") : (user.role || "Customer")}
                   </span>
                 </div>
               </div>
@@ -596,13 +596,13 @@ const Navbar = React.memo(() => {
 
             {user?.role?.toLowerCase() === "vendor" && (
               <Link
-                to="/vendor"
+                to={user?.shopStatus === "approved" ? "/vendor/dashboard" : "/vendor/profile"}
                 onClick={() => setOpen(false)}
                 className="flex items-center justify-between p-2.5 rounded-xl text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition"
               >
                 <div className="flex items-center gap-2.5">
                   <Store size={16} />
-                  <span>Vendor Dashboard</span>
+                  <span>{user?.shopStatus === "approved" ? "Vendor Dashboard" : "Vendor Onboarding"}</span>
                 </div>
                 <ChevronDown size={14} className="-rotate-90 text-emerald-600" />
               </Link>

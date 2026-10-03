@@ -59,9 +59,9 @@ const Register = () => {
       if (resp.ok) {
         login(data.user, data.token);
         if (data.user?.role?.toLowerCase() === "vendor") {
-          navigate("/vendor");
+          navigate("/vendor/profile", { replace: true });
         } else {
-          navigate("/");
+          navigate("/", { replace: true });
         }
       } else {
         setError(data.message || "Registration failed");

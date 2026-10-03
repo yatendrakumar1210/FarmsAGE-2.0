@@ -30,7 +30,11 @@ router.use(authMiddleware);
 // Registration (Needs to be accessible to users to become vendors)
 router.post("/register-shop", registerShop);
 
-// 🔒 Restricted to Vendors/Admins only
+// Profile / Onboarding (Accessible to any vendor or admin so pending/rejected vendors can manage their store profile)
+router.get("/profile", getProfile);
+router.put("/profile", updateProfile);
+
+// 🔒 Restricted to Approved Vendors/Admins only
 router.use(vendorMiddleware);
 
 // Products
@@ -43,9 +47,5 @@ router.delete("/products/:id", deleteProduct);
 // Orders
 router.get("/orders", getMyOrders);
 router.put("/orders/:id", updateOrderStatus);
-
-// Profile
-router.get("/profile", getProfile);
-router.put("/profile", updateProfile);
 
 module.exports = router;

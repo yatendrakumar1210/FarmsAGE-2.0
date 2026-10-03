@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { MapPin, Save, Loader, Navigation } from "lucide-react";
+import { MapPin, Save, Loader, Navigation, Clock, AlertCircle, AlertTriangle, CheckCircle2 } from "lucide-react";
 import MapLocationPicker from "../../components/location/MapLocationPicker";
+import { useAuth } from "../../context/AuthContext";
 import "./vendor.css";
 import { API_BASE_URL as API } from "../../config/api";
 
 const VendorProfile = () => {
+  const { user, updateUser } = useAuth();
   const [profile, setProfile] = useState({
     storeName: "",
     specialty: "",
     storeImage: "",
+    storeAddress: "",
     coordinates: { lat: "", lng: "" },
   });
   const [loading, setLoading] = useState(true);
@@ -28,6 +31,7 @@ const VendorProfile = () => {
           storeName: data.storeName || "",
           specialty: data.specialty || "",
           storeImage: data.storeImage || "",
+          storeAddress: data.storeAddress || "",
           coordinates: {
             lat: data.coordinates?.lat || "",
             lng: data.coordinates?.lng || "",
@@ -54,6 +58,7 @@ const VendorProfile = () => {
           storeName: profile.storeName,
           specialty: profile.specialty,
           storeImage: profile.storeImage,
+          storeAddress: profile.storeAddress,
           coordinates: {
             lat: profile.coordinates.lat ? Number(profile.coordinates.lat) : null,
             lng: profile.coordinates.lng ? Number(profile.coordinates.lng) : null,
@@ -62,10 +67,18 @@ const VendorProfile = () => {
       });
       if (res.ok) {
         setMessage("Profile updated successfully!");
-        // Update local storage user data
-        const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-        storedUser.storeName = profile.storeName;
-        localStorage.setItem("user", JSON.stringify(storedUser));
+        // Update user in context & localStorage
+        const updatedFields = {
+          storeName: profile.storeName,
+          specialty: profile.specialty,
+          storeImage: profile.storeImage,
+          storeAddress: profile.storeAddress,
+          coordinates: profile.coordinates,
+        };
+        updateUser(updatedFields);
+      } else {
+        const data = await res.json().catch(() => null);
+        setMessage(data?.message || "Failed to update profile.");
       }
     } catch (err) {
       setMessage("Failed to update profile.");
@@ -107,8 +120,157 @@ const VendorProfile = () => {
     );
   }
 
+  const shopStatus = user?.shopStatus || "pending";
+
   return (
     <div className="fade-in">
+      {/* ─── Vendor Status Banners ─── */}
+      {shopStatus === "pending" && (
+        <div style={{
+          background: "#fffbeb",
+          border: "1.5px solid #fde68a",
+          borderRadius: "1rem",
+          padding: "1.25rem",
+          marginBottom: "1.5rem",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "1rem"
+        }}>
+          <Clock size={28} style={{ color: "#d97706", flexShrink: 0, marginTop: 2 }} />
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.25rem" }}>
+              <h3 style={{ fontSize: "0.95rem", fontWeight: 800, color: "#92400e", margin: 0 }}>
+                Your vendor application is under review.
+              </h3>
+              <span style={{
+                background: "#fef3c7",
+                color: "#b45309",
+                border: "1px solid #fde68a",
+                fontSize: "0.65rem",
+                fontWeight: 900,
+                padding: "2px 8px",
+                borderRadius: "9999px",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase"
+              }}>
+                Status: PENDING
+              </span>
+            </div>
+            <p style={{ fontSize: "0.8rem", color: "#b45309", margin: 0, lineHeight: 1.4 }}>
+              Complete your store information and wait for admin approval. Once approved, your products and live vendor dashboard will be fully activated.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {shopStatus === "rejected" && (
+        <div style={{
+          background: "#fef2f2",
+          border: "1.5px solid #fecaca",
+          borderRadius: "1rem",
+          padding: "1.25rem",
+          marginBottom: "1.5rem",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "1rem"
+        }}>
+          <AlertCircle size={28} style={{ color: "#dc2626", flexShrink: 0, marginTop: 2 }} />
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.25rem" }}>
+              <h3 style={{ fontSize: "0.95rem", fontWeight: 800, color: "#991b1b", margin: 0 }}>
+                Vendor Application Not Approved
+              </h3>
+              <span style={{
+                background: "#fee2e2",
+                color: "#b91c1c",
+                border: "1px solid #fecaca",
+                fontSize: "0.65rem",
+                fontWeight: 900,
+                padding: "2px 8px",
+                borderRadius: "9999px",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase"
+              }}>
+                Status: REJECTED
+              </span>
+            </div>
+            <p style={{ fontSize: "0.8rem", color: "#b91c1c", margin: 0, lineHeight: 1.4 }}>
+              Your application was not approved. You can review and update your store details below for admin reconsideration.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {shopStatus === "suspended" && (
+        <div style={{
+          background: "#fff7ed",
+          border: "1.5px solid #fed7aa",
+          borderRadius: "1rem",
+          padding: "1.25rem",
+          marginBottom: "1.5rem",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "1rem"
+        }}>
+          <AlertTriangle size={28} style={{ color: "#ea580c", flexShrink: 0, marginTop: 2 }} />
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.25rem" }}>
+              <h3 style={{ fontSize: "0.95rem", fontWeight: 800, color: "#9a3412", margin: 0 }}>
+                Vendor Account Suspended
+              </h3>
+              <span style={{
+                background: "#ffedd5",
+                color: "#c2410c",
+                border: "1px solid #fed7aa",
+                fontSize: "0.65rem",
+                fontWeight: 900,
+                padding: "2px 8px",
+                borderRadius: "9999px",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase"
+              }}>
+                Status: SUSPENDED
+              </span>
+            </div>
+            <p style={{ fontSize: "0.8rem", color: "#c2410c", margin: 0, lineHeight: 1.4 }}>
+              Your vendor store is currently suspended by administration. Product listings and order fulfillment are disabled. Please contact support.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {shopStatus === "approved" && (
+        <div style={{
+          background: "#f0fdf4",
+          border: "1.5px solid #bbf7d0",
+          borderRadius: "1rem",
+          padding: "0.875rem 1.25rem",
+          marginBottom: "1.5rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.75rem"
+        }}>
+          <CheckCircle2 size={20} style={{ color: "#16a34a", flexShrink: 0 }} />
+          <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#15803d" }}>
+            Your store is approved and active on FarmsAGE Marketplace.
+          </span>
+          <span style={{
+            marginLeft: "auto",
+            background: "#dcfce7",
+            color: "#15803d",
+            border: "1px solid #bbf7d0",
+            fontSize: "0.65rem",
+            fontWeight: 900,
+            padding: "2px 8px",
+            borderRadius: "9999px",
+            letterSpacing: "0.05em",
+            textTransform: "uppercase"
+          }}>
+            Approved
+          </span>
+        </div>
+      )}
+
       <h2 style={{ fontSize: "1.4rem", fontWeight: 800, color: "#0f172a", marginBottom: "1.5rem", fontFamily: "'Outfit', sans-serif" }}>
         Store Profile
       </h2>
@@ -138,6 +300,16 @@ const VendorProfile = () => {
               placeholder="e.g. Fresh Organic Vegetables"
               value={profile.specialty}
               onChange={(e) => setProfile({ ...profile, specialty: e.target.value })}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Store Address</label>
+            <input
+              type="text"
+              placeholder="e.g. Shop #4, Main Market, Sector 12"
+              value={profile.storeAddress}
+              onChange={(e) => setProfile({ ...profile, storeAddress: e.target.value })}
             />
           </div>
 

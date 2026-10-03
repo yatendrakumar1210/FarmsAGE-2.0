@@ -169,12 +169,14 @@ const ManageUsers = () => {
                           ${u.shopStatus === "approved" ? "bg-emerald-50 border-emerald-100 text-emerald-700" : 
                             u.shopStatus === "pending" ? "bg-amber-50 border-amber-200 text-amber-700 animate-pulse" : 
                             u.shopStatus === "rejected" ? "bg-rose-50 border-rose-100 text-rose-700" : 
+                            u.shopStatus === "suspended" ? "bg-purple-50 border-purple-100 text-purple-700" :
                             "bg-slate-50 border-slate-100 text-slate-500"}`}
                       >
                         <option value="none">NONE</option>
                         <option value="pending">PENDING</option>
                         <option value="approved">APPROVED</option>
                         <option value="rejected">REJECTED</option>
+                        <option value="suspended">SUSPENDED</option>
                       </select>
                     ) : (
                       <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">—</span>

@@ -34,12 +34,14 @@ exports.register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const isVendorSignup = role === "vendor";
+
     const userData = {
       name: name || "",
       phone,
       password: hashedPassword,
-      role: "user",
-      shopStatus: "none",
+      role: isVendorSignup ? "vendor" : "user",
+      shopStatus: isVendorSignup ? "pending" : "none",
       authProvider: "password",
       isProfileComplete: true,
       isVerified: true,

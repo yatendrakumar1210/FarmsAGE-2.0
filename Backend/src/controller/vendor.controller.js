@@ -133,25 +133,36 @@ exports.updateOrderStatus = async (req, res) => {
 
 // ─── Vendor Profile ───
 
-// 👤 Get vendor profile
+// 👤 Get vendor profile (Accessible to any vendor to view their store profile & status)
 exports.getProfile = async (req, res) => {
   try {
+    if (req.user.role !== "vendor" && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Access Denied. Vendor role required." });
+    }
+
     const vendor = await User.findById(req.user.id).select("-password");
+    if (!vendor) return res.status(404).json({ message: "User not found" });
     res.json(vendor);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch profile", error: err.message });
   }
 };
 
-// ✏️ Update vendor profile (storeName, specialty, coordinates, storeImage)
+// ✏️ Update vendor profile (storeName, specialty, coordinates, storeImage, storeAddress)
 exports.updateProfile = async (req, res) => {
   try {
-    const { storeName, specialty, storeImage, coordinates } = req.body;
+    if (req.user.role !== "vendor" && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Access Denied. Vendor role required." });
+    }
+
+    const { storeName, specialty, storeImage, coordinates, storeAddress } = req.body;
+    const isProfileComplete = Boolean(storeName && (storeAddress || specialty));
     const vendor = await User.findByIdAndUpdate(
       req.user.id,
-      { storeName, specialty, storeImage, coordinates },
+      { storeName, specialty, storeImage, coordinates, storeAddress, isProfileComplete },
       { returnDocument: "after" }
     ).select("-password");
+    if (!vendor) return res.status(404).json({ message: "User not found" });
     res.json(vendor);
   } catch (err) {
     res.status(500).json({ message: "Failed to update profile", error: err.message });

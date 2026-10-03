@@ -52,7 +52,11 @@ const Login = () => {
       return;
     }
 
-    navigate("/vendor");
+    if (vendorUser.shopStatus?.toLowerCase() === "approved") {
+      navigate("/vendor/dashboard");
+    } else {
+      navigate("/vendor/profile");
+    }
   };
 
   const handleGoogleLogin = useGoogleLogin({
@@ -72,10 +76,15 @@ const Login = () => {
             navigate("/complete-profile");
           } else {
             const role = data.user?.role?.toLowerCase();
+            const shopStatus = data.user?.shopStatus?.toLowerCase();
             if (role === "admin") {
               navigate("/admin/dashboard", { replace: true });
             } else if (role === "vendor") {
-              navigate("/vendor/dashboard", { replace: true });
+              if (shopStatus === "approved") {
+                navigate("/vendor/dashboard", { replace: true });
+              } else {
+                navigate("/vendor/profile", { replace: true });
+              }
             } else {
               const fromPath = location.state?.from || "/";
               navigate(fromPath, { replace: true });
@@ -150,10 +159,15 @@ const Login = () => {
       if (resp.ok) {
         login(data.user, data.token);
         const role = data.user?.role?.toLowerCase();
+        const shopStatus = data.user?.shopStatus?.toLowerCase();
         if (role === "admin") {
           navigate("/admin/dashboard", { replace: true });
         } else if (role === "vendor") {
-          navigate("/vendor/dashboard", { replace: true });
+          if (shopStatus === "approved") {
+            navigate("/vendor/dashboard", { replace: true });
+          } else {
+            navigate("/vendor/profile", { replace: true });
+          }
         } else {
           const fromPath = location.state?.from || "/";
           navigate(fromPath, { replace: true });

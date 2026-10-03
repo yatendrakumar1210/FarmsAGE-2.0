@@ -15,8 +15,11 @@ import {
   Store as StoreIcon,
   CheckCircle2,
   Clock,
+  AlertTriangle,
+  AlertCircle,
 } from "lucide-react";
 import logo from "../../assets/logo.jpg";
+import VendorProfile from "./VendorProfile";
 import VendorRegistration from "./VendorRegistration";
 import "../Admin/admin.css";
 import "./vendor.css";
@@ -149,12 +152,55 @@ const VendorLayout = () => {
                 ))}
               </>
             ) : (
-              <div className="mx-2 p-4 bg-slate-800/60 rounded-2xl border border-slate-700/80 text-center">
-                <Clock size={24} className="text-amber-400 mx-auto mb-2 animate-pulse" />
-                <p className="text-xs font-bold text-slate-200 mb-1">Approval Pending</p>
-                <p className="text-[10px] text-slate-400 leading-relaxed">
-                  Complete your store details to unlock full vendor capabilities.
-                </p>
+              <div className="space-y-3">
+                <div className="mx-2 p-4 bg-slate-800/60 rounded-2xl border border-slate-700/80 text-center">
+                  {user?.shopStatus === "suspended" ? (
+                    <>
+                      <AlertTriangle size={24} className="text-orange-400 mx-auto mb-2" />
+                      <p className="text-xs font-bold text-slate-200 mb-1">Account Suspended</p>
+                      <p className="text-[10px] text-slate-400 leading-relaxed">
+                        Store operations are restricted. Contact administration for assistance.
+                      </p>
+                    </>
+                  ) : user?.shopStatus === "rejected" ? (
+                    <>
+                      <AlertCircle size={24} className="text-rose-400 mx-auto mb-2" />
+                      <p className="text-xs font-bold text-slate-200 mb-1">Application Rejected</p>
+                      <p className="text-[10px] text-slate-400 leading-relaxed">
+                        Update your store details for admin reconsideration.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <Clock size={24} className="text-amber-400 mx-auto mb-2 animate-pulse" />
+                      <p className="text-xs font-bold text-slate-200 mb-1">Approval Pending</p>
+                      <p className="text-[10px] text-slate-400 leading-relaxed">
+                        Complete your store details to unlock full vendor capabilities.
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                {user?.shopStatus !== "suspended" && (
+                  <NavLink
+                    to="/vendor/profile"
+                    className={({ isActive }) =>
+                      `flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all duration-200 group ${
+                        isActive
+                          ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/30"
+                          : "text-slate-400 hover:bg-slate-800/80 hover:text-slate-200"
+                      }`
+                    }
+                  >
+                    <div className="flex items-center gap-3">
+                      <User size={19} />
+                      <span>Store Profile</span>
+                    </div>
+                    <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                      Onboarding
+                    </span>
+                  </NavLink>
+                )}
               </div>
             )}
 
@@ -270,7 +316,24 @@ const VendorLayout = () => {
         {/* Dynamic Page Outlet */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50/60">
           <div className="w-full max-w-7xl mx-auto">
-            {isApproved ? <Outlet /> : <VendorRegistration />}
+            {isApproved ? (
+              <Outlet />
+            ) : user?.shopStatus === "suspended" ? (
+              <div className="bg-white rounded-3xl p-8 border border-orange-200 shadow-sm text-center max-w-lg mx-auto mt-12">
+                <div className="w-16 h-16 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle size={32} />
+                </div>
+                <h2 className="text-xl font-bold text-slate-800 mb-2">Vendor Account Suspended</h2>
+                <p className="text-sm text-slate-500 leading-relaxed mb-6">
+                  Your vendor store has been suspended by administration. Product publishing and order fulfillments are inactive. Please contact support to resolve this issue.
+                </p>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-100 text-orange-800 text-xs font-bold uppercase tracking-wider">
+                  Status: Suspended
+                </div>
+              </div>
+            ) : (
+              <VendorProfile />
+            )}
           </div>
         </main>
       </div>
