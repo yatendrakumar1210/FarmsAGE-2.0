@@ -2,6 +2,7 @@ const razorpay = require("../config/razorpay");
 const Order = require("../models/order.model");
 const Product = require("../models/product.model");
 const User = require("../models/user.model");
+const Coupon = require("../models/coupon.model");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
 const userTemplate = require("../templates/userTemplate");
@@ -152,10 +153,95 @@ const updateProductInventoryAtomic = async (items) => {
   }
 };
 
+// Helper to validate and calculate coupon discount
+const validateAndCalculateCouponDiscount = async (code, subtotal) => {
+  if (!code || typeof code !== "string" || !code.trim()) {
+    return { valid: false, discountAmount: 0, coupon: null };
+  }
+
+  const normalizedCode = code.trim().toUpperCase();
+  const coupon = await Coupon.findOne({ code: normalizedCode });
+
+  if (!coupon) {
+    throw new Error(`Coupon '${normalizedCode}' does not exist`);
+  }
+
+  if (!coupon.isActive) {
+    throw new Error(`Coupon '${normalizedCode}' is inactive`);
+  }
+
+  if (coupon.expiryDate && new Date(coupon.expiryDate) < new Date()) {
+    throw new Error(`Coupon '${normalizedCode}' has expired`);
+  }
+
+  if (coupon.usageLimit !== null && coupon.usageLimit !== undefined && coupon.usageCount >= coupon.usageLimit) {
+    throw new Error(`Coupon '${normalizedCode}' usage limit has been reached`);
+  }
+
+  if (coupon.minOrderAmount && subtotal < coupon.minOrderAmount) {
+    throw new Error(`Minimum order amount of ₹${coupon.minOrderAmount} required for coupon '${normalizedCode}'`);
+  }
+
+  let discount = 0;
+  if (coupon.discountType === "fixed") {
+    discount = Math.min(coupon.discountValue, subtotal);
+  } else {
+    discount = (subtotal * coupon.discountValue) / 100;
+    if (coupon.maxDiscount && coupon.maxDiscount > 0) {
+      discount = Math.min(discount, coupon.maxDiscount);
+    }
+    discount = Math.min(discount, subtotal);
+  }
+
+  discount = Math.round(discount * 100) / 100;
+
+  return {
+    valid: true,
+    discountAmount: discount,
+    coupon,
+  };
+};
+
+// Customer validation endpoint
+exports.validateCoupon = async (req, res) => {
+  try {
+    const { code, items, subtotal: clientSubtotal } = req.body;
+    if (!code || typeof code !== "string" || !code.trim()) {
+      return res.status(400).json({ success: false, message: "Coupon code is required" });
+    }
+
+    let authoritativeSubtotal = 0;
+    if (items && Array.isArray(items) && items.length > 0) {
+      const sanitized = await validateAndSanitizeItems(items);
+      authoritativeSubtotal = sanitized.subtotal;
+    } else if (typeof clientSubtotal === "number" && clientSubtotal >= 0) {
+      authoritativeSubtotal = clientSubtotal;
+    } else {
+      return res.status(400).json({ success: false, message: "Cart items or valid subtotal required for coupon validation" });
+    }
+
+    const result = await validateAndCalculateCouponDiscount(code, authoritativeSubtotal);
+
+    res.json({
+      success: true,
+      code: result.coupon.code,
+      discountType: result.coupon.discountType,
+      discountValue: result.coupon.discountValue,
+      discountAmount: result.discountAmount,
+      subtotal: authoritativeSubtotal,
+      minOrderAmount: result.coupon.minOrderAmount,
+      maxDiscount: result.coupon.maxDiscount,
+      message: `Coupon '${result.coupon.code}' applied successfully`,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message || "Invalid coupon" });
+  }
+};
+
 // Create Razorpay Order with authoritative server-side price/stock verification & pending Order persistence
 exports.createOrder = async (req, res) => {
   try {
-    const { items, deliveryAddress } = req.body;
+    const { items, deliveryAddress, couponCode } = req.body;
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
@@ -164,8 +250,19 @@ exports.createOrder = async (req, res) => {
 
     const { subtotal, verifiedItems } = await validateAndSanitizeItems(items);
 
+    let discountAmount = 0;
+    let appliedCouponCode = null;
+
+    if (couponCode && typeof couponCode === "string" && couponCode.trim()) {
+      const couponRes = await validateAndCalculateCouponDiscount(couponCode, subtotal);
+      if (couponRes.valid) {
+        discountAmount = couponRes.discountAmount;
+        appliedCouponCode = couponRes.coupon.code;
+      }
+    }
+
     const deliveryCharge = subtotal > 500 || subtotal === 0 ? 0 : 40;
-    const totalAmount = subtotal + deliveryCharge;
+    const totalAmount = Math.max(0, subtotal - discountAmount + deliveryCharge);
 
     const razorpayOrder = await razorpay.orders.create({
       amount: Math.round(totalAmount * 100),
@@ -186,15 +283,18 @@ exports.createOrder = async (req, res) => {
     for (const vId of vendorKeys) {
       const vItems = vendorGroups[vId];
       const vSubtotal = vItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-      // For multi-vendor orders, distribute delivery charge to first sub-order
+      // For multi-vendor orders, distribute delivery charge and discount to first sub-order
       const vDelivery = vendorKeys.length === 1 ? deliveryCharge : (vId === vendorKeys[0] ? deliveryCharge : 0);
-      const vTotal = vSubtotal + vDelivery;
+      const vDiscount = vendorKeys.length === 1 ? discountAmount : (vId === vendorKeys[0] ? discountAmount : 0);
+      const vTotal = Math.max(0, vSubtotal - vDiscount + vDelivery);
 
       const orderDoc = await Order.create({
         userId: req.user.id,
         vendorId: (vId !== "global" && mongoose.Types.ObjectId.isValid(vId)) ? vId : null,
         items: vItems,
         deliveryAddress: sanitizedAddress,
+        couponCode: appliedCouponCode,
+        discountAmount: vDiscount,
         totalAmount: vTotal,
         paymentMethod: "Online",
         paymentStatus: "Pending",
@@ -212,6 +312,9 @@ exports.createOrder = async (req, res) => {
       success: true,
       order: razorpayOrder,
       totalAmount,
+      subtotal,
+      discountAmount,
+      couponCode: appliedCouponCode,
       verifiedItems,
       key_id: process.env.RAZORPAY_KEY_ID || "",
     });
@@ -373,6 +476,14 @@ const processOrderPaymentSuccess = async ({
       subject: "Order Confirmed - FarmsAge",
       html: userTemplate(targetUser.name || "Customer", completedOrders),
     }).catch((e) => console.error("User email failed:", e));
+  }
+
+  // Increment coupon usage if a coupon was used
+  const usedCouponCode = orders.find((o) => o.couponCode)?.couponCode;
+  if (usedCouponCode) {
+    Coupon.updateOne({ code: usedCouponCode }, { $inc: { usageCount: 1 } }).catch((err) =>
+      console.error("Failed to increment coupon usageCount:", err)
+    );
   }
 
   return {
@@ -550,7 +661,7 @@ exports.verifyPayment = async (req, res) => {
 // COD Order (Handles Multi-Vendor Splitting & Atomic Stock)
 exports.codOrder = async (req, res) => {
   try {
-    const { items, deliveryAddress } = req.body;
+    const { items, deliveryAddress, couponCode } = req.body;
 
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
@@ -559,6 +670,18 @@ exports.codOrder = async (req, res) => {
     const sanitizedAddress = validateDeliveryAddress(deliveryAddress || user.defaultAddress);
 
     const { subtotal, verifiedItems } = await validateAndSanitizeItems(items);
+
+    let discountAmount = 0;
+    let appliedCouponCode = null;
+
+    if (couponCode && typeof couponCode === "string" && couponCode.trim()) {
+      const couponRes = await validateAndCalculateCouponDiscount(couponCode, subtotal);
+      if (couponRes.valid) {
+        discountAmount = couponRes.discountAmount;
+        appliedCouponCode = couponRes.coupon.code;
+      }
+    }
+
     const deliveryCharge = subtotal > 500 || subtotal === 0 ? 0 : 40;
 
     // Perform atomic stock decrement AFTER all validations pass
@@ -578,15 +701,18 @@ exports.codOrder = async (req, res) => {
     for (const vId of vendorKeys) {
       const vItems = vendorGroups[vId];
       const vSubtotal = vItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-      // For multi-vendor orders, distribute delivery charge to first sub-order (consistent with online checkout)
+      // For multi-vendor orders, distribute delivery charge and discount to first sub-order (consistent with online checkout)
       const vDelivery = vendorKeys.length === 1 ? deliveryCharge : (vId === vendorKeys[0] ? deliveryCharge : 0);
-      const vTotal = vSubtotal + vDelivery;
+      const vDiscount = vendorKeys.length === 1 ? discountAmount : (vId === vendorKeys[0] ? discountAmount : 0);
+      const vTotal = Math.max(0, vSubtotal - vDiscount + vDelivery);
 
       const order = await Order.create({
         userId: req.user.id,
         vendorId: (vId !== "global" && mongoose.Types.ObjectId.isValid(vId)) ? vId : null,
         items: vItems,
         deliveryAddress: sanitizedAddress,
+        couponCode: appliedCouponCode,
+        discountAmount: vDiscount,
         totalAmount: vTotal,
         paymentMethod: "COD",
         paymentStatus: "Pending",
@@ -620,13 +746,21 @@ exports.codOrder = async (req, res) => {
       }).catch(e => console.error("User email failed:", e));
     }
 
+    if (appliedCouponCode) {
+      Coupon.updateOne({ code: appliedCouponCode }, { $inc: { usageCount: 1 } }).catch((e) =>
+        console.error("Failed to increment coupon usageCount for COD:", e)
+      );
+    }
+
     const mainOrder = createdOrders[0] || null;
 
     res.json({ 
       success: true, 
       order: mainOrder, 
       orderId: mainOrder ? mainOrder._id : null,
-      allOrders: createdOrders 
+      allOrders: createdOrders,
+      discountAmount,
+      couponCode: appliedCouponCode,
     });
   } catch (err) {
     console.error("COD ORDER ERROR:", err);
@@ -1041,3 +1175,4 @@ exports.cancelOrder = async (req, res) => {
 
 exports.initiateOrderRefund = initiateOrderRefund;
 exports.restoreOrderInventoryAtomic = restoreOrderInventoryAtomic;
+exports.validateAndCalculateCouponDiscount = validateAndCalculateCouponDiscount;

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp, Zap } from "lucide-react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import { API_BASE_URL as API } from "../../config/api";
 
 const MainLayout = ({ children }) => {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -10,8 +11,30 @@ const MainLayout = ({ children }) => {
     return localStorage.getItem("farmsage_announcement") || "";
   });
 
-  // Handle "Scroll to Top" visibility
   useEffect(() => {
+    let isMounted = true;
+    const fetchBroadcast = async () => {
+      try {
+        const res = await fetch(`${API}/api/admin/broadcast`);
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted) {
+            const liveMsg = data.message || "";
+            setAnnouncement(liveMsg);
+            if (liveMsg) {
+              localStorage.setItem("farmsage_announcement", liveMsg);
+            } else {
+              localStorage.removeItem("farmsage_announcement");
+            }
+          }
+        }
+      } catch (err) {
+        // Silent fallback
+      }
+    };
+    fetchBroadcast();
+
+    // Handle "Scroll to Top" visibility
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
     };
@@ -23,6 +46,7 @@ const MainLayout = ({ children }) => {
     window.addEventListener("storage", handleStorage);
 
     return () => {
+      isMounted = false;
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("storage", handleStorage);
     };

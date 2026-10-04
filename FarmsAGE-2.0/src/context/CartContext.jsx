@@ -16,6 +16,33 @@ export const CartProvider = ({ children }) => {
     }
   });
 
+  const [appliedCoupon, setAppliedCoupon] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem("farmsage_coupon");
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const applyCouponData = (couponData) => {
+    setAppliedCoupon(couponData);
+    try {
+      if (couponData) {
+        sessionStorage.setItem("farmsage_coupon", JSON.stringify(couponData));
+      } else {
+        sessionStorage.removeItem("farmsage_coupon");
+      }
+    } catch (e) {}
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    try {
+      sessionStorage.removeItem("farmsage_coupon");
+    } catch (e) {}
+  };
+
   useEffect(() => {
     try {
       localStorage.setItem("farmsage_cart", JSON.stringify(cart));
@@ -138,11 +165,22 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     setCart([]);
+    removeCoupon();
   };
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, updateQuantity, updateItemWeight, clearCart }}
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        updateItemWeight,
+        clearCart,
+        appliedCoupon,
+        applyCouponData,
+        removeCoupon,
+      }}
     >
       {children}
     </CartContext.Provider>

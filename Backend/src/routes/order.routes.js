@@ -8,8 +8,10 @@ const {
   getMyOrders,
   handleWebhook,
   cancelOrder,
+  validateCoupon,
 } = require('../controller/order.controller');
 
+router.post('/validate-coupon', validateCoupon);
 router.post('/create', authMiddleware, createOrder);
 router.post('/verify-payment', authMiddleware, verifyPayment);
 router.post('/cod', authMiddleware, codOrder);

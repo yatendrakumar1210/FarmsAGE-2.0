@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, ArrowLeft, Trash2, Plus, Minus, Truck, ShieldCheck, Ticket } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,11 +7,24 @@ import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { calculateNewUnitPrice } from "../utils/weightUtils";
+import { API_BASE_URL as API } from "../config/api";
 
 const Cart = () => {
-  const { cart, removeFromCart, updateQuantity, updateItemWeight } = useCart();
+  const {
+    cart,
+    removeFromCart,
+    updateQuantity,
+    updateItemWeight,
+    appliedCoupon,
+    applyCouponData,
+    removeCoupon,
+  } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const [couponCodeInput, setCouponCodeInput] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponMsg, setCouponMsg] = useState({ text: "", type: "" });
 
   const handleCheckout = () => {
     if (!user) {
@@ -22,10 +35,78 @@ const Cart = () => {
   };
 
   const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const deliveryCharge = subtotal > 500 ? 0 : 40;
-  const total = subtotal + deliveryCharge;
+  const deliveryCharge = subtotal > 500 || subtotal === 0 ? 0 : 40;
+  const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+  const total = Math.max(0, subtotal - discountAmount + deliveryCharge);
   const freeDeliveryThreshold = 500;
   const progressToFree = Math.min((subtotal / freeDeliveryThreshold) * 100, 100);
+
+  // If subtotal drops below coupon minimum order amount, auto-remove coupon
+  useEffect(() => {
+    if (appliedCoupon && appliedCoupon.minOrderAmount && subtotal < appliedCoupon.minOrderAmount) {
+      removeCoupon();
+      setCouponMsg({
+        text: `Coupon '${appliedCoupon.code}' removed (Minimum order ₹${appliedCoupon.minOrderAmount} required)`,
+        type: "error",
+      });
+    }
+  }, [subtotal, appliedCoupon]);
+
+  const handleApplyCoupon = async (e) => {
+    if (e) e.preventDefault();
+    if (!couponCodeInput.trim()) {
+      setCouponMsg({ text: "Please enter a coupon code", type: "error" });
+      return;
+    }
+
+    setCouponLoading(true);
+    setCouponMsg({ text: "", type: "" });
+
+    try {
+      const res = await fetch(`${API}/api/orders/validate-coupon`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: couponCodeInput.trim(),
+          items: cart.map(item => ({
+            productId: String(item._id || item.id),
+            price: Number(item.price),
+            quantity: item.quantity,
+          })),
+          subtotal,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setCouponMsg({ text: data.message || "Invalid coupon", type: "error" });
+        return;
+      }
+
+      applyCouponData({
+        code: data.code,
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+        discountAmount: data.discountAmount,
+        minOrderAmount: data.minOrderAmount,
+      });
+
+      setCouponMsg({
+        text: `Coupon '${data.code}' applied! Saved ₹${data.discountAmount}`,
+        type: "success",
+      });
+      setCouponCodeInput("");
+    } catch (err) {
+      setCouponMsg({ text: "Failed to validate coupon. Please try again.", type: "error" });
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    removeCoupon();
+    setCouponMsg({ text: "Coupon removed", type: "" });
+  };
 
   if (cart.length === 0) {
     return (
@@ -216,10 +297,14 @@ const Cart = () => {
                       {deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}
                     </span>
                   </div>
-                  <div className="flex justify-between text-slate-500 font-medium">
-                    <span>Discount</span>
-                    <span className="text-rose-500 font-bold">- ₹0</span>
-                  </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-emerald-600 font-bold">
+                      <span className="flex items-center gap-1">
+                        <span>Discount ({appliedCoupon?.code})</span>
+                      </span>
+                      <span>- ₹{discountAmount}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-between items-center py-4 sm:py-6">
@@ -235,10 +320,60 @@ const Cart = () => {
                   <ArrowLeft size={18} className="rotate-180 sm:w-5 sm:h-5" />
                 </button>
 
-                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-emerald-50 rounded-xl sm:rounded-2xl border border-emerald-100 flex items-center gap-2 sm:gap-3">
-                  <Ticket size={18} className="text-emerald-600 shrink-0 sm:w-5 sm:h-5" />
-                  <input type="text" placeholder="Apply Coupon" className="bg-transparent outline-none text-xs sm:text-sm font-bold placeholder:text-emerald-600/50 flex-1 min-w-0" />
-                  <button className="text-emerald-600 font-black text-xs uppercase shrink-0 hover:text-emerald-700 transition-colors">Apply</button>
+                <div className="mt-4 sm:mt-6">
+                  {appliedCoupon ? (
+                    <div className="p-3 sm:p-4 bg-emerald-50 rounded-xl sm:rounded-2xl border border-emerald-200 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Ticket size={18} className="text-emerald-600 shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-xs font-black text-emerald-800 uppercase tracking-wide truncate">
+                            {appliedCoupon.code} Applied
+                          </p>
+                          <p className="text-[10px] text-emerald-600 font-semibold">
+                            Saved ₹{appliedCoupon.discountAmount}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleRemoveCoupon}
+                        className="text-rose-500 hover:text-rose-600 text-xs font-black uppercase shrink-0 transition-colors p-1"
+                        title="Remove coupon"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <form
+                      onSubmit={handleApplyCoupon}
+                      className="p-3 sm:p-4 bg-emerald-50 rounded-xl sm:rounded-2xl border border-emerald-100 flex items-center gap-2 sm:gap-3"
+                    >
+                      <Ticket size={18} className="text-emerald-600 shrink-0 sm:w-5 sm:h-5" />
+                      <input
+                        type="text"
+                        value={couponCodeInput}
+                        onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                        placeholder="Apply Coupon"
+                        className="bg-transparent outline-none text-xs sm:text-sm font-bold uppercase placeholder:normal-case placeholder:text-emerald-600/50 flex-1 min-w-0"
+                      />
+                      <button
+                        type="submit"
+                        disabled={couponLoading || !couponCodeInput.trim()}
+                        className="text-emerald-600 font-black text-xs uppercase shrink-0 hover:text-emerald-700 transition-colors disabled:opacity-50"
+                      >
+                        {couponLoading ? "Checking..." : "Apply"}
+                      </button>
+                    </form>
+                  )}
+
+                  {couponMsg.text && (
+                    <p
+                      className={`text-xs mt-2 font-bold px-2 ${
+                        couponMsg.type === "success" ? "text-emerald-600" : "text-rose-500"
+                      }`}
+                    >
+                      {couponMsg.text}
+                    </p>
+                  )}
                 </div>
               </div>
 

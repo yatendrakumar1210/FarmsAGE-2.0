@@ -16,6 +16,10 @@ import {
   Sparkles,
   X,
   CheckCircle2,
+  Ticket,
+  Trash2,
+  Calendar,
+  Tag,
 } from "lucide-react";
 import { API_BASE_URL as API } from "../../config/api";
 
@@ -40,6 +44,20 @@ const Dashboard = () => {
   );
   const [announcementSaved, setAnnouncementSaved] = useState(false);
 
+  // Coupon management state
+  const [showCouponModal, setShowCouponModal] = useState(false);
+  const [coupons, setCoupons] = useState([]);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponForm, setCouponForm] = useState({
+    code: "",
+    discountType: "percentage",
+    discountValue: "",
+    minOrderAmount: "",
+    maxDiscount: "",
+    expiryDate: "",
+    usageLimit: "",
+  });
+
   // Dynamic Weekly Sales calculation
   const [weeklySalesData, setWeeklySalesData] = useState([
     { day: "M", sales: 0, height: 20 },
@@ -53,6 +71,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
+    fetchLiveAnnouncement();
   }, []);
 
   const fetchDashboardData = async () => {
@@ -129,14 +148,115 @@ const Dashboard = () => {
     }
   };
 
-  const handleSaveAnnouncement = (e) => {
+  const fetchLiveAnnouncement = async () => {
+    try {
+      const res = await axios.get(`${API}/api/admin/broadcast`);
+      if (res.data && res.data.message !== undefined) {
+        setAnnouncementText(res.data.message);
+      }
+    } catch (err) {
+      console.error("Failed to fetch live broadcast:", err);
+    }
+  };
+
+  const fetchCoupons = async () => {
+    try {
+      setCouponLoading(true);
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${API}/api/admin/coupons`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCoupons(res.data || []);
+    } catch (err) {
+      console.error("Failed to fetch coupons:", err);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleSaveAnnouncement = async (e) => {
     e.preventDefault();
-    localStorage.setItem("farmsage_announcement", announcementText.trim());
-    setAnnouncementSaved(true);
-    setTimeout(() => {
-      setAnnouncementSaved(false);
-      setShowAnnouncementModal(false);
-    }, 1200);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `${API}/api/admin/broadcast`,
+        { message: announcementText.trim() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      localStorage.setItem("farmsage_announcement", announcementText.trim());
+      setAnnouncementSaved(true);
+      setTimeout(() => {
+        setAnnouncementSaved(false);
+        setShowAnnouncementModal(false);
+      }, 1200);
+    } catch (err) {
+      alert("Failed to broadcast announcement: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleClearAnnouncement = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API}/api/admin/broadcast`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      localStorage.removeItem("farmsage_announcement");
+      setAnnouncementText("");
+      setAnnouncementSaved(true);
+      setTimeout(() => {
+        setAnnouncementSaved(false);
+        setShowAnnouncementModal(false);
+      }, 1000);
+    } catch (err) {
+      alert("Failed to clear announcement: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleCreateCoupon = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      const payload = {
+        code: couponForm.code.trim().toUpperCase(),
+        discountType: couponForm.discountType,
+        discountValue: Number(couponForm.discountValue),
+        minOrderAmount: couponForm.minOrderAmount ? Number(couponForm.minOrderAmount) : 0,
+        maxDiscount: couponForm.maxDiscount ? Number(couponForm.maxDiscount) : null,
+        expiryDate: couponForm.expiryDate || null,
+        usageLimit: couponForm.usageLimit ? Number(couponForm.usageLimit) : null,
+      };
+
+      const res = await axios.post(`${API}/api/admin/coupons`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setCoupons([res.data, ...coupons]);
+      setCouponForm({
+        code: "",
+        discountType: "percentage",
+        discountValue: "",
+        minOrderAmount: "",
+        maxDiscount: "",
+        expiryDate: "",
+        usageLimit: "",
+      });
+      alert(`Coupon '${res.data.code}' created successfully!`);
+    } catch (err) {
+      alert("Failed to create coupon: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleDeleteCoupon = async (couponId) => {
+    if (!window.confirm("Are you sure you want to delete this coupon?")) return;
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API}/api/admin/coupons/${couponId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCoupons(coupons.filter((c) => c._id !== couponId));
+    } catch (err) {
+      alert("Failed to delete coupon: " + (err.response?.data?.message || err.message));
+    }
   };
 
   if (loading) {
@@ -169,6 +289,15 @@ const Dashboard = () => {
             className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5"
           >
             <Plus size={15} /> Add Product
+          </button>
+          <button
+            onClick={() => {
+              setShowCouponModal(true);
+              fetchCoupons();
+            }}
+            className="bg-emerald-700/80 hover:bg-emerald-600 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-md border border-emerald-400/30"
+          >
+            <Ticket size={15} /> Coupons
           </button>
           <button
             onClick={() => setShowAnnouncementModal(true)}
@@ -443,10 +572,7 @@ const Dashboard = () => {
               <div className="flex gap-2 justify-end pt-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    localStorage.removeItem("farmsage_announcement");
-                    setAnnouncementText("");
-                  }}
+                  onClick={handleClearAnnouncement}
                   className="px-3.5 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition"
                 >
                   Clear Banner
@@ -459,6 +585,185 @@ const Dashboard = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Coupon Management Modal */}
+      {showCouponModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2 text-slate-800">
+                <Ticket className="text-emerald-600" size={22} />
+                <h3 className="font-black text-lg">Dynamic Coupon Management</h3>
+              </div>
+              <button
+                onClick={() => setShowCouponModal(false)}
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Create Coupon Form */}
+            <form onSubmit={handleCreateCoupon} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6 space-y-4">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                <Tag size={14} className="text-emerald-600" /> Create New Coupon
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Coupon Code *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. FARM30"
+                    value={couponForm.code}
+                    onChange={(e) => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() })}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold uppercase focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Discount Type</label>
+                  <select
+                    value={couponForm.discountType}
+                    onChange={(e) => setCouponForm({ ...couponForm, discountType: e.target.value })}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="fixed">Fixed Amount (₹)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Discount Value *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    placeholder={couponForm.discountType === "percentage" ? "e.g. 20 (for 20%)" : "e.g. 100 (for ₹100)"}
+                    value={couponForm.discountValue}
+                    onChange={(e) => setCouponForm({ ...couponForm, discountValue: e.target.value })}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Min Order (₹)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="0 (no minimum)"
+                    value={couponForm.minOrderAmount}
+                    onChange={(e) => setCouponForm({ ...couponForm, minOrderAmount: e.target.value })}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Max Discount (₹)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="Optional cap"
+                    value={couponForm.maxDiscount}
+                    onChange={(e) => setCouponForm({ ...couponForm, maxDiscount: e.target.value })}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Expiry Date</label>
+                  <input
+                    type="date"
+                    value={couponForm.expiryDate}
+                    onChange={(e) => setCouponForm({ ...couponForm, expiryDate: e.target.value })}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Usage Limit</label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="Unlimited"
+                    value={couponForm.usageLimit}
+                    onChange={(e) => setCouponForm({ ...couponForm, usageLimit: e.target.value })}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-1">
+                <button
+                  type="submit"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black px-5 py-2.5 rounded-xl transition shadow-md flex items-center gap-1.5"
+                >
+                  <Plus size={15} /> Save Coupon
+                </button>
+              </div>
+            </form>
+
+            {/* Existing Coupons List */}
+            <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 mb-3">
+              Existing Coupons ({coupons.length})
+            </h4>
+
+            {couponLoading ? (
+              <div className="p-8 text-center text-xs text-slate-400">Loading coupons...</div>
+            ) : coupons.length === 0 ? (
+              <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                No active coupons found. Create one above to get started.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {coupons.map((c) => (
+                  <div
+                    key={c._id}
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200 gap-2"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-black text-sm text-slate-900 tracking-wider bg-white px-2 py-0.5 rounded-lg border border-slate-200">
+                          {c.code}
+                        </span>
+                        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                          {c.discountType === "percentage" ? `${c.discountValue}% OFF` : `₹${c.discountValue} OFF`}
+                        </span>
+                        {c.isActive ? (
+                          <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                            Active
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+                            Inactive
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 font-medium">
+                        {c.minOrderAmount > 0 && <span>Min Order: ₹{c.minOrderAmount}</span>}
+                        {c.maxDiscount > 0 && <span>Max Cap: ₹{c.maxDiscount}</span>}
+                        {c.expiryDate && <span>Expires: {new Date(c.expiryDate).toLocaleDateString()}</span>}
+                        <span>Used: {c.usageCount || 0}{c.usageLimit ? ` / ${c.usageLimit}` : ""}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleDeleteCoupon(c._id)}
+                      className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition self-end sm:self-center"
+                      title="Delete Coupon"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

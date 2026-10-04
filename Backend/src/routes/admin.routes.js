@@ -10,12 +10,31 @@ const {
   getUsers,
   updateUserRole,
   updateShopStatus,
+  getBroadcast,
+  setBroadcast,
+  clearBroadcast,
+  getCoupons,
+  createCoupon,
+  deleteCoupon,
 } = require("../controller/admin.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
 const adminMiddleware = require("../middleware/admin.middleware");
 
+// 📢 Public storefront broadcast route (no auth required)
+router.get("/broadcast", getBroadcast);
+
+// Protected admin routes
 router.use(authMiddleware, adminMiddleware);
+
+// Broadcast management
+router.post("/broadcast", setBroadcast);
+router.delete("/broadcast", clearBroadcast);
+
+// Coupon management
+router.get("/coupons", getCoupons);
+router.post("/coupons", createCoupon);
+router.delete("/coupons/:id", deleteCoupon);
 
 router.get("/orders", getOrders);
 router.put("/orders/:id", updateOrder);

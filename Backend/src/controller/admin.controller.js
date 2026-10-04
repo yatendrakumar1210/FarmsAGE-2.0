@@ -1,6 +1,8 @@
 const Order = require("../models/order.model");
 const Product = require("../models/product.model");
 const User = require("../models/user.model");
+const Announcement = require("../models/announcement.model");
+const Coupon = require("../models/coupon.model");
 const { sendEmail } = require("../utils/sendEmail");
 const orderStatusTemplate = require("../templates/orderStatusTemplate");
 const shopStatusTemplate = require("../templates/shopStatusTemplate");
@@ -275,5 +277,108 @@ exports.updateShopStatus = async (req, res) => {
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: "Failed to update shop status", error: err.message });
+  }
+};
+
+// 📢 Announcement Broadcast Handlers
+exports.getBroadcast = async (req, res) => {
+  try {
+    const announcement = await Announcement.findOne({ isActive: true }).sort({ updatedAt: -1 });
+    res.json({ message: announcement ? announcement.message : "" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch announcement", error: err.message });
+  }
+};
+
+exports.setBroadcast = async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message || !message.trim()) {
+      return res.status(400).json({ message: "Announcement message is required" });
+    }
+    // Deactivate previous active announcements
+    await Announcement.updateMany({}, { isActive: false });
+    const announcement = await Announcement.create({
+      message: message.trim(),
+      isActive: true,
+      updatedBy: req.user ? req.user._id : null,
+    });
+    res.json({ message: announcement.message, success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to set announcement", error: err.message });
+  }
+};
+
+exports.clearBroadcast = async (req, res) => {
+  try {
+    await Announcement.updateMany({}, { isActive: false });
+    res.json({ message: "", success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to clear announcement", error: err.message });
+  }
+};
+
+// 🎟️ Coupon Management Handlers
+exports.getCoupons = async (req, res) => {
+  try {
+    const coupons = await Coupon.find().sort({ createdAt: -1 });
+    res.json(coupons);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch coupons", error: err.message });
+  }
+};
+
+exports.createCoupon = async (req, res) => {
+  try {
+    const {
+      code,
+      discountType,
+      discountValue,
+      minOrderAmount,
+      maxDiscount,
+      expiryDate,
+      isActive,
+      usageLimit,
+    } = req.body;
+
+    if (!code || !code.trim()) {
+      return res.status(400).json({ message: "Coupon code is required" });
+    }
+    if (discountValue === undefined || discountValue === null || Number(discountValue) < 0) {
+      return res.status(400).json({ message: "Valid discount value is required" });
+    }
+
+    const normalizedCode = code.trim().toUpperCase();
+    const existing = await Coupon.findOne({ code: normalizedCode });
+    if (existing) {
+      return res.status(400).json({ message: `Coupon '${normalizedCode}' already exists` });
+    }
+
+    const coupon = await Coupon.create({
+      code: normalizedCode,
+      discountType: discountType === "fixed" ? "fixed" : "percentage",
+      discountValue: Number(discountValue),
+      minOrderAmount: minOrderAmount ? Number(minOrderAmount) : 0,
+      maxDiscount: maxDiscount ? Number(maxDiscount) : null,
+      expiryDate: expiryDate ? new Date(expiryDate) : null,
+      isActive: isActive !== false,
+      usageLimit: usageLimit ? Number(usageLimit) : null,
+    });
+
+    res.status(201).json(coupon);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to create coupon", error: err.message });
+  }
+};
+
+exports.deleteCoupon = async (req, res) => {
+  try {
+    const coupon = await Coupon.findByIdAndDelete(req.params.id);
+    if (!coupon) {
+      return res.status(404).json({ message: "Coupon not found" });
+    }
+    res.json({ message: "Coupon deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete coupon", error: err.message });
   }
 };

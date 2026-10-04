@@ -30,7 +30,7 @@ import { API_BASE_URL as API } from "../config/api";
 import { playOrderSuccessSound } from "../utils/playOrderSound";
 
 const Checkout = () => {
-  const { cart, clearCart, updateQuantity, removeFromCart, updateItemWeight } = useCart();
+  const { cart, clearCart, updateQuantity, removeFromCart, updateItemWeight, appliedCoupon } = useCart();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   
@@ -167,8 +167,9 @@ const Checkout = () => {
   };
 
   const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const deliveryCharge = subtotal > 500 ? 0 : 40;
-  const total = subtotal + deliveryCharge;
+  const deliveryCharge = subtotal > 500 || subtotal === 0 ? 0 : 40;
+  const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+  const total = Math.max(0, subtotal - discountAmount + deliveryCharge);
 
   const handleInputChange = (e) => {
     setAddress({ ...address, [e.target.name]: e.target.value });
@@ -222,6 +223,7 @@ const Checkout = () => {
 
       const orderData = {
         deliveryAddress: address,
+        couponCode: appliedCoupon?.code || null,
         items: cart.map(item => ({
           productId: String(item._id || item.id),
           price: Number(item.price),
@@ -377,6 +379,7 @@ const Checkout = () => {
           vendorId: item.vendorId || null
         })),
         deliveryAddress: address,
+        couponCode: appliedCoupon?.code || null,
         totalAmount: total
       };
 
@@ -821,6 +824,12 @@ const Checkout = () => {
                       {deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}
                     </span>
                   </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-emerald-600 font-bold text-sm">
+                      <span>Discount ({appliedCoupon?.code})</span>
+                      <span>- ₹{discountAmount}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center pt-4 border-t border-gray-50 mt-4">
                     <span className="text-base font-black text-slate-800">Total Amount</span>
                     <span className="text-2xl font-black text-emerald-600">₹{total}</span>
