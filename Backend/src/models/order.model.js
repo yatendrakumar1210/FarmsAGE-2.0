@@ -149,4 +149,9 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// ─── Indexes optimized for query and sort patterns ───────────
+orderSchema.index({ userId: 1, createdAt: -1 });
+orderSchema.index({ vendorId: 1, createdAt: -1 });
+orderSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model("Order", orderSchema);

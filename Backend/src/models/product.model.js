@@ -62,6 +62,8 @@ const productSchema = new mongoose.Schema({
 // ─── Indexes optimized for getPublicProducts sort/filter patterns ───────────
 // vendorId null check + category filter
 productSchema.index({ vendorId: 1, category: 1, quantity: -1, createdAt: -1 });
+// Vendor product queries: { vendorId } sorted by { createdAt: -1 }
+productSchema.index({ vendorId: 1, createdAt: -1 });
 // Default sort: quantity desc, createdAt desc (most common hit)
 productSchema.index({ quantity: -1, createdAt: -1 });
 // Price sort variants

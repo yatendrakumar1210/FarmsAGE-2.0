@@ -120,4 +120,7 @@ const userSchema = new mongoose.Schema(
   },
 );
 
+// ─── Indexes optimized for vendor discovery and role filtering ───────────
+userSchema.index({ role: 1, shopStatus: 1 });
+
 module.exports = mongoose.model("User", userSchema);
