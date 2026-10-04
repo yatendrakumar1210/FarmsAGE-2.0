@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin,
@@ -148,7 +149,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation, currentLocationName 
 
   if (!isOpen && !showMapPicker) return null;
 
-  return (
+  const modalNode = (
     <>
       {/* Background Overlay */}
       {isOpen && !showMapPicker && (
@@ -339,6 +340,8 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation, currentLocationName 
       />
     </>
   );
+
+  return typeof document !== "undefined" ? createPortal(modalNode, document.body) : modalNode;
 };
 
 export default LocationModal;

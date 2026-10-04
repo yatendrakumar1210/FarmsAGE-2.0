@@ -364,13 +364,15 @@ const MyOrders = () => {
                         </div>
 
                         <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
-                          <button
-                            onClick={() => setTrackingOrder(order)}
-                            className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 whitespace-nowrap"
-                          >
-                            <Truck size={14} className="text-emerald-400" />
-                            <span>Track on Map</span>
-                          </button>
+                          {!["Delivered", "Cancelled"].includes(order.status) && (
+                            <button
+                              onClick={() => setTrackingOrder(order)}
+                              className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 whitespace-nowrap"
+                            >
+                              <Truck size={14} className="text-emerald-400" />
+                              <span>Track on Map</span>
+                            </button>
+                          )}
 
                           <button
                             onClick={() => setSelectedInvoice(order)}

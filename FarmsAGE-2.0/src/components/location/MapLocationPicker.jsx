@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import "leaflet/dist/leaflet.css";
 import {
   MapContainer,
@@ -286,14 +287,14 @@ const MapLocationPicker = ({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[250] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/70 backdrop-blur-sm animate-fade-in">
+  const modalContent = (
+    <div className="fixed inset-0 z-[300] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/70 backdrop-blur-sm animate-fade-in">
       <motion.div
         initial={{ opacity: 0, y: 50, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 50, scale: 0.98 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white rounded-t-[2.2rem] sm:rounded-[2.5rem] w-full max-w-4xl h-[92vh] sm:h-auto sm:max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-100"
+        className="bg-white rounded-t-[2.2rem] sm:rounded-[2.5rem] w-full max-w-4xl h-[92vh] sm:h-auto sm:max-h-[90vh] max-h-[92dvh] flex flex-col shadow-2xl overflow-hidden border border-slate-100"
       >
         {/* Mobile Sheet Drag Handle */}
         <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mt-2.5 sm:hidden shrink-0" />
@@ -618,6 +619,10 @@ const MapLocationPicker = ({
       </motion.div>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 };
 
 export default MapLocationPicker;
