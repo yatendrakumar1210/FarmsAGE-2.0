@@ -14,7 +14,7 @@ import logo from "../../assets/logo.jpg";
 
 const Footer = () => {
   return (
-    <footer className="relative bg-[#0B1221] text-gray-400 pt-4 pb-16 md:pb-4 overflow-hidden border-t border-slate-800/40 text-xs">
+    <footer className="relative bg-[#0B1221] text-gray-400 pt-4 pb-36 md:pb-4 overflow-hidden border-t border-slate-800/40 text-xs">
       {/* Decorative Subtle Element */}
       <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-48 h-48 bg-emerald-500/5 blur-[80px] rounded-full pointer-events-none" />
 

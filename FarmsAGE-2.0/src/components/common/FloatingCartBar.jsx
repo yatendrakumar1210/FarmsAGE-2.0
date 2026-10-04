@@ -9,7 +9,7 @@ const FloatingCartBar = () => {
   const location = useLocation();
   const [dismissed, setDismissed] = useState(false);
 
-  const hiddenRoutes = ["/cart", "/checkout", "/order-success", "/admin", "/vendor"];
+  const hiddenRoutes = ["/cart", "/checkout", "/order-success", "/admin", "/vendor", "/login", "/register"];
   const isHidden = hiddenRoutes.some((route) => location.pathname.startsWith(route));
 
   const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
@@ -24,7 +24,7 @@ const FloatingCartBar = () => {
 
   return (
     <AnimatePresence>
-      <div className="fixed bottom-[68px] md:bottom-4 left-0 right-0 z-[120] px-3 sm:px-4 pointer-events-none flex justify-center">
+      <div className="fixed bottom-[calc(68px+env(safe-area-inset-bottom,0px))] md:bottom-4 left-0 right-0 z-[120] px-3 sm:px-4 pointer-events-none flex justify-center">
         <motion.div
           initial={{ y: 50, opacity: 0, scale: 0.95 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}

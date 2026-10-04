@@ -296,7 +296,7 @@ const MapLocationPicker = ({
         className="bg-white rounded-t-[2.2rem] sm:rounded-[2.5rem] w-full max-w-4xl h-[92vh] sm:h-auto sm:max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-100"
       >
         {/* Mobile Sheet Drag Handle */}
-        <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mt-2.5 sm:hidden" />
+        <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mt-2.5 sm:hidden shrink-0" />
 
         {/* Header */}
         <div className="p-3.5 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
@@ -322,9 +322,9 @@ const MapLocationPicker = ({
         </div>
 
         {/* Content Body: Map + Form */}
-        <div className="flex-1 overflow-y-auto flex flex-col lg:flex-row">
+        <div className="flex-1 overflow-y-auto min-h-0 flex flex-col lg:flex-row">
           {/* Left Column: Interactive Map Canvas */}
-          <div className="w-full lg:w-3/5 h-[230px] sm:h-[340px] lg:h-[500px] relative bg-slate-100 shrink-0">
+          <div className="w-full lg:w-3/5 h-[180px] sm:h-[260px] lg:h-[500px] relative bg-slate-100 shrink-0">
             {/* Search Bar Overlay */}
             <div className="absolute top-3 left-3 right-3 z-[1000]">
               <div className="relative">
@@ -590,8 +590,8 @@ const MapLocationPicker = ({
               </div>
             </div>
 
-            {/* Bottom Confirm Action */}
-            <div className="pt-3 border-t border-slate-100">
+            {/* Desktop Bottom Confirm Action */}
+            <div className="hidden lg:block pt-3 border-t border-slate-100">
               <button
                 type="button"
                 onClick={handleSaveAndConfirm}
@@ -602,6 +602,18 @@ const MapLocationPicker = ({
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Mobile Fixed/Sticky Action Footer */}
+        <div className="lg:hidden p-3.5 bg-white border-t border-slate-100 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] shrink-0 z-20 pb-[max(0.875rem,env(safe-area-inset-bottom))]">
+          <button
+            type="button"
+            onClick={handleSaveAndConfirm}
+            className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm rounded-2xl shadow-xl shadow-emerald-600/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          >
+            <Check size={18} />
+            <span>Save & Deliver to this Location</span>
+          </button>
         </div>
       </motion.div>
     </div>

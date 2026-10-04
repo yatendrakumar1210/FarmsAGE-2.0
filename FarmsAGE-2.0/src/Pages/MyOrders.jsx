@@ -23,6 +23,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
+import OrderTrackingMap from "../components/location/OrderTrackingMap";
 import { useCart } from "../context/CartContext";
 import { API_BASE_URL as API } from "../config/api";
 
@@ -177,7 +178,7 @@ const MyOrders = () => {
     <div className="bg-[#FAFBFD] min-h-screen flex flex-col font-sans selection:bg-emerald-100">
       <Navbar />
       
-      <main className="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-24">
+      <main className="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 md:px-8 pt-8 sm:pt-10 pb-36 sm:pb-24">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div>
@@ -362,10 +363,10 @@ const MyOrders = () => {
                           <span className="truncate max-w-[200px]">{order.deliveryAddress?.city || "Local Delivery"}</span>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
                           <button
                             onClick={() => setTrackingOrder(order)}
-                            className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95"
+                            className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 whitespace-nowrap"
                           >
                             <Truck size={14} className="text-emerald-400" />
                             <span>Track on Map</span>
@@ -373,7 +374,7 @@ const MyOrders = () => {
 
                           <button
                             onClick={() => setSelectedInvoice(order)}
-                            className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 transition-colors"
+                            className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap"
                           >
                             <FileText size={14} className="text-slate-500" />
                             <span>Invoice</span>
@@ -383,7 +384,7 @@ const MyOrders = () => {
                             <button
                               onClick={() => handleCancelOrder(order._id)}
                               disabled={cancellingId === order._id}
-                              className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl border border-rose-200 text-xs font-extrabold text-rose-600 hover:bg-rose-50 flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                              className="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl border border-rose-200 text-xs font-extrabold text-rose-600 hover:bg-rose-50 flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50 whitespace-nowrap"
                             >
                               <XCircle size={14} className="text-rose-500" />
                               <span>{cancellingId === order._id ? "Cancelling..." : "Cancel"}</span>
@@ -392,7 +393,7 @@ const MyOrders = () => {
 
                           <button
                             onClick={() => handleReorder(order.items)}
-                            className="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-md shadow-emerald-200 transition-all flex items-center justify-center gap-1.5"
+                            className="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-md shadow-emerald-200 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap"
                           >
                             <span>Reorder</span>
                             <ChevronRight size={14} />

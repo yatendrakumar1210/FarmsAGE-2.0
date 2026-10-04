@@ -9,11 +9,12 @@ const CompleteProfile = () => {
   const { user, login } = useAuth();
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
-  const [role, setRole] = useState(user?.role || "user");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const navigate = useNavigate();
 
+  const isOnboarding = !user?.isProfileComplete;
   const hasExistingEmail = Boolean(user?.email && user.email.trim() !== "");
 
   const handleSubmit = async (e) => {
@@ -38,6 +39,7 @@ const CompleteProfile = () => {
 
     setLoading(true);
     setError("");
+    setSuccessMsg("");
     try {
       const token = localStorage.getItem("token");
       const resp = await fetch(`${API}/api/auth/complete-profile`, {
@@ -46,15 +48,16 @@ const CompleteProfile = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: name.trim(), role, email: finalEmail }),
+        body: JSON.stringify({ name: name.trim(), email: finalEmail }),
       });
       const data = await resp.json();
       if (resp.ok) {
-        login(data.user, data.token); // Use new token with updated role
-        if (role === "vendor") {
-          navigate("/vendor");
-        } else {
+        login(data.user, data.token);
+        if (isOnboarding) {
           navigate("/");
+        } else {
+          setSuccessMsg("Profile updated successfully!");
+          setTimeout(() => setSuccessMsg(""), 4000);
         }
       } else {
         setError(data.message || "Failed to update profile");
@@ -67,14 +70,14 @@ const CompleteProfile = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] relative overflow-hidden py-10">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] relative overflow-hidden py-10 pb-24 sm:py-10">
       {/* Background Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full z-0 opacity-40">
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-200 blur-[120px] rounded-full" />
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-amber-200 blur-[120px] rounded-full" />
       </div>
 
-      <div className="max-w-lg w-full mx-4 sm:mx-6 bg-white rounded-2xl sm:rounded-[3rem] shadow-2xl shadow-emerald-100/50 overflow-hidden relative z-10 border border-gray-100 p-5 sm:p-8 md:p-12 space-y-6">
+      <div className="max-w-lg w-full mx-3 sm:mx-6 bg-white rounded-2xl sm:rounded-[3rem] shadow-2xl shadow-emerald-100/50 overflow-hidden relative z-10 border border-gray-100 p-4 sm:p-8 md:p-12 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-slate-100 pb-5">
           <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center shrink-0">
@@ -83,7 +86,9 @@ const CompleteProfile = () => {
           <div>
             <h1 className="text-2xl font-black text-slate-800 font-['Outfit']">Profile & Account</h1>
             <p className="text-slate-500 text-xs font-medium mt-0.5">
-              Review your details and complete registration
+              {isOnboarding
+                ? "Review your details and complete registration"
+                : "Manage your account details and profile information"}
             </p>
           </div>
         </div>
@@ -177,38 +182,57 @@ const CompleteProfile = () => {
             </div>
           )}
 
-          {/* Role Selection */}
+          {/* Account Type (Read-Only Display) */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
-              Select Account Type
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setRole("user")}
-                className={`py-3.5 rounded-2xl font-bold text-sm transition-all border-2 ${
-                  role === "user"
-                    ? "bg-emerald-50 border-emerald-500 text-emerald-700 shadow-md shadow-emerald-100"
-                    : "bg-slate-50 border-transparent text-slate-600 hover:bg-slate-100"
-                }`}
-              >
-                🛒 Customer
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole("vendor")}
-                className={`py-3.5 rounded-2xl font-bold text-sm transition-all border-2 ${
-                  role === "vendor"
-                    ? "bg-emerald-50 border-emerald-500 text-emerald-700 shadow-md shadow-emerald-100"
-                    : "bg-slate-50 border-transparent text-slate-600 hover:bg-slate-100"
-                }`}
-              >
-                🌾 Vendor
-              </button>
+            <div className="flex items-center justify-between">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                Account Type
+              </label>
+              <span className="text-[10px] font-semibold text-slate-400">Verified by System</span>
+            </div>
+            <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm ${
+                  user?.role === "vendor"
+                    ? "bg-amber-100 text-amber-800"
+                    : user?.role === "admin"
+                    ? "bg-purple-100 text-purple-800"
+                    : "bg-emerald-100 text-emerald-800"
+                }`}>
+                  {user?.role === "vendor" ? "🌾" : user?.role === "admin" ? "🛡️" : "🛒"}
+                </div>
+                <div>
+                  <p className="text-xs font-black text-slate-800">
+                    {user?.role === "vendor" ? "Vendor Partner" : user?.role === "admin" ? "Administrator" : "Customer"}
+                  </p>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    {user?.role === "vendor"
+                      ? "Verified Merchant Store"
+                      : user?.role === "admin"
+                      ? "System Administrator"
+                      : "Personal Shopping Account"}
+                  </p>
+                </div>
+              </div>
+              <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
+                user?.role === "vendor"
+                  ? "bg-amber-200/80 text-amber-900"
+                  : user?.role === "admin"
+                  ? "bg-purple-200/80 text-purple-900"
+                  : "bg-emerald-200/80 text-emerald-900"
+              }`}>
+                {user?.role === "vendor" ? "Vendor" : user?.role === "admin" ? "Admin" : "Customer"}
+              </span>
             </div>
           </div>
 
           {error && <p className="text-red-500 text-xs font-bold px-1">{error}</p>}
+          {successMsg && (
+            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 flex items-center gap-2">
+              <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+          )}
 
           {/* Submit Button */}
           <button
@@ -216,7 +240,9 @@ const CompleteProfile = () => {
             disabled={loading}
             className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black text-base shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-95 flex items-center justify-center gap-3 group disabled:opacity-70 disabled:active:scale-100"
           >
-            {loading ? "Saving Profile..." : "Save Profile & Continue"}
+            {loading
+              ? (isOnboarding ? "Saving Profile..." : "Saving Changes...")
+              : (isOnboarding ? "Save Profile & Continue" : "Save Changes")}
             {!loading && (
               <ArrowRight
                 size={18}

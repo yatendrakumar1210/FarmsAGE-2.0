@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -182,14 +183,14 @@ const Register = () => {
                 <label className="text-[11px] font-bold text-slate-600 ml-1">
                   Full Name
                 </label>
-                <div className="flex items-center gap-3 w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3.5 focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-500/10 transition-all">
+                <div className="flex items-center gap-2.5 sm:gap-3 w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-3 sm:px-4 py-3 sm:py-3.5 focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-500/10 transition-all">
                   <User size={18} className="text-slate-400 shrink-0" />
                   <input
                     type="text"
                     placeholder="Enter your full name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-transparent outline-none text-sm font-bold text-slate-800 placeholder:text-slate-300"
+                    className="flex-1 min-w-0 bg-transparent outline-none text-sm font-bold text-slate-800 placeholder:text-slate-300"
                     required
                   />
                 </div>
@@ -200,14 +201,14 @@ const Register = () => {
                 <label className="text-[11px] font-bold text-slate-600 ml-1">
                   Mobile Phone Number
                 </label>
-                <div className="flex items-center gap-3 w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3.5 focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-500/10 transition-all">
-                  <div className="flex items-center gap-1.5 border-r border-slate-200 pr-3 shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3 w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-3 sm:px-4 py-3 sm:py-3.5 focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-500/10 transition-all">
+                  <div className="flex items-center gap-1.5 border-r border-slate-200 pr-2.5 sm:pr-3 shrink-0">
                     <img
                       src="https://flagcdn.com/w20/in.png"
                       alt="India Flag"
                       className="w-5 h-3.5 rounded-xs object-cover"
                     />
-                    <span className="font-bold text-slate-700 text-sm">
+                    <span className="font-bold text-slate-700 text-sm whitespace-nowrap">
                       +91
                     </span>
                   </div>
@@ -217,7 +218,7 @@ const Register = () => {
                     placeholder="10-digit Mobile Number"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-transparent outline-none text-sm font-bold text-slate-800 placeholder:text-slate-300 tracking-wider"
+                    className="flex-1 min-w-0 bg-transparent outline-none text-sm font-bold text-slate-800 placeholder:text-slate-300 placeholder:tracking-normal tracking-wider"
                     required
                   />
                 </div>
@@ -228,14 +229,14 @@ const Register = () => {
                 <label className="text-[11px] font-bold text-slate-600 ml-1">
                   Password
                 </label>
-                <div className="flex items-center gap-3 w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3.5 focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-500/10 transition-all">
+                <div className="flex items-center gap-2.5 sm:gap-3 w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-3 sm:px-4 py-3 sm:py-3.5 focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-500/10 transition-all">
                   <Lock size={18} className="text-slate-400 shrink-0" />
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a strong password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-transparent outline-none text-sm font-bold text-slate-800 placeholder:text-slate-300"
+                    className="flex-1 min-w-0 bg-transparent outline-none text-sm font-bold text-slate-800 placeholder:text-slate-300"
                     required
                   />
                   <button

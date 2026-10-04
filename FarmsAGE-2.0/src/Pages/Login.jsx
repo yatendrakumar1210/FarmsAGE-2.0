@@ -223,9 +223,9 @@ const Login = () => {
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="w-full max-w-md px-6 -mt-10 relative z-20"
+        className="w-full max-w-md px-4 sm:px-6 -mt-10 relative z-20"
       >
-        <div className="bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] p-8 md:p-10 border border-slate-50">
+        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] p-5 sm:p-8 md:p-10 border border-slate-50">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
               Login or Signup
@@ -234,14 +234,14 @@ const Login = () => {
 
           <form className="space-y-4" onSubmit={handlePasswordLogin}>
             <div className="space-y-3">
-              <div className="flex items-center gap-3 w-full bg-white border-2 border-slate-100 rounded-2xl px-4 py-3.5 focus-within:border-emerald-500 transition-all">
-                <div className="flex items-center gap-1 border-r border-slate-200 pr-3">
+              <div className="flex items-center gap-2 sm:gap-3 w-full bg-white border-2 border-slate-100 rounded-2xl px-3 sm:px-4 py-3 sm:py-3.5 focus-within:border-emerald-500 transition-all">
+                <div className="flex items-center gap-1.5 border-r border-slate-200 pr-2.5 sm:pr-3 shrink-0">
                   <img
                     src="https://flagcdn.com/w20/in.png"
                     alt="India"
-                    className="w-5 h-4 rounded-sm object-cover"
+                    className="w-5 h-3.5 rounded-xs object-cover shrink-0"
                   />
-                  <span className="font-bold text-slate-700 text-sm ml-1">
+                  <span className="font-bold text-slate-700 text-sm whitespace-nowrap">
                     +91
                   </span>
                 </div>
@@ -252,19 +252,19 @@ const Login = () => {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   disabled={loading}
-                  className="flex-1 bg-transparent border-none outline-none font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-medium tracking-wider"
+                  className="flex-1 min-w-0 bg-transparent border-none outline-none font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-medium placeholder:tracking-normal tracking-wider text-sm"
                   required
                 />
               </div>
 
-              <div className="flex items-center gap-3 w-full bg-white border-2 border-slate-100 rounded-2xl px-4 py-3.5 focus-within:border-emerald-500 transition-all">
+              <div className="flex items-center gap-2 sm:gap-3 w-full bg-white border-2 border-slate-100 rounded-2xl px-3 sm:px-4 py-3 sm:py-3.5 focus-within:border-emerald-500 transition-all">
                 <input
                   type="password"
                   placeholder="Enter Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
-                  className="flex-1 bg-transparent border-none outline-none font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-medium"
+                  className="flex-1 min-w-0 bg-transparent border-none outline-none font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-medium text-sm"
                   required
                 />
               </div>
@@ -307,7 +307,7 @@ const Login = () => {
         </div>
 
         {/* Footer Links */}
-        <div className="mt-8 flex flex-col items-center gap-4 pb-12">
+        <div className="mt-8 flex flex-col items-center gap-4 pb-20 sm:pb-12">
           <div className="flex items-center gap-6">
             <button
               onClick={handleAdminClick}
