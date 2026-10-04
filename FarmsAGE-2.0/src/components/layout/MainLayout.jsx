@@ -59,21 +59,14 @@ const MainLayout = ({ children }) => {
   return (
     <div className="bg-[#F8FAFC] min-h-screen flex flex-col font-sans selection:bg-emerald-100 selection:text-emerald-900">
       {/* 1. Premium Announcement Bar */}
-      <div className="bg-emerald-600 text-white py-2 px-3 sm:px-4 overflow-hidden relative">
-        <div className="max-w-7xl mx-auto flex flex-wrap justify-center items-center gap-1 sm:gap-2 text-[9px] xs:text-[10px] sm:text-xs font-bold uppercase tracking-wide text-center">
-          <Zap size={14} className="fill-current animate-pulse" />
-          <span>
-            {announcement || (
-              <>
-                Flash Sale: Get 30% Off on Organic Fruits. Use Code:{" "}
-                <span className="underline decoration-wavy underline-offset-4">
-                  FARM30
-                </span>
-              </>
-            )}
-          </span>
+      {announcement && (
+        <div className="bg-emerald-600 text-white py-2 px-3 sm:px-4 overflow-hidden relative">
+          <div className="max-w-7xl mx-auto flex flex-wrap justify-center items-center gap-1 sm:gap-2 text-[9px] xs:text-[10px] sm:text-xs font-bold uppercase tracking-wide text-center">
+            <Zap size={14} className="fill-current animate-pulse" />
+            <span>{announcement}</span>
+          </div>
         </div>
-      </div>
+      )}
       {/* 2. Sticky Navbar Container */}
       <div className="z-[100]">
         <Navbar />

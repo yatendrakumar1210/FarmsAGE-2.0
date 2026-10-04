@@ -184,6 +184,7 @@ const Dashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       localStorage.setItem("farmsage_announcement", announcementText.trim());
+      window.dispatchEvent(new Event("storage"));
       setAnnouncementSaved(true);
       setTimeout(() => {
         setAnnouncementSaved(false);
@@ -202,6 +203,7 @@ const Dashboard = () => {
       });
       localStorage.removeItem("farmsage_announcement");
       setAnnouncementText("");
+      window.dispatchEvent(new Event("storage"));
       setAnnouncementSaved(true);
       setTimeout(() => {
         setAnnouncementSaved(false);
