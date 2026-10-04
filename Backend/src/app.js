@@ -23,10 +23,12 @@ app.use(compression({
 }));
 
 app.use(express.json({
+  limit: '10mb',
   verify: (req, res, buf) => {
     req.rawBody = buf;
   }
 }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ─── CORS ───
 const isProduction = process.env.NODE_ENV === "production";
@@ -118,9 +120,16 @@ app.use((err, req, res, next) => {
   const statusCode = err.status || err.statusCode || 500;
   const isProd = process.env.NODE_ENV === "production";
 
+  let errorMsg = err.message || "An error occurred";
+  if (statusCode === 413 || err.type === "entity.too.large") {
+    errorMsg = "Request payload too large. Please upload an image under 10MB.";
+  } else if (isProd && statusCode >= 500) {
+    errorMsg = "Internal Server Error";
+  }
+
   res.status(statusCode).json({
     success: false,
-    message: isProd && statusCode >= 500 ? "Internal Server Error" : (err.message || "An error occurred"),
+    message: errorMsg,
   });
 });
 

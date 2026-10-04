@@ -34,8 +34,8 @@ const VendorProfile = () => {
           storeImage: data.storeImage || "",
           storeAddress: data.storeAddress || "",
           coordinates: {
-            lat: data.coordinates?.lat || "",
-            lng: data.coordinates?.lng || "",
+            lat: data.coordinates?.lat != null ? String(data.coordinates.lat) : "",
+            lng: data.coordinates?.lng != null ? String(data.coordinates.lng) : "",
           },
         });
         if (data.shopStatus && data.shopStatus !== user?.shopStatus) {
@@ -50,11 +50,75 @@ const VendorProfile = () => {
     fetchProfile();
   }, []);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setMessage("Please select a valid image file (JPEG, PNG, or WEBP).");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setMessage("Image file size must be less than 10MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const maxDim = 1200;
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL("image/jpeg", 0.82);
+          setProfile((prev) => ({ ...prev, storeImage: compressed }));
+          setMessage("");
+        } catch {
+          // Fallback to original Data URL if canvas fails
+          setProfile((prev) => ({ ...prev, storeImage: event.target.result }));
+          setMessage("");
+        }
+      };
+      img.onerror = () => {
+        setProfile((prev) => ({ ...prev, storeImage: event.target.result }));
+        setMessage("");
+      };
+      img.src = event.target.result;
+    };
+    reader.onerror = () => {
+      setMessage("Failed to read image file.");
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
     setMessage("");
     try {
+      const parsedLat = profile.coordinates.lat !== "" && profile.coordinates.lat != null && !isNaN(Number(profile.coordinates.lat))
+        ? Number(profile.coordinates.lat)
+        : null;
+      const parsedLng = profile.coordinates.lng !== "" && profile.coordinates.lng != null && !isNaN(Number(profile.coordinates.lng))
+        ? Number(profile.coordinates.lng)
+        : null;
+
       const res = await fetch(`${API}/api/vendor/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -64,28 +128,34 @@ const VendorProfile = () => {
           storeImage: profile.storeImage,
           storeAddress: profile.storeAddress,
           coordinates: {
-            lat: profile.coordinates.lat ? Number(profile.coordinates.lat) : null,
-            lng: profile.coordinates.lng ? Number(profile.coordinates.lng) : null,
+            lat: parsedLat,
+            lng: parsedLng,
           },
         }),
       });
       if (res.ok) {
+        const savedData = await res.json().catch(() => null);
         setMessage("Profile updated successfully!");
         // Update user in context & localStorage
         const updatedFields = {
-          storeName: profile.storeName,
-          specialty: profile.specialty,
-          storeImage: profile.storeImage,
-          storeAddress: profile.storeAddress,
-          coordinates: profile.coordinates,
+          storeName: savedData?.storeName ?? profile.storeName,
+          specialty: savedData?.specialty ?? profile.specialty,
+          storeImage: savedData?.storeImage ?? profile.storeImage,
+          storeAddress: savedData?.storeAddress ?? profile.storeAddress,
+          coordinates: savedData?.coordinates ?? profile.coordinates,
+          isProfileComplete: savedData?.isProfileComplete,
         };
         updateUser(updatedFields);
       } else {
         const data = await res.json().catch(() => null);
-        setMessage(data?.message || "Failed to update profile.");
+        let errorMsg = data?.message;
+        if (res.status === 413 || errorMsg?.includes("too large")) {
+          errorMsg = "Store photo is too large. Please select a smaller photo (max 10MB).";
+        }
+        setMessage(errorMsg || "Failed to update profile.");
       }
     } catch (err) {
-      setMessage("Failed to update profile.");
+      setMessage("Failed to update profile. Please check your connection and try again.");
       console.error("Save failed:", err);
     } finally {
       setSaving(false);
@@ -370,16 +440,7 @@ const VendorProfile = () => {
                   type="file"
                   accept="image/*"
                   style={{ display: "none" }}
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setProfile((prev) => ({ ...prev, storeImage: reader.result }));
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
+                  onChange={handleImageChange}
                 />
               </label>
             </div>
@@ -444,9 +505,9 @@ const VendorProfile = () => {
             <div style={{
               padding: "0.6rem 1rem", borderRadius: 10, marginBottom: "1rem",
               fontSize: "0.82rem", fontWeight: 600,
-              background: message.includes("success") ? "#f0fdf4" : "#fffbeb",
-              color: message.includes("success") ? "#15803d" : "#b45309",
-              border: `1px solid ${message.includes("success") ? "#dcfce7" : "#fef3c7"}`,
+              background: message.toLowerCase().includes("success") || message.toLowerCase().includes("detected") || message.toLowerCase().includes("selected") ? "#f0fdf4" : "#fef2f2",
+              color: message.toLowerCase().includes("success") || message.toLowerCase().includes("detected") || message.toLowerCase().includes("selected") ? "#15803d" : "#b91c1c",
+              border: `1px solid ${message.toLowerCase().includes("success") || message.toLowerCase().includes("detected") || message.toLowerCase().includes("selected") ? "#dcfce7" : "#fecaca"}`,
             }}>
               {message}
             </div>
