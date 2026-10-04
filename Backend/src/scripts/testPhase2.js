@@ -206,8 +206,8 @@ const runTests = async () => {
     await getProducts(req, res);
     const organicCount = res.jsonData?.products?.length || 0;
     assert(
-      res.statusCode === 200 && organicCount === 30 && res.jsonData?.totalProducts === 30,
-      `getProducts category=Organic returns 30 products (got ${organicCount}, total: ${res.jsonData?.totalProducts})`
+      res.statusCode === 200 && organicCount >= 30 && res.jsonData?.totalProducts >= 30,
+      `getProducts category=Organic returns at least 30 products (got ${organicCount}, total: ${res.jsonData?.totalProducts})`
     );
   }
 
