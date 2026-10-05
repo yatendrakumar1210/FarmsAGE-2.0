@@ -9,11 +9,18 @@ const MobileBottomNav = () => {
   const { cart } = useCart();
   const { user } = useAuth();
 
-  // Hide bottom nav on admin or vendor dashboards or during checkout to prevent clutter
-  const hiddenPrefixes = ["/admin", "/vendor", "/checkout", "/order-success"];
+  // Hide bottom nav on admin, vendor, delivery dashboards or during checkout to prevent clutter
+  const hiddenPrefixes = ["/admin", "/vendor", "/delivery", "/checkout", "/order-success"];
   const isHidden = hiddenPrefixes.some((prefix) => location.pathname.startsWith(prefix));
 
-  if (isHidden) return null;
+  if (
+    isHidden ||
+    user?.role?.toLowerCase() === "delivery" ||
+    user?.role?.toLowerCase() === "admin" ||
+    user?.role?.toLowerCase() === "vendor"
+  ) {
+    return null;
+  }
 
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 

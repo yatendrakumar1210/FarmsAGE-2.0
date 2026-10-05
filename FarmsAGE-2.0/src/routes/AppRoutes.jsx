@@ -34,6 +34,7 @@ import AdminRoute from "./AdminRoute";
 import VendorRoute from "./VendorRoute";
 import DeliveryRoute from "./DeliveryRoute";
 import ProtectedRoute from "./ProtectedRoute";
+import CustomerRoute from "./CustomerRoute";
 
 // Admin Lazy Imports
 const AdminLayout = lazy(() => import("../Pages/Admin/AdminLayout"));
@@ -46,6 +47,12 @@ const ManageDeliveryPartners = lazy(() => import("../Pages/Admin/ManageDeliveryP
 // Delivery Partner Lazy Imports
 const DeliveryRegister = lazy(() => import("../Pages/Delivery/DeliveryRegister"));
 const DeliveryProfile = lazy(() => import("../Pages/Delivery/DeliveryProfile"));
+const DeliveryLayout = lazy(() => import("../Pages/Delivery/DeliveryLayout"));
+const DeliveryDashboard = lazy(() => import("../Pages/Delivery/DeliveryDashboard"));
+const DeliveryAvailableOrders = lazy(() => import("../Pages/Delivery/DeliveryAvailableOrders"));
+const DeliveryActiveOrder = lazy(() => import("../Pages/Delivery/DeliveryActiveOrder"));
+const DeliveryOrderDetail = lazy(() => import("../Pages/Delivery/DeliveryOrderDetail"));
+const DeliveryHistory = lazy(() => import("../Pages/Delivery/DeliveryHistory"));
 
 // Vendor Lazy Imports
 const VendorLayout = lazy(() => import("../Pages/Vendor/VendorLayout"));
@@ -60,40 +67,55 @@ const AppRoutes = () => {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/contact" element={<Contact />} />
+        <Route path="/" element={<CustomerRoute><Home /></CustomerRoute>} />
+        <Route path="/home" element={<CustomerRoute><Home /></CustomerRoute>} />
+        <Route path="/cart" element={<CustomerRoute><Cart /></CustomerRoute>} />
+        <Route path="/contact" element={<CustomerRoute><Contact /></CustomerRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/complete-profile" element={<CompleteProfile />} />
-        <Route path="/category/fruits" element={<Fruits />} />
-        <Route path="/category/vegetables" element={<Vegetables />} />
-        <Route path="/category/organic" element={<Organic />} />
-        <Route path="/category/dairy" element={<Dairy />} />
-        <Route path="/category/all" element={<AllProducts />} />
+        <Route path="/complete-profile" element={<CustomerRoute><CompleteProfile /></CustomerRoute>} />
+        <Route path="/category/fruits" element={<CustomerRoute><Fruits /></CustomerRoute>} />
+        <Route path="/category/vegetables" element={<CustomerRoute><Vegetables /></CustomerRoute>} />
+        <Route path="/category/organic" element={<CustomerRoute><Organic /></CustomerRoute>} />
+        <Route path="/category/dairy" element={<CustomerRoute><Dairy /></CustomerRoute>} />
+        <Route path="/category/all" element={<CustomerRoute><AllProducts /></CustomerRoute>} />
+        <Route path="/categories" element={<CustomerRoute><Navigate to="/category/all" replace /></CustomerRoute>} />
+        <Route path="/orders" element={<CustomerRoute><Navigate to="/my-orders" replace /></CustomerRoute>} />
+        <Route path="/profile" element={<CustomerRoute><Navigate to="/complete-profile" replace /></CustomerRoute>} />
         <Route path="/checkout" element={
-          <ProtectedRoute>
-            <Checkout />
-          </ProtectedRoute>
+          <CustomerRoute>
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          </CustomerRoute>
         } />
-        <Route path="/order-success" element={<OrderSuccess />} />
+        <Route path="/order-success" element={<CustomerRoute><OrderSuccess /></CustomerRoute>} />
         <Route path="/my-orders" element={
-          <ProtectedRoute>
-            <MyOrders />
-          </ProtectedRoute>
+          <CustomerRoute>
+            <ProtectedRoute>
+              <MyOrders />
+            </ProtectedRoute>
+          </CustomerRoute>
         } />
 
         {/* Public Vendor Store Page */}
-        <Route path="/vendor/:vendorId/store" element={<VendorStore />} />
+        <Route path="/vendor/:vendorId/store" element={<CustomerRoute><VendorStore /></CustomerRoute>} />
 
-        {/* Delivery Partner Onboarding & Profile */}
+        {/* Delivery Partner Application */}
         <Route path="/delivery/register" element={<DeliveryRegister />} />
-        <Route path="/delivery/profile" element={
+        <Route path="/delivery" element={
           <DeliveryRoute>
-            <DeliveryProfile />
+            <DeliveryLayout />
           </DeliveryRoute>
-        } />
+        }>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<DeliveryDashboard />} />
+          <Route path="available-orders" element={<DeliveryAvailableOrders />} />
+          <Route path="active-delivery" element={<DeliveryActiveOrder />} />
+          <Route path="orders/:orderId" element={<DeliveryOrderDetail />} />
+          <Route path="history" element={<DeliveryHistory />} />
+          <Route path="profile" element={<DeliveryProfile />} />
+        </Route>
 
         {/* Admin Panel Routes */}
         <Route path="/admin" element={

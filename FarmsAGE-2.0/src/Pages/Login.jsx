@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, ArrowRight, ShieldCheck, Leaf, ChevronDown, Mail, Search, Store } from "lucide-react";
@@ -18,6 +18,22 @@ const Login = () => {
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user"))
+      : null;
+    const activeUser = user || storedUser;
+    if (activeUser?.role?.toLowerCase() === "delivery") {
+      const deliveryStatus = activeUser.deliveryStatus?.toLowerCase();
+      navigate(
+        deliveryStatus === "approved"
+          ? "/delivery/dashboard"
+          : "/delivery/profile",
+        { replace: true }
+      );
+    }
+  }, [user, navigate]);
 
   const handleAdminClick = (e) => {
     e.preventDefault();
@@ -72,25 +88,29 @@ const Login = () => {
         const data = await res.json();
         if (res.ok) {
           login(data.user, data.token);
-          if (data.isNewUser) {
-            navigate("/complete-profile");
-          } else {
-            const role = data.user?.role?.toLowerCase();
-            const shopStatus = data.user?.shopStatus?.toLowerCase();
-            if (role === "admin") {
-              navigate("/admin/dashboard", { replace: true });
-            } else if (role === "vendor") {
-              if (shopStatus === "approved") {
-                navigate("/vendor/dashboard", { replace: true });
-              } else {
-                navigate("/vendor/profile", { replace: true });
-              }
-            } else if (role === "delivery") {
-              navigate("/delivery/profile", { replace: true });
+          const role = data.user?.role?.toLowerCase();
+          const deliveryStatus = data.user?.deliveryStatus?.toLowerCase();
+          const shopStatus = data.user?.shopStatus?.toLowerCase();
+
+          if (role === "delivery") {
+            if (deliveryStatus === "approved") {
+              navigate("/delivery/dashboard", { replace: true });
             } else {
-              const fromPath = location.state?.from || "/";
-              navigate(fromPath, { replace: true });
+              navigate("/delivery/profile", { replace: true });
             }
+          } else if (data.isNewUser) {
+            navigate("/complete-profile");
+          } else if (role === "admin") {
+            navigate("/admin/dashboard", { replace: true });
+          } else if (role === "vendor") {
+            if (shopStatus === "approved") {
+              navigate("/vendor/dashboard", { replace: true });
+            } else {
+              navigate("/vendor/profile", { replace: true });
+            }
+          } else {
+            const fromPath = location.state?.from || "/";
+            navigate(fromPath, { replace: true });
           }
         } else {
 
@@ -171,7 +191,12 @@ const Login = () => {
             navigate("/vendor/profile", { replace: true });
           }
         } else if (role === "delivery") {
-          navigate("/delivery/profile", { replace: true });
+          const deliveryStatus = data.user?.deliveryStatus?.toLowerCase();
+          if (deliveryStatus === "approved") {
+            navigate("/delivery/dashboard", { replace: true });
+          } else {
+            navigate("/delivery/profile", { replace: true });
+          }
         } else {
           const fromPath = location.state?.from || "/";
           navigate(fromPath, { replace: true });

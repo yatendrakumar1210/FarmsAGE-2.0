@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Phone,
@@ -29,8 +29,24 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user"))
+      : null;
+    const activeUser = user || storedUser;
+    if (activeUser?.role?.toLowerCase() === "delivery") {
+      const deliveryStatus = activeUser.deliveryStatus?.toLowerCase();
+      navigate(
+        deliveryStatus === "approved"
+          ? "/delivery/dashboard"
+          : "/delivery/profile",
+        { replace: true }
+      );
+    }
+  }, [user, navigate]);
 
   const handleRegister = async (e) => {
     e.preventDefault();

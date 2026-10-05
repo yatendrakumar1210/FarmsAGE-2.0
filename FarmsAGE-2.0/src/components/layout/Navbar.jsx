@@ -193,13 +193,24 @@ const Navbar = React.memo(() => {
                     {user.email || user.phone}
                   </p>
                 </div>
-                <Link
-                  to="/my-orders"
-                  className="px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
-                >
-                  <Package size={14} className="text-emerald-600" />
-                  <span>My Orders</span>
-                </Link>
+                {user?.role?.toLowerCase() !== "delivery" && (
+                  <Link
+                    to="/my-orders"
+                    className="px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                  >
+                    <Package size={14} className="text-emerald-600" />
+                    <span>My Orders</span>
+                  </Link>
+                )}
+                {user?.role?.toLowerCase() === "delivery" && (
+                  <Link
+                    to={user?.deliveryStatus === "approved" ? "/delivery/dashboard" : "/delivery/profile"}
+                    className="px-4 py-2.5 text-xs font-bold text-teal-800 bg-teal-50/60 hover:bg-teal-100/80 flex items-center gap-2"
+                  >
+                    <Truck size={14} className="text-teal-600" />
+                    <span>Delivery Portal</span>
+                  </Link>
+                )}
                 {user?.role?.toLowerCase() === "admin" && (
                   <Link
                     to="/admin"
@@ -239,13 +250,24 @@ const Navbar = React.memo(() => {
           )}
 
           {/* Orders */}
-          {user && !routerLocation.pathname.startsWith("/admin") && (
+          {user && !routerLocation.pathname.startsWith("/admin") && user?.role?.toLowerCase() !== "delivery" && (
             <Link
               to="/my-orders"
               className="hidden lg:flex items-center gap-1.5 font-extrabold text-slate-700 hover:text-emerald-600 px-2 py-1.5 rounded-xl hover:bg-slate-50 transition"
             >
               <Package size={18} />
               <span className="text-xs sm:text-sm">Orders</span>
+            </Link>
+          )}
+
+          {/* Delivery Portal */}
+          {user?.role?.toLowerCase() === "delivery" && (
+            <Link
+              to={user?.deliveryStatus === "approved" ? "/delivery/dashboard" : "/delivery/profile"}
+              className="hidden md:flex items-center gap-1.5 font-black text-teal-800 bg-teal-50 px-2.5 py-1 rounded-xl border border-teal-200/60 text-xs"
+            >
+              <Truck size={16} />
+              <span>Delivery Portal</span>
             </Link>
           )}
 
@@ -394,21 +416,38 @@ const Navbar = React.memo(() => {
                     </p>
                   )}
                   <span className="inline-block text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-400/20 px-2 py-0.5 rounded-full mt-1.5 border border-amber-400/30">
-                    {user.role === "vendor" ? (user.shopStatus === "approved" ? "Approved Vendor" : "Pending Vendor") : (user.role || "Customer")}
+                    {user.role === "vendor"
+                      ? (user.shopStatus === "approved" ? "Approved Vendor" : "Pending Vendor")
+                      : user.role === "delivery"
+                      ? (user.deliveryStatus === "approved" ? "Delivery Partner (Approved)" : `Delivery Partner (${user.deliveryStatus || "Pending"})`)
+                      : user.role === "admin"
+                      ? "Admin"
+                      : "Customer"}
                   </span>
                 </div>
               </div>
 
               {/* Quick Action Badges / Shortcuts */}
               <div className="grid grid-cols-2 gap-2 pt-2 border-t border-emerald-800/60">
-                <Link
-                  to="/my-orders"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-2 p-2 bg-emerald-900/60 hover:bg-emerald-800/80 border border-emerald-700/50 rounded-xl text-xs font-bold text-emerald-100 transition"
-                >
-                  <History size={14} className="text-emerald-400 shrink-0" />
-                  <span className="truncate">Order History</span>
-                </Link>
+                {user.role === "delivery" ? (
+                  <Link
+                    to={user.deliveryStatus === "approved" ? "/delivery/dashboard" : "/delivery/profile"}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2 p-2 bg-emerald-900/60 hover:bg-emerald-800/80 border border-emerald-700/50 rounded-xl text-xs font-bold text-emerald-100 transition"
+                  >
+                    <Truck size={14} className="text-emerald-400 shrink-0" />
+                    <span className="truncate">Delivery Portal</span>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/my-orders"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2 p-2 bg-emerald-900/60 hover:bg-emerald-800/80 border border-emerald-700/50 rounded-xl text-xs font-bold text-emerald-100 transition"
+                  >
+                    <History size={14} className="text-emerald-400 shrink-0" />
+                    <span className="truncate">Order History</span>
+                  </Link>
+                )}
 
                 <Link
                   to="/contact"

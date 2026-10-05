@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowRight, UserCircle, CheckCircle2, Phone, Mail, Package, Headphones, History, User } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -13,6 +13,12 @@ const CompleteProfile = () => {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.role?.toLowerCase() === "delivery") {
+      navigate("/delivery/profile", { replace: true });
+    }
+  }, [user, navigate]);
 
   const isOnboarding = !user?.isProfileComplete;
   const hasExistingEmail = Boolean(user?.email && user.email.trim() !== "");
@@ -197,19 +203,29 @@ const CompleteProfile = () => {
                     ? "bg-amber-100 text-amber-800"
                     : user?.role === "admin"
                     ? "bg-purple-100 text-purple-800"
+                    : user?.role === "delivery"
+                    ? "bg-teal-100 text-teal-800"
                     : "bg-emerald-100 text-emerald-800"
                 }`}>
-                  {user?.role === "vendor" ? "🌾" : user?.role === "admin" ? "🛡️" : "🛒"}
+                  {user?.role === "vendor" ? "🌾" : user?.role === "admin" ? "🛡️" : user?.role === "delivery" ? "🚚" : "🛒"}
                 </div>
                 <div>
                   <p className="text-xs font-black text-slate-800">
-                    {user?.role === "vendor" ? "Vendor Partner" : user?.role === "admin" ? "Administrator" : "Customer"}
+                    {user?.role === "vendor"
+                      ? "Vendor Partner"
+                      : user?.role === "admin"
+                      ? "Administrator"
+                      : user?.role === "delivery"
+                      ? "Delivery Partner"
+                      : "Customer"}
                   </p>
                   <p className="text-[11px] text-slate-500 font-medium">
                     {user?.role === "vendor"
                       ? "Verified Merchant Store"
                       : user?.role === "admin"
                       ? "System Administrator"
+                      : user?.role === "delivery"
+                      ? "Active Logistics Account"
                       : "Personal Shopping Account"}
                   </p>
                 </div>
@@ -219,9 +235,11 @@ const CompleteProfile = () => {
                   ? "bg-amber-200/80 text-amber-900"
                   : user?.role === "admin"
                   ? "bg-purple-200/80 text-purple-900"
+                  : user?.role === "delivery"
+                  ? "bg-teal-200/80 text-teal-900"
                   : "bg-emerald-200/80 text-emerald-900"
               }`}>
-                {user?.role === "vendor" ? "Vendor" : user?.role === "admin" ? "Admin" : "Customer"}
+                {user?.role === "vendor" ? "Vendor" : user?.role === "admin" ? "Admin" : user?.role === "delivery" ? "Delivery" : "Customer"}
               </span>
             </div>
           </div>

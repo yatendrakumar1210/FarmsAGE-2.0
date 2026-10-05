@@ -13,6 +13,16 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
+  // Delivery partners cannot access customer protected routes
+  if (activeUser.role?.toLowerCase() === "delivery") {
+    const deliveryStatus = activeUser.deliveryStatus?.toLowerCase();
+    const destination =
+      deliveryStatus === "approved"
+        ? "/delivery/dashboard"
+        : "/delivery/profile";
+    return <Navigate to={destination} replace />;
+  }
+
   return children;
 };
 

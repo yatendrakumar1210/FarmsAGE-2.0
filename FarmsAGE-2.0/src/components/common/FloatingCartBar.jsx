@@ -2,14 +2,25 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ShoppingBag, ArrowRight, X } from "lucide-react";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 const FloatingCartBar = () => {
   const { cart } = useCart();
+  const { user } = useAuth();
   const location = useLocation();
   const [dismissed, setDismissed] = useState(false);
 
-  const hiddenRoutes = ["/cart", "/checkout", "/order-success", "/admin", "/vendor", "/login", "/register"];
+  const hiddenRoutes = [
+    "/cart",
+    "/checkout",
+    "/order-success",
+    "/admin",
+    "/vendor",
+    "/delivery",
+    "/login",
+    "/register",
+  ];
   const isHidden = hiddenRoutes.some((route) => location.pathname.startsWith(route));
 
   const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
@@ -20,7 +31,16 @@ const FloatingCartBar = () => {
     setDismissed(false);
   }, [totalQuantity]);
 
-  if (isHidden || totalQuantity === 0 || dismissed) return null;
+  if (
+    isHidden ||
+    user?.role?.toLowerCase() === "delivery" ||
+    user?.role?.toLowerCase() === "admin" ||
+    user?.role?.toLowerCase() === "vendor" ||
+    totalQuantity === 0 ||
+    dismissed
+  ) {
+    return null;
+  }
 
   return (
     <AnimatePresence>
