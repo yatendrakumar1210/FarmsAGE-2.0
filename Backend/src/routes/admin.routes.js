@@ -16,6 +16,8 @@ const {
   getCoupons,
   createCoupon,
   deleteCoupon,
+  getDeliveryPartners,
+  updateDeliveryPartnerStatus,
 } = require("../controller/admin.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
@@ -47,5 +49,9 @@ router.delete("/products/:id", deleteProduct);
 router.get("/users", getUsers);
 router.put("/users/:id/role", updateUserRole);
 router.put("/users/:id/shop-status", updateShopStatus);
+
+// Delivery partner management
+router.get("/delivery-partners", getDeliveryPartners);
+router.put("/delivery-partners/:id/status", updateDeliveryPartnerStatus);
 
 module.exports = router;

@@ -1,5 +1,22 @@
 const mongoose = require("mongoose");
 
+const vehicleDetailsSchema = new mongoose.Schema(
+  {
+    vehicleType: {
+      type: String,
+      enum: ["Bike", "Scooter", "Electric Vehicle", "Bicycle"],
+      default: "Bike",
+    },
+    vehicleNumber: {
+      type: String,
+      trim: true,
+      uppercase: true,
+      default: "",
+    },
+  },
+  { _id: false }
+);
+
 const userSchema = new mongoose.Schema(
   {
     phone: {
@@ -39,7 +56,7 @@ const userSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["user", "vendor", "admin"],
+      enum: ["user", "vendor", "admin", "delivery"],
       default: "user",
     },
 
@@ -78,6 +95,30 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["none", "pending", "approved", "rejected", "suspended"],
       default: "none",
+    },
+
+    // Delivery Partner-specific fields
+    deliveryStatus: {
+      type: String,
+      enum: ["none", "pending", "approved", "rejected", "suspended"],
+      default: "none",
+    },
+
+    isAvailable: {
+      type: Boolean,
+      default: false,
+    },
+
+    vehicleDetails: {
+      type: vehicleDetailsSchema,
+      default: undefined,
+    },
+
+    drivingLicenceNumber: {
+      type: String,
+      trim: true,
+      uppercase: true,
+      default: "",
     },
 
     isVerified: {
@@ -120,7 +161,8 @@ const userSchema = new mongoose.Schema(
   },
 );
 
-// ─── Indexes optimized for vendor discovery and role filtering ───────────
+// ─── Indexes optimized for vendor and delivery role filtering ───────────
 userSchema.index({ role: 1, shopStatus: 1 });
+userSchema.index({ role: 1, deliveryStatus: 1 });
 
 module.exports = mongoose.model("User", userSchema);

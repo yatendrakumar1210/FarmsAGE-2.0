@@ -9,6 +9,7 @@ const adminSystem = require('./routes/admin.routes');
 const addressSystem = require('./routes/address.routes');
 const productsSystem = require('./routes/products.routes');
 const vendorSystem = require('./routes/vendor.routes');
+const deliverySystem = require('./routes/delivery.routes');
 
 const app = express();
 
@@ -95,6 +96,7 @@ app.use('/api/admin', adminSystem);
 app.use('/api/address', addressSystem);
 app.use('/api/products', productsSystem);
 app.use('/api/vendor', vendorSystem);
+app.use('/api/delivery', deliverySystem);
 
 app.get('/health', (req, res) => {
   res.set('Cache-Control', 'no-store');

@@ -241,13 +241,25 @@ exports.getUsers = async (req, res) => {
 exports.updateUserRole = async (req, res) => {
   try {
     const { role } = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { role },
-      { returnDocument: "after", runValidators: true }
-    ).select("-password");
+    if (role === "delivery") {
+      return res.status(400).json({
+        message: "Cannot convert existing user to delivery partner. Delivery partners must register through the dedicated delivery registration flow.",
+      });
+    }
+
+    const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
-    res.json(user);
+
+    if (user.role === "delivery" && role !== "delivery") {
+      return res.status(400).json({ message: "Cannot convert delivery partner to other role." });
+    }
+
+    user.role = role;
+    await user.save();
+
+    const sanitized = user.toObject();
+    delete sanitized.password;
+    res.json(sanitized);
   } catch (err) {
     res.status(500).json({ message: "Failed to update user role", error: err.message });
   }
@@ -380,5 +392,81 @@ exports.deleteCoupon = async (req, res) => {
     res.json({ message: "Coupon deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: "Failed to delete coupon", error: err.message });
+  }
+};
+
+// 🚚 Get all delivery partners (Admin only)
+exports.getDeliveryPartners = async (req, res) => {
+  try {
+    const { status, isAvailable } = req.query;
+    const query = { role: "delivery" };
+
+    if (status && ["pending", "approved", "rejected", "suspended"].includes(status)) {
+      query.deliveryStatus = status;
+    }
+
+    if (isAvailable !== undefined) {
+      query.isAvailable = isAvailable === "true";
+    }
+
+    const partners = await User.find(query)
+      .select("-password")
+      .sort({ createdAt: -1 });
+
+    res.json(partners);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch delivery partners", error: err.message });
+  }
+};
+
+// 🚚 Update delivery partner status (Approve/Reject/Suspend) (Admin only)
+exports.updateDeliveryPartnerStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid delivery partner ID format" });
+    }
+
+    const validStatuses = ["pending", "approved", "rejected", "suspended"];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+      });
+    }
+
+    const partner = await User.findById(id);
+    if (!partner) {
+      return res.status(404).json({ success: false, message: "Delivery partner not found" });
+    }
+
+    // Crucial check: Target user must be a delivery partner
+    if (partner.role !== "delivery") {
+      return res.status(400).json({
+        success: false,
+        message: "Target user is not a delivery partner. Cannot update delivery status of customer or vendor.",
+      });
+    }
+
+    partner.deliveryStatus = status;
+
+    // Suspending forces isAvailable = false
+    // Reactivating/approving keeps isAvailable = false (partner must manually go online later)
+    partner.isAvailable = false;
+
+    await partner.save();
+
+    const sanitized = partner.toObject();
+    delete sanitized.password;
+
+    res.json({
+      success: true,
+      message: `Delivery partner status updated to ${status}`,
+      partner: sanitized,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update delivery partner status", error: err.message });
   }
 };

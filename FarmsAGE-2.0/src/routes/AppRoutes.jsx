@@ -32,6 +32,7 @@ const MyOrders = lazy(() => import("../Pages/MyOrders"));
 
 import AdminRoute from "./AdminRoute";
 import VendorRoute from "./VendorRoute";
+import DeliveryRoute from "./DeliveryRoute";
 import ProtectedRoute from "./ProtectedRoute";
 
 // Admin Lazy Imports
@@ -40,6 +41,11 @@ const Dashboard = lazy(() => import("../Pages/Admin/Dashboard"));
 const ManageProducts = lazy(() => import("../Pages/Admin/ManageProducts"));
 const ManageOrders = lazy(() => import("../Pages/Admin/ManageOrders"));
 const ManageUsers = lazy(() => import("../Pages/Admin/ManageUsers"));
+const ManageDeliveryPartners = lazy(() => import("../Pages/Admin/ManageDeliveryPartners"));
+
+// Delivery Partner Lazy Imports
+const DeliveryRegister = lazy(() => import("../Pages/Delivery/DeliveryRegister"));
+const DeliveryProfile = lazy(() => import("../Pages/Delivery/DeliveryProfile"));
 
 // Vendor Lazy Imports
 const VendorLayout = lazy(() => import("../Pages/Vendor/VendorLayout"));
@@ -81,6 +87,14 @@ const AppRoutes = () => {
         {/* Public Vendor Store Page */}
         <Route path="/vendor/:vendorId/store" element={<VendorStore />} />
 
+        {/* Delivery Partner Onboarding & Profile */}
+        <Route path="/delivery/register" element={<DeliveryRegister />} />
+        <Route path="/delivery/profile" element={
+          <DeliveryRoute>
+            <DeliveryProfile />
+          </DeliveryRoute>
+        } />
+
         {/* Admin Panel Routes */}
         <Route path="/admin" element={
           <AdminRoute>
@@ -92,6 +106,7 @@ const AppRoutes = () => {
           <Route path="products" element={<ManageProducts />} />
           <Route path="orders" element={<ManageOrders />} />
           <Route path="users" element={<ManageUsers />} />
+          <Route path="delivery-partners" element={<ManageDeliveryPartners />} />
         </Route>
 
         {/* Vendor Panel Routes */}

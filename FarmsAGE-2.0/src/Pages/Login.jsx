@@ -85,6 +85,8 @@ const Login = () => {
               } else {
                 navigate("/vendor/profile", { replace: true });
               }
+            } else if (role === "delivery") {
+              navigate("/delivery/profile", { replace: true });
             } else {
               const fromPath = location.state?.from || "/";
               navigate(fromPath, { replace: true });
@@ -168,6 +170,8 @@ const Login = () => {
           } else {
             navigate("/vendor/profile", { replace: true });
           }
+        } else if (role === "delivery") {
+          navigate("/delivery/profile", { replace: true });
         } else {
           const fromPath = location.state?.from || "/";
           navigate(fromPath, { replace: true });

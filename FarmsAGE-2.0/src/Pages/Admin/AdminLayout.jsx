@@ -13,6 +13,7 @@ import {
   Sparkles,
   ChevronRight,
   ShieldCheck,
+  Truck,
 } from "lucide-react";
 import logo from "../../assets/logo.jpg";
 import "./admin.css";
@@ -57,6 +58,12 @@ const AdminLayout = () => {
       label: "User Accounts",
       icon: <Users size={19} />,
       badge: null,
+    },
+    {
+      to: "/admin/delivery-partners",
+      label: "Delivery Partners",
+      icon: <Truck size={19} />,
+      badge: "Network",
     },
   ];
 
