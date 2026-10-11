@@ -5,6 +5,16 @@ const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
+export const normalizeVendorId = (vendor) => {
+  if (!vendor || vendor === "global") return "global";
+  if (typeof vendor === "object") {
+    const rawId = vendor._id || vendor.id;
+    return rawId ? String(rawId).trim() : "global";
+  }
+  const str = String(vendor).trim();
+  return str && str !== "null" && str !== "undefined" ? str : "global";
+};
+
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
     try {
@@ -55,13 +65,13 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product, selectedWeight) => {
     if (!product) return;
-    const productVendorId = product.vendorId || "global";
+    const productVendorId = normalizeVendorId(product.vendorId);
     const productId = getItemId(product);
     const weightToUse = selectedWeight || product.unit || "1 kg";
 
     // 🥡 Zomato Style: One shop at a time check
     if (cart.length > 0) {
-      const cartVendorId = cart[0].vendorId || "global";
+      const cartVendorId = normalizeVendorId(cart[0].vendorId);
       if (cartVendorId !== productVendorId) {
         const wantsToReplace = window.confirm(
           "Your cart contains items from another store. Clear cart and add this item instead?"

@@ -175,12 +175,15 @@ const ManageOrders = () => {
                   <div onClick={(e) => e.stopPropagation()}>
                     <select
                       value={order.status || "Pending"}
+                      disabled={order.status === "Delivered" || order.status === "Cancelled"}
                       onChange={(e) => updateStatus(order._id, e.target.value)}
-                      className="text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 outline-none cursor-pointer bg-slate-50 hover:bg-white transition-colors"
+                      className="text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 outline-none cursor-pointer bg-slate-50 hover:bg-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       <option value="Placed">Placed</option>
+                      <option value="Pending">Pending</option>
                       <option value="Accepted">Accepted</option>
                       <option value="Packing">Packing</option>
+                      <option value="Processing">Processing</option>
                       <option value="OutForDelivery">Out For Delivery</option>
                       <option value="Delivered">Delivered</option>
                       <option value="Cancelled">Cancelled</option>

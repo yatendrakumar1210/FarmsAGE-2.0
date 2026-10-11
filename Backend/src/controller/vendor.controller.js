@@ -88,12 +88,76 @@ exports.deleteProduct = async (req, res) => {
   }
 };
 
+// Helper to determine if an order's online payment is fully refunded
+const isFullyRefunded = (order) => {
+  if (order.paymentMethod !== "Online") return false;
+  if (order.paymentStatus === "Refunded") {
+    // If partial refund is recorded (refundAmount > 0 and refundAmount < totalAmount), it is not fully refunded
+    if (order.refundAmount > 0 && order.totalAmount > 0 && order.refundAmount < order.totalAmount) {
+      return false;
+    }
+    return true;
+  }
+  if (
+    order.refundStatus === "Processed" &&
+    order.totalAmount > 0 &&
+    order.refundAmount >= order.totalAmount
+  ) {
+    return true;
+  }
+  return false;
+};
+
+// Helper to determine if an order is unpaid online
+const isUnpaidOnline = (order) => {
+  if (order.paymentMethod !== "Online") return false;
+  return order.paymentStatus === "Pending" || order.paymentStatus === "Failed";
+};
+
+// Allowed forward preparation and cancellation transitions for vendors (sequential preparation without skipping)
+const VENDOR_ALLOWED_TRANSITIONS = {
+  Placed: ["Accepted", "Cancelled"],
+  Pending: ["Accepted", "Cancelled"],
+  Accepted: ["Packing", "Cancelled"],
+  Packing: ["Processing", "Cancelled"],
+  Processing: ["Cancelled"],
+};
+
 // ─── Vendor Orders ───
 
-// 📦 Get orders assigned to this vendor
+// 📦 Get orders assigned to this vendor (filters out abandoned/unpaid and fully refunded online orders)
 exports.getMyOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ vendorId: req.user.id })
+    const orders = await Order.find({
+      vendorId: req.user.id,
+      $or: [
+        // 1. Legitimate COD orders
+        { paymentMethod: "COD" },
+        // 2. Paid online orders (not fully refunded, including legacy orders with missing/default refund fields)
+        {
+          paymentMethod: "Online",
+          paymentStatus: "Paid",
+          $or: [
+            { refundStatus: { $ne: "Processed" } },
+            {
+              refundStatus: "Processed",
+              $expr: { $lt: [{ $ifNull: ["$refundAmount", 0] }, "$totalAmount"] },
+            },
+          ],
+        },
+        // 3. Partially refunded online orders that remain valid for fulfillment
+        {
+          paymentMethod: "Online",
+          paymentStatus: "Refunded",
+          $expr: {
+            $and: [
+              { $gt: [{ $ifNull: ["$refundAmount", 0] }, 0] },
+              { $lt: [{ $ifNull: ["$refundAmount", 0] }, "$totalAmount"] },
+            ],
+          },
+        },
+      ],
+    })
       .populate("userId", "name email phone")
       .sort({ createdAt: -1 });
     res.json(orders);
@@ -109,6 +173,16 @@ exports.updateOrderStatus = async (req, res) => {
     const order = await Order.findOne({ _id: req.params.id, vendorId: req.user.id });
     if (!order) return res.status(404).json({ message: "Order not found or access denied" });
 
+    // Block processing unpaid online orders
+    if (isUnpaidOnline(order)) {
+      return res.status(400).json({ message: "Cannot process unpaid online orders" });
+    }
+
+    // Block processing fully refunded online orders
+    if (isFullyRefunded(order)) {
+      return res.status(400).json({ message: "Cannot process fully refunded orders" });
+    }
+
     // Terminal state protection: Cancelled and Delivered are terminal
     if (order.status === "Cancelled") {
       return res.status(400).json({ message: "Order is already cancelled and cannot be changed" });
@@ -118,11 +192,30 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(400).json({ message: "Delivered orders cannot be changed" });
     }
 
-    order.status = status;
-    if (status === "Delivered" && order.paymentMethod === "COD") {
-      order.paymentStatus = "Paid";
+    // In-transit protection: OutForDelivery orders cannot be modified by vendor
+    if (order.status === "OutForDelivery") {
+      return res.status(400).json({ message: "Orders out for delivery cannot be modified by vendor" });
     }
-    
+
+    // Vendors cannot mark orders OutForDelivery or Delivered (bypassing delivery process)
+    const blockedVendorStatuses = ["OutForDelivery", "Delivered"];
+    if (blockedVendorStatuses.includes(status)) {
+      return res.status(400).json({
+        message: `Vendors cannot transition orders to '${status}'. Delivery transitions are handled by delivery partners.`,
+      });
+    }
+
+    // Validate transition based on current order status (prevent backward transitions)
+    const currentStatus = order.status || "Placed";
+    const allowedNextStatuses = VENDOR_ALLOWED_TRANSITIONS[currentStatus] || [];
+
+    if (!allowedNextStatuses.includes(status)) {
+      return res.status(400).json({
+        message: `Invalid order status transition from '${currentStatus}' to '${status}'. Allowed transitions: ${allowedNextStatuses.join(", ")}`,
+      });
+    }
+
+    order.status = status;
     await order.save();
 
     if (status === "Cancelled") {

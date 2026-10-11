@@ -69,29 +69,29 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<CustomerRoute><Home /></CustomerRoute>} />
         <Route path="/home" element={<CustomerRoute><Home /></CustomerRoute>} />
-        <Route path="/cart" element={<CustomerRoute><Cart /></CustomerRoute>} />
+        <Route path="/cart" element={<CustomerRoute customerOnly><Cart /></CustomerRoute>} />
         <Route path="/contact" element={<CustomerRoute><Contact /></CustomerRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/complete-profile" element={<CustomerRoute><CompleteProfile /></CustomerRoute>} />
+        <Route path="/complete-profile" element={<CustomerRoute customerOnly><CompleteProfile /></CustomerRoute>} />
         <Route path="/category/fruits" element={<CustomerRoute><Fruits /></CustomerRoute>} />
         <Route path="/category/vegetables" element={<CustomerRoute><Vegetables /></CustomerRoute>} />
         <Route path="/category/organic" element={<CustomerRoute><Organic /></CustomerRoute>} />
         <Route path="/category/dairy" element={<CustomerRoute><Dairy /></CustomerRoute>} />
         <Route path="/category/all" element={<CustomerRoute><AllProducts /></CustomerRoute>} />
         <Route path="/categories" element={<CustomerRoute><Navigate to="/category/all" replace /></CustomerRoute>} />
-        <Route path="/orders" element={<CustomerRoute><Navigate to="/my-orders" replace /></CustomerRoute>} />
-        <Route path="/profile" element={<CustomerRoute><Navigate to="/complete-profile" replace /></CustomerRoute>} />
+        <Route path="/orders" element={<CustomerRoute customerOnly><Navigate to="/my-orders" replace /></CustomerRoute>} />
+        <Route path="/profile" element={<CustomerRoute customerOnly><Navigate to="/complete-profile" replace /></CustomerRoute>} />
         <Route path="/checkout" element={
-          <CustomerRoute>
+          <CustomerRoute customerOnly>
             <ProtectedRoute>
               <Checkout />
             </ProtectedRoute>
           </CustomerRoute>
         } />
-        <Route path="/order-success" element={<CustomerRoute><OrderSuccess /></CustomerRoute>} />
+        <Route path="/order-success" element={<CustomerRoute customerOnly><OrderSuccess /></CustomerRoute>} />
         <Route path="/my-orders" element={
-          <CustomerRoute>
+          <CustomerRoute customerOnly>
             <ProtectedRoute>
               <MyOrders />
             </ProtectedRoute>

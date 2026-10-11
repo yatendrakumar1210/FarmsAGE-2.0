@@ -23,6 +23,16 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to={destination} replace />;
   }
 
+  // Vendors cannot access customer protected routes
+  if (activeUser.role?.toLowerCase() === "vendor") {
+    const shopStatus = activeUser.shopStatus?.toLowerCase();
+    const destination =
+      shopStatus === "approved"
+        ? "/vendor/dashboard"
+        : "/vendor/profile";
+    return <Navigate to={destination} replace />;
+  }
+
   return children;
 };
 

@@ -57,7 +57,7 @@ const VendorOrders = () => {
 
       {/* Filter Tabs */}
       <div className="vendor-product-tabs" style={{ marginBottom: "1.5rem" }}>
-        {["All", "Pending", "Processing", "OutForDelivery", "Delivered", "Cancelled"].map((s) => (
+        {["All", "Placed", "Pending", "Processing", "OutForDelivery", "Delivered", "Cancelled"].map((s) => (
           <button
             key={s}
             className={`vendor-tab-btn ${filter === s ? "active" : ""}`}
@@ -88,14 +88,31 @@ const VendorOrders = () => {
               </div>
               <select
                 className="vendor-status-select"
-                value={order.status}
+                value={order.status || "Placed"}
+                disabled={["OutForDelivery", "Delivered", "Cancelled"].includes(order.status)}
                 onChange={(e) => handleStatusChange(order._id, e.target.value)}
               >
-                <option value="Pending">Pending</option>
-                <option value="Processing">Processing</option>
-                <option value="OutForDelivery">Out For Delivery</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Cancelled">Cancelled</option>
+                <option value={order.status || "Placed"} disabled>
+                  {order.status === "Processing" ? "Processing (Ready)" : (order.status || "Placed")} (Current)
+                </option>
+                {(order.status === "Placed" || order.status === "Pending") && (
+                  <option value="Accepted">Accepted</option>
+                )}
+                {order.status === "Accepted" && (
+                  <option value="Packing">Packing</option>
+                )}
+                {order.status === "Packing" && (
+                  <option value="Processing">Processing (Ready)</option>
+                )}
+                {!["OutForDelivery", "Delivered", "Cancelled"].includes(order.status) && (
+                  <option value="Cancelled">Cancelled</option>
+                )}
+                {order.status === "OutForDelivery" && (
+                  <option value="OutForDelivery" disabled>Out For Delivery</option>
+                )}
+                {order.status === "Delivered" && (
+                  <option value="Delivered" disabled>Delivered</option>
+                )}
               </select>
             </div>
 

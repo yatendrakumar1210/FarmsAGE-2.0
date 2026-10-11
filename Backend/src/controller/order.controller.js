@@ -245,6 +245,14 @@ exports.createOrder = async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
+    // Authoritative customer role enforcement: only customer accounts (role === "user") can place orders
+    if (user.role !== "user") {
+      return res.status(403).json({
+        success: false,
+        message: "Only customer accounts can place orders. Admin, vendor, and delivery accounts cannot place customer orders.",
+      });
+    }
+
     // Validate delivery address BEFORE Razorpay order or DB order creation
     const sanitizedAddress = validateDeliveryAddress(deliveryAddress || user.defaultAddress);
 
@@ -665,6 +673,14 @@ exports.codOrder = async (req, res) => {
 
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    // Authoritative customer role enforcement: only customer accounts (role === "user") can place orders
+    if (user.role !== "user") {
+      return res.status(403).json({
+        success: false,
+        message: "Only customer accounts can place orders. Admin, vendor, and delivery accounts cannot place customer orders.",
+      });
+    }
 
     // Validate delivery address BEFORE modifying stock or creating order
     const sanitizedAddress = validateDeliveryAddress(deliveryAddress || user.defaultAddress);
